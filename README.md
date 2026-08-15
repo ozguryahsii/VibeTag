@@ -165,7 +165,7 @@ alttan yükselir, gradient yavaşça sürüklenir. Hepsi
 üzerine çizer — önizleme ile indirilen PNG birebir aynıdır.
 
 - Story `1080×1920`, Kare `1080×1080`, Geniş `1600×900`
-- 4 tema: Sunset / Ember / Aura / Cream
+- 4 tema: Auto / Glow / Calm / Aura — Auto tonu skora göre seçer
 - Skoru gizleme seçeneği (sadece etiketlerle paylaşım)
 - `navigator.share` varsa doğrudan paylaşım sayfası, yoksa PNG indirme
 

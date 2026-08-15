@@ -1,4 +1,4 @@
-import { iconFor, type IconDef } from "@/lib/icons";
+import { iconFor, traitIconFor, type IconDef } from "@/lib/icons";
 
 export function TagIcon({
   tagKey,
@@ -12,6 +12,27 @@ export function TagIcon({
   strokeWidth?: number;
 }) {
   return <IconGlyph def={iconFor(tagKey)} size={size} color={color} strokeWidth={strokeWidth} />;
+}
+
+export function TraitIcon({
+  traitKey,
+  size = 16,
+  color = "currentColor",
+  strokeWidth = 1.9,
+}: {
+  traitKey: string;
+  size?: number;
+  color?: string;
+  strokeWidth?: number;
+}) {
+  return (
+    <IconGlyph
+      def={traitIconFor(traitKey)}
+      size={size}
+      color={color}
+      strokeWidth={strokeWidth}
+    />
+  );
 }
 
 export function IconGlyph({

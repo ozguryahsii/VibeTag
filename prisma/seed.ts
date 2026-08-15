@@ -270,7 +270,7 @@ async function main() {
       ratedUserId: ozgur.id,
       raterUserId: ozgurRaters[i].id,
       relationship: mix[i % mix.length],
-      bias: 0.5,
+      bias: 0.42,
       withComment: i % 4 === 0,
       ageDays: 3 + i * 4,
       hideIdentity: i === 5,

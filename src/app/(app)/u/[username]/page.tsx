@@ -7,6 +7,7 @@ import { cooldownDaysLeft } from "@/lib/rating-rules";
 import { earnedBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
 import { CONTEXT_GROUPS, RELATIONSHIPS } from "@/lib/taxonomy";
+import { TraitIcon } from "@/components/Icon";
 import { ScoreDial } from "@/components/ScoreDial";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
@@ -138,8 +139,9 @@ export default async function PublicProfile({
               {profile.traits.slice(0, 5).map((t) => (
                 <div key={t.key}>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[13.5px] font-bold">
-                      {t.emoji} {t.label}
+                    <span className="text-[13.5px] font-bold inline-flex items-center gap-2">
+                      <TraitIcon traitKey={t.key} color="#FF8A3D" />
+                      {t.label}
                     </span>
                     <span className="text-[13px] font-black tabular-nums grad-text">
                       {t.score}

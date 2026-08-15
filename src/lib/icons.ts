@@ -103,6 +103,21 @@ export const ICONS: Record<string, IconDef> = {
     ],
   },
   check: { circles: [[12, 12, 8.8]], paths: ["M8.3 12.2 11 14.9l5-5.4"] },
+  scales: {
+    paths: [
+      "M12 4.2v15.6",
+      "M6.4 7.4h11.2",
+      "M6.4 7.4 3.4 13.6h6z",
+      "M17.6 7.4l-3 6.2h6z",
+      "M8 20.4h8",
+    ],
+  },
+  leaf: {
+    paths: [
+      "M20.4 4.2C20.4 12.8 15.6 17.4 9 17.4a5.6 5.6 0 0 1 0-11.2c4 0 7.6-.6 11.4-2z",
+      "M4.4 20.4C6.8 15 11.2 11.4 16.6 9.6",
+    ],
+  },
 
   /** The brand mark itself, in the same 24-box as everything else. */
   fingerprint: {
@@ -138,6 +153,34 @@ export const TAG_ICON: Record<string, keyof typeof ICONS> = {
   generous: "gift",
   calm: "wave",
 };
+
+/** Traits get icons from the same set, so the app never mixes vocabularies. */
+export const TRAIT_ICON: Record<string, keyof typeof ICONS> = {
+  reliability: "check",
+  communication: "message",
+  kindness: "heart",
+  helpfulness: "heartHands",
+  professionalism: "briefcase",
+  responsibility: "shieldCheck",
+  teamwork: "users",
+  problemSolving: "bulb",
+  diligence: "target",
+  leadership: "crown",
+  punctuality: "clock",
+  honesty: "shield",
+  empathy: "heartHands",
+  supportiveness: "gift",
+  funToBeAround: "smile",
+  creativity: "sparkle",
+  workQuality: "sparkle",
+  fairness: "scales",
+  respect: "leaf",
+  positivity: "bolt",
+};
+
+export function traitIconFor(traitKey: string): IconDef {
+  return ICONS[TRAIT_ICON[traitKey] ?? "check"];
+}
 
 export function iconFor(tagKey: string): IconDef {
   return ICONS[TAG_ICON[tagKey] ?? "sparkle"];

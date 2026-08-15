@@ -5,6 +5,7 @@ import { getVibeProfile } from "@/lib/profile";
 import { generateVibeSummary } from "@/lib/insights";
 import { growthAreas, strongestTraits } from "@/lib/vibe";
 import { RELATIONSHIPS, TRAITS, VIBE_TAGS } from "@/lib/taxonomy";
+import { TraitIcon } from "@/components/Icon";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -161,8 +162,9 @@ export default async function InsightsPage() {
                     {strong.map((t) => (
                       <div key={t.key}>
                         <div className="flex justify-between text-[13px] font-bold mb-1">
-                          <span>
-                            {t.emoji} {t.en}
+                          <span className="inline-flex items-center gap-2">
+                            <TraitIcon traitKey={t.key} color="#FF8A3D" />
+                            {t.en}
                           </span>
                           <span className="tabular-nums grad-text font-black">
                             {t.score}
@@ -186,8 +188,9 @@ export default async function InsightsPage() {
                       {growth.map((t) => (
                         <div key={t.key}>
                           <div className="flex justify-between text-[13px] font-bold mb-1">
-                            <span>
-                              {t.emoji} {t.en}
+                            <span className="inline-flex items-center gap-2">
+                              <TraitIcon traitKey={t.key} color="#8B5CF6" />
+                              {t.en}
                             </span>
                             <span className="tabular-nums text-purple font-black">
                               {t.score}

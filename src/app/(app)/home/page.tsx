@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { getPercentile, getVibeProfile } from "@/lib/profile";
 import { computeBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
+import { TraitIcon } from "@/components/Icon";
 import { ScoreDial } from "@/components/ScoreDial";
 import { Avatar, Button, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
@@ -122,8 +123,9 @@ export default async function HomePage() {
             {profile.traits.slice(0, 4).map((t) => (
               <div key={t.key}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[13.5px] font-bold">
-                    {t.emoji} {t.label}
+                  <span className="text-[13.5px] font-bold inline-flex items-center gap-2">
+                    <TraitIcon traitKey={t.key} color="#FF8A3D" />
+                    {t.label}
                   </span>
                   <span className="text-[13px] font-black tabular-nums grad-text">
                     {t.score}

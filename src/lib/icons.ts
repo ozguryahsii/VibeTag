@@ -119,6 +119,34 @@ export const ICONS: Record<string, IconDef> = {
     ],
   },
 
+  chart: {
+    paths: ["M4.4 20.2v-6.4", "M12 20.2V4.6", "M19.6 20.2v-9.6", "M2.4 20.2h19.2"],
+  },
+  plus: { paths: ["M12 5.4v13.2", "M5.4 12h13.2"] },
+  store: {
+    paths: [
+      "M3.4 9.4 5 4.4h14l1.6 5",
+      "M4.6 9.4h14.8v9.8a1.4 1.4 0 0 1-1.4 1.4H6a1.4 1.4 0 0 1-1.4-1.4z",
+      "M9.6 20.6v-5.4h4.8v5.4",
+    ],
+  },
+  wrench: {
+    paths: [
+      "M15.4 3.4a5.4 5.4 0 0 0-6.1 6.9l-6 6 2.4 2.4 6-6a5.4 5.4 0 0 0 6.9-6.1l-3.1 3.1-2.7-.5-.5-2.7z",
+    ],
+  },
+  laptop: {
+    paths: ["M5.4 5.6h13.2v9.8H5.4z", "M2.8 18.4h18.4", "M9.8 18.4h4.4"],
+  },
+  globe: {
+    circles: [[12, 12, 9]],
+    paths: ["M3.2 12h17.6", "M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z"],
+  },
+  userCircle: {
+    circles: [[12, 12, 9], [12, 9.6, 3.1]],
+    paths: ["M5.6 19.4c1.1-2.6 3.5-4 6.4-4s5.3 1.4 6.4 4"],
+  },
+
   /** The brand mark itself, in the same 24-box as everything else. */
   fingerprint: {
     paths: [
@@ -178,10 +206,46 @@ export const TRAIT_ICON: Record<string, keyof typeof ICONS> = {
   positivity: "bolt",
 };
 
+/** Relationship contexts share the vocabulary too. */
+export const RELATIONSHIP_ICON: Record<string, keyof typeof ICONS> = {
+  sameCompany: "briefcase",
+  wasMyManager: "crown",
+  wasMyEmployee: "users",
+  sameProject: "target",
+  wasMyClient: "scales",
+  closeFriend: "heart",
+  friend: "smile",
+  socialCircle: "sparkle",
+  familyCircle: "heartHands",
+  knowAsSeller: "store",
+  knowAsCustomer: "gift",
+  receivedService: "check",
+  providedService: "wrench",
+  online: "laptop",
+  community: "globe",
+  other: "plus",
+};
+
+export const GROUP_ICON: Record<string, keyof typeof ICONS> = {
+  PROFESSIONAL: "briefcase",
+  SOCIAL: "users",
+  COMMERCE: "store",
+  OTHER: "globe",
+};
+
+export function relationshipIconFor(key: string): IconDef {
+  return ICONS[RELATIONSHIP_ICON[key] ?? "plus"];
+}
+
+export function groupIconFor(key: string): IconDef {
+  return ICONS[GROUP_ICON[key] ?? "globe"];
+}
+
 export function traitIconFor(traitKey: string): IconDef {
   return ICONS[TRAIT_ICON[traitKey] ?? "check"];
 }
 
-export function iconFor(tagKey: string): IconDef {
-  return ICONS[TAG_ICON[tagKey] ?? "sparkle"];
+/** Accepts a Vibe Tag key or a raw icon name (badges pass the latter). */
+export function iconFor(key: string): IconDef {
+  return ICONS[TAG_ICON[key] ?? key] ?? ICONS.sparkle;
 }

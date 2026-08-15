@@ -7,7 +7,8 @@ import { cooldownDaysLeft } from "@/lib/rating-rules";
 import { earnedBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
 import { CONTEXT_GROUPS, RELATIONSHIPS } from "@/lib/taxonomy";
-import { TraitIcon } from "@/components/Icon";
+import { groupIconFor } from "@/lib/icons";
+import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ScoreDial } from "@/components/ScoreDial";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
@@ -124,7 +125,7 @@ export default async function PublicProfile({
                 {badges.map((b) => (
                   <TagPill
                     key={b.key}
-                    emoji={b.emoji}
+                    tagKey={b.icon}
                     label={b.label}
                     tone="purple"
                   />
@@ -158,7 +159,9 @@ export default async function PublicProfile({
             <Card className="grid gap-3">
               {profile.groups.map((g) => (
                 <div key={g.group} className="flex items-center gap-3">
-                  <span className="text-lg w-6">{CONTEXT_GROUPS[g.group].emoji}</span>
+                  <span className="w-6 grid place-items-center">
+                    <IconGlyph def={groupIconFor(g.group)} size={18} color="#FF8A3D" />
+                  </span>
                   <div className="flex-1">
                     <div className="flex justify-between text-[12.5px] font-bold mb-1">
                       <span>{g.label}</span>

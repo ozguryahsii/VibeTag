@@ -17,6 +17,8 @@ import {
   type RelationshipKey,
 } from "@/lib/taxonomy";
 import { Avatar } from "@/components/ui";
+import { IconGlyph, TagIcon, TraitIcon } from "@/components/Icon";
+import { groupIconFor, relationshipIconFor } from "@/lib/icons";
 
 const SCORE_WORDS = ["", "Zayıf", "İdare eder", "İyi", "Çok iyi", "Mükemmel"];
 const DEFAULT_SCORE = 4;
@@ -210,7 +212,7 @@ export function RateFlow({
               {GROUP_ORDER.map((g) => (
                 <div key={g}>
                   <div className="flex items-center gap-2 mb-2.5 px-1">
-                    <span>{CONTEXT_GROUPS[g].emoji}</span>
+                    <IconGlyph def={groupIconFor(g)} size={16} color="#FF8A3D" />
                     <span className="text-[13px] font-extrabold">
                       {CONTEXT_GROUPS[g].label}
                     </span>
@@ -237,7 +239,11 @@ export function RateFlow({
                               : undefined,
                           }}
                         >
-                          <div className="text-[18px]">{r.emoji}</div>
+                          <IconGlyph
+                            def={relationshipIconFor(r.key)}
+                            size={20}
+                            color={active ? "#FF5C77" : "#8C8177"}
+                          />
                           <div className="text-[13px] font-bold leading-tight mt-1.5">
                             {r.label}
                           </div>
@@ -271,8 +277,9 @@ export function RateFlow({
                 return (
                   <div key={t.key} className="card p-4">
                     <div className="flex items-baseline justify-between">
-                      <span className="text-[14px] font-extrabold">
-                        {t.emoji} {t.label}
+                      <span className="text-[14px] font-extrabold inline-flex items-center gap-2">
+                        <TraitIcon traitKey={t.key} color="#FF8A3D" size={17} />
+                        {t.label}
                       </span>
                       <span className="text-[12px] font-bold text-orange">
                         {v ? SCORE_WORDS[v] : "—"}
@@ -343,7 +350,7 @@ export function RateFlow({
                     type="button"
                     disabled={full}
                     onClick={() => toggleTag(t.key)}
-                    className="rounded-full px-4 py-2.5 text-[13px] font-bold transition-transform active:scale-95 disabled:opacity-35"
+                    className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-bold transition-transform active:scale-95 disabled:opacity-35"
                     style={
                       active
                         ? {
@@ -360,7 +367,8 @@ export function RateFlow({
                           }
                     }
                   >
-                    {t.emoji} {t.en}
+                    <TagIcon tagKey={t.key} size={15} />
+                    {t.en}
                   </button>
                 );
               })}

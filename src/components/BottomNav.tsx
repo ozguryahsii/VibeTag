@@ -2,15 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ICONS } from "@/lib/icons";
+import { IconGlyph } from "@/components/Icon";
 
-type Tab = { href: string; label: string; icon: string; center?: boolean };
+type Tab = {
+  href: string;
+  label: string;
+  icon: keyof typeof ICONS;
+  center?: boolean;
+};
 
 const TABS: Tab[] = [
-  { href: "/home", label: "My Vibe", icon: "✨" },
-  { href: "/people", label: "Kişiler", icon: "🫂" },
-  { href: "/rate", label: "Değerlendir", icon: "＋", center: true },
-  { href: "/insights", label: "Insights", icon: "📊" },
-  { href: "/settings", label: "Profil", icon: "⚙️" },
+  { href: "/home", label: "My Vibe", icon: "fingerprint" },
+  { href: "/people", label: "Kişiler", icon: "users" },
+  { href: "/rate", label: "Değerlendir", icon: "plus", center: true },
+  { href: "/insights", label: "Insights", icon: "chart" },
+  { href: "/settings", label: "Profil", icon: "userCircle" },
 ];
 
 export function BottomNav() {
@@ -41,9 +48,9 @@ export function BottomNav() {
                     key={t.href}
                     href={t.href}
                     aria-label={t.label}
-                    className="grid place-items-center w-13 h-13 rounded-full grad-score text-white text-2xl font-bold shadow-[0_10px_26px_rgba(255,92,119,0.45)] active:scale-95 transition-transform -mt-6"
+                    className="grid place-items-center w-13 h-13 rounded-full grad-score text-white shadow-[0_10px_26px_rgba(255,92,119,0.45)] active:scale-95 transition-transform -mt-6"
                   >
-                    {t.icon}
+                    <IconGlyph def={ICONS[t.icon]} size={24} color="#fff" strokeWidth={2.4} />
                   </Link>
                 );
               }
@@ -58,7 +65,12 @@ export function BottomNav() {
                     background: active ? "#FFF0E8" : "transparent",
                   }}
                 >
-                  <span className="text-[17px] leading-none">{t.icon}</span>
+                  <IconGlyph
+                    def={ICONS[t.icon]}
+                    size={19}
+                    color={active ? "#FF5C77" : "#8C8177"}
+                    strokeWidth={active ? 2.1 : 1.8}
+                  />
                   <span className="text-[10px] font-bold leading-none">
                     {t.label}
                   </span>

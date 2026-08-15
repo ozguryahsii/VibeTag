@@ -23,6 +23,12 @@ import {
 const PRIOR_SCORE = 78;
 /** How many "virtual" ratings the prior is worth. */
 const PRIOR_STRENGTH = 4;
+/**
+ * Per-trait prior. Without it a trait that only three people were ever in a
+ * position to judge shows a flat 100, which reads as broken rather than
+ * flattering — and it is not something the raw data actually supports.
+ */
+const TRAIT_PRIOR_STRENGTH = 3;
 
 export type RatingInput = {
   id: string;
@@ -133,7 +139,10 @@ export function buildVibeProfile(ratings: RatingInput[]): VibeProfile {
       label: TRAITS[key].label,
       en: TRAITS[key].en,
       emoji: TRAITS[key].emoji,
-      score: Math.round(toHundred(v.ws / v.w)),
+      score: Math.round(
+        (toHundred(v.ws / v.w) * v.w + PRIOR_SCORE * TRAIT_PRIOR_STRENGTH) /
+          (v.w + TRAIT_PRIOR_STRENGTH),
+      ),
       count: v.n,
     }))
     .sort((a, b) => b.score - a.score || b.count - a.count);

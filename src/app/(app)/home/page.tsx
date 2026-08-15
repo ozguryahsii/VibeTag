@@ -3,7 +3,8 @@ import { requireUser } from "@/lib/auth";
 import { getPercentile, getVibeProfile } from "@/lib/profile";
 import { computeBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
-import { TraitIcon } from "@/components/Icon";
+import { IconGlyph, TraitIcon } from "@/components/Icon";
+import { ICONS } from "@/lib/icons";
 import { ScoreDial } from "@/components/ScoreDial";
 import { Avatar, Button, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
@@ -148,7 +149,9 @@ export default async function HomePage() {
               className="card shrink-0 w-[132px] p-3.5 text-center"
               style={{ opacity: b.earned ? 1 : 0.55 }}
             >
-              <div className="text-2xl">{b.emoji}</div>
+              <div className="grid place-items-center h-7">
+                <IconGlyph def={ICONS[b.icon]} size={24} color="#FF7A4D" strokeWidth={1.8} />
+              </div>
               <div className="text-[12.5px] font-extrabold mt-1.5 leading-tight">
                 {b.label}
               </div>

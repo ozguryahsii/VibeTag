@@ -4,7 +4,8 @@ export type Badge = {
   key: string;
   label: string;
   tr: string;
-  emoji: string;
+  /** Key into the shared line-icon set. */
+  icon: string;
   description: string;
   earned: boolean;
   /** 0..1 — how close the user is to earning it. */
@@ -31,42 +32,42 @@ export function computeBadges(profile: VibeProfile): Badge[] {
       key: "trustedPerson",
       label: "Trusted Person",
       tr: "Güven Veren",
-      emoji: "🛡️",
+      icon: "shieldCheck",
       description: "Güvenilirlik puanı 90+ ve en az 8 değerlendirme",
     },
     {
       key: "goodEnergy",
       label: "Good Energy",
       tr: "İyi Enerji",
-      emoji: "🔥",
+      icon: "bolt",
       description: "Pozitif enerji puanı 90+ veya 10+ kişiden enerji etiketi",
     },
     {
       key: "teamPlayer",
       label: "Team Player",
       tr: "Takım Oyuncusu",
-      emoji: "🧩",
+      icon: "users",
       description: "Takım çalışması puanı 88+ ve en az 5 iş değerlendirmesi",
     },
     {
       key: "communityFavorite",
       label: "Community Favorite",
       tr: "Topluluk Favorisi",
-      emoji: "🌟",
+      icon: "crown",
       description: "25+ kişi tarafından değerlendirildi, skor 88+",
     },
     {
       key: "kindHeart",
       label: "Kind Heart",
       tr: "İyi Kalp",
-      emoji: "❤️",
+      icon: "heart",
       description: "Kibarlık puanı 92+",
     },
     {
       key: "manyWorlds",
       label: "Many Worlds",
       tr: "Çok Yönlü",
-      emoji: "🌍",
+      icon: "leaf",
       description: "En az 3 farklı sosyal çevreden değerlendirildi",
     },
   ];

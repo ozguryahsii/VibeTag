@@ -5,7 +5,8 @@ import { getVibeProfile } from "@/lib/profile";
 import { generateVibeSummary } from "@/lib/insights";
 import { growthAreas, strongestTraits } from "@/lib/vibe";
 import { RELATIONSHIPS, TRAITS, VIBE_TAGS } from "@/lib/taxonomy";
-import { TraitIcon } from "@/components/Icon";
+import { groupIconFor } from "@/lib/icons";
+import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -127,8 +128,9 @@ export default async function InsightsPage() {
               {profile.groups.map((g) => (
                 <div key={g.group}>
                   <div className="flex justify-between text-[13px] font-bold mb-1.5">
-                    <span>
-                      {g.emoji} {g.label}
+                    <span className="inline-flex items-center gap-2">
+                      <IconGlyph def={groupIconFor(g.group)} size={16} color="#FF8A3D" />
+                      {g.label}
                     </span>
                     <span className="tabular-nums text-muted">
                       %{Math.round(g.share * 100)}
@@ -241,7 +243,7 @@ export default async function InsightsPage() {
                                 {d.raterUser.name}
                               </Link>
                               <p className="text-[11.5px] text-muted">
-                                {rel.emoji} {rel.label}
+                                {rel.label}
                               </p>
                             </div>
                           </>
@@ -255,7 +257,7 @@ export default async function InsightsPage() {
                                 Anonim
                               </p>
                               <p className="text-[11.5px] text-muted">
-                                {rel.emoji} {rel.label}
+                                {rel.label}
                               </p>
                             </div>
                           </>

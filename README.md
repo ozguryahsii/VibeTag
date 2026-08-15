@@ -135,13 +135,23 @@ Tüm token'lar `src/app/globals.css` içinde tek yerde tanımlı.
 | Çizgi              | `#F0E5DD`                                 |
 | Kart yarıçapı      | `24px`                                    |
 | Gölge              | `0 10px 40px rgba(255,138,61,0.12)`       |
-| Font               | Inter (400–900), `next/font` ile self-host |
+| Başlık/gövde fontu | Inter (400–900), `next/font` ile self-host |
+| Editöryel font     | DM Serif Display — isim ve Vibe Score      |
 
 Gradientler: skor `#FF8A3D → #FF5C77`, kart `#FF9A3D → #FF5C77 → #FF7AA2`,
 premium `#FF8A3D → #8B5CF6`.
 
 Logo **Vibe Fingerprint** (`src/components/Logo.tsx`): parmak izi çizgileri +
 içinde V, turuncu→mercan→mor geçişiyle.
+
+**İkonlar** (`src/lib/icons.ts`): 24×24 kutuda, ince çizgili tek bir set.
+Aynı kaynak hem React'te (`<TagIcon>`, `<TraitIcon>`) hem Vibe Card canvas'ında
+(`Path2D`) kullanılır — emoji yok, çünkü emoji markanın ortasına başka birinin
+sanat yönetimini taşıyor ve iki ekranda aynı kriter farklı görünüyordu.
+
+**Avatar** (`src/components/Avatar.tsx`): yüklenen fotoğraf, yoksa kişinin kendi
+gradientinde monogram. Fotoğraf cihazda 512px kareye küçültülüp JPEG olarak
+gönderilir.
 
 Animasyonlar: skor 0'dan sayarak açılır (`ScoreDial`, easeOutExpo), kartlar
 alttan yükselir, gradient yavaşça sürüklenir. Hepsi
@@ -204,6 +214,7 @@ npm run db:reset   # sıfırla + şema + demo verisi
 Konseptte tanımlı olup bu MVP'de yer almayanlar:
 
 - Davet akışı (link/QR ile çevre daveti)
+- Fotoğrafların object storage'a (R2/S3) taşınması — şu an data URL
 - Push bildirimleri ("3 yeni kişi seni değerlendirdi")
 - Gerçek ödeme entegrasyonu
 - Sahte oy tespitinin periyodik toplu yeniden hesaplaması

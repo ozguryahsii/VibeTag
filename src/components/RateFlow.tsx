@@ -444,7 +444,15 @@ export function RateFlow({
           )}
 
           {step < 3 ? (
+            /*
+             * The key matters. Without it React reconciles this button and the
+             * submit button below as the same DOM node and merely patches
+             * `type` — so advancing from step 2 flipped the live node to
+             * type="submit" mid-click, and the browser's default action then
+             * submitted the form, skipping the comment step entirely.
+             */
             <button
+              key="advance"
               type="button"
               disabled={
                 (step === 0 && !relationship) ||
@@ -466,6 +474,7 @@ export function RateFlow({
             </button>
           ) : (
             <button
+              key="submit"
               type="submit"
               disabled={pending || locked}
               className="flex-1 h-13 rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)] active:scale-[0.98] transition-transform disabled:opacity-40"

@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
+import { claimInviteFor, inviteByCode, readInviteCookie } from "@/lib/invite";
 import {
   createSession,
   destroySession,
@@ -68,7 +69,11 @@ export async function registerAction(
   });
 
   await createSession(user.id);
-  redirect("/home");
+
+  // Honour the link that brought them in: land straight on the rating flow
+  // for whoever invited them, which is the whole point of the invite.
+  const inviter = await claimInviteFor(user.id);
+  redirect(inviter ? `/rate/${inviter}` : "/home");
 }
 
 export async function loginAction(
@@ -86,6 +91,14 @@ export async function loginAction(
   }
 
   await createSession(user.id);
+
+  const code = await readInviteCookie();
+  if (code) {
+    const invite = await inviteByCode(code);
+    if (invite && invite.inviterId !== user.id) {
+      redirect(`/rate/${invite.inviter.username}`);
+    }
+  }
   redirect("/home");
 }
 

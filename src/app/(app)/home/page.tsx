@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
+import { unreadCount } from "@/lib/notifications";
 import { getPercentile, getVibeProfile } from "@/lib/profile";
 import { computeBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
@@ -23,6 +24,7 @@ export default async function HomePage() {
   const badges = computeBadges(profile);
   const earned = badges.filter((b) => b.earned);
   const summary = generateVibeSummary(profile, user.name.split(" ")[0]);
+  const unread = await unreadCount(user.id);
 
   return (
     <main className="px-5 pt-12">
@@ -34,10 +36,32 @@ export default async function HomePage() {
             {user.name.split(" ")[0]} 👋
           </h1>
         </div>
-        <Link href="/settings" aria-label="Profil">
-          <Avatar name={user.name}
-          url={user.avatarUrl} color={user.avatarColor} size={46} ring />
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/notifications"
+            aria-label="Bildirimler"
+            className="relative w-11 h-11 grid place-items-center rounded-full bg-warmwhite border border-line"
+          >
+            <IconGlyph def={ICONS.bell} size={19} color="#6B6B6B" />
+            {unread > 0 && (
+              <span
+                className="absolute -top-1 -right-1 min-w-5 h-5 px-1.5 grid place-items-center rounded-full grad-score text-white text-[10px] font-black"
+                style={{ boxShadow: "0 0 0 2.5px #FAF7F2" }}
+              >
+                {unread > 9 ? "9+" : unread}
+              </span>
+            )}
+          </Link>
+          <Link href="/settings" aria-label="Profil">
+            <Avatar
+              name={user.name}
+              url={user.avatarUrl}
+              color={user.avatarColor}
+              size={46}
+              ring
+            />
+          </Link>
+        </div>
       </header>
 
       {/* score hero */}
@@ -77,7 +101,7 @@ export default async function HomePage() {
             emoji="🌱"
             title="Vibe profilin henüz boş"
             body="Seni tanıyan birkaç kişiyi davet et. İlk değerlendirmeler geldiğinde burada sende gördükleri özellikler belirecek."
-            action={<Button href="/people">Kişileri gör</Button>}
+            action={<Button href="/invite">Çevreni davet et</Button>}
           />
         ) : (
           <Card className="flex flex-wrap gap-2">
@@ -165,6 +189,28 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {profile.ratingCount > 0 && profile.ratingCount < 10 && (
+        <section className="mt-6 reveal">
+          <Link href="/invite" className="block">
+            <Card className="flex items-center gap-3.5">
+              <span className="w-10 h-10 shrink-0 grid place-items-center rounded-full grad-score">
+                <IconGlyph def={ICONS.users} size={19} color="#fff" />
+              </span>
+              <span className="flex-1">
+                <span className="block text-[13.5px] font-extrabold">
+                  Profilini güçlendir
+                </span>
+                <span className="block text-[12px] text-muted leading-relaxed">
+                  Farklı çevrelerden {10 - profile.ratingCount} kişi daha,
+                  profilini belirgin şekilde gerçekçi kılar.
+                </span>
+              </span>
+              <span className="text-orange font-bold text-[18px]">→</span>
+            </Card>
+          </Link>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="mt-6 mb-2 reveal" style={{ animationDelay: "380ms" }}>

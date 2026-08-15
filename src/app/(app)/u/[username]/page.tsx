@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
+import { toggleBlockAction } from "@/lib/actions/safety";
+import { ReportDialog } from "@/components/ReportDialog";
 import { prisma } from "@/lib/db";
 import { getMyRatingOf, getPercentile, getUserByUsername, getVibeProfile } from "@/lib/profile";
 import { cooldownDaysLeft } from "@/lib/rating-rules";
@@ -30,6 +32,15 @@ export default async function PublicProfile({
   const summary = generateVibeSummary(profile, user.name.split(" ")[0]);
   const existing = isMe ? null : await getMyRatingOf(me.id, user.id);
   const daysLeft = existing ? cooldownDaysLeft(existing.lastUpdatedAt) : 0;
+
+  const blockedByMe = isMe
+    ? null
+    : await prisma.block.findUnique({
+        where: {
+          blockerId_blockedId: { blockerId: me.id, blockedId: user.id },
+        },
+        select: { id: true },
+      });
 
   // Anonymous wall — comments are never attributed to a person here,
   // no matter who is looking (§9).
@@ -71,7 +82,26 @@ export default async function PublicProfile({
         </p>
       </section>
 
-      {!isMe && (
+      {!isMe && blockedByMe && (
+        <div className="mt-5 card p-4 text-center">
+          <p className="text-[13.5px] font-bold">Bu kişiyi engelledin</p>
+          <p className="text-[12.5px] text-muted mt-1 leading-relaxed">
+            Sana yeni değerlendirme yapamaz ve mevcut değerlendirmesini
+            güncelleyemez.
+          </p>
+          <form action={toggleBlockAction} className="mt-3">
+            <input type="hidden" name="username" value={user.username} />
+            <button
+              type="submit"
+              className="h-11 px-6 rounded-full bg-white border border-line text-[13.5px] font-bold"
+            >
+              Engeli kaldır
+            </button>
+          </form>
+        </div>
+      )}
+
+      {!isMe && !blockedByMe && (
         <div className="mt-5">
           {existing && daysLeft > 0 ? (
             <div className="card p-4 text-center">
@@ -92,6 +122,19 @@ export default async function PublicProfile({
                 : `${user.name.split(" ")[0]}’i değerlendir`}
             </Link>
           )}
+
+          <div className="mt-3 flex items-center justify-center gap-4">
+            <ReportDialog username={user.username} label="Bu profili bildir" compact />
+            <form action={toggleBlockAction}>
+              <input type="hidden" name="username" value={user.username} />
+              <button
+                type="submit"
+                className="text-[11.5px] font-bold text-muted underline underline-offset-2"
+              >
+                Engelle
+              </button>
+            </form>
+          </div>
         </div>
       )}
 

@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { logoutAction, setPlanAction } from "@/lib/actions/auth";
+import { setRatingPolicyAction, toggleBlockAction } from "@/lib/actions/safety";
 import { ProfileEditor } from "@/components/ProfileEditor";
+import { DeleteAccount } from "@/components/DeleteAccount";
+import { Avatar } from "@/components/Avatar";
 import { Card, SectionTitle } from "@/components/ui";
 
 const PLANS = [
@@ -36,8 +40,21 @@ const PLANS = [
   },
 ] as const;
 
+export const dynamic = "force-dynamic";
+
 export default async function SettingsPage() {
   const user = await requireUser();
+
+  const blocks = await prisma.block.findMany({
+    where: { blockerId: user.id },
+    select: {
+      id: true,
+      blocked: {
+        select: { name: true, username: true, avatarUrl: true, avatarColor: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
     <main className="px-5 pt-12">
@@ -46,18 +63,24 @@ export default async function SettingsPage() {
         @{user.username} · {user.email}
       </p>
 
-      <div className="mt-5 grid grid-cols-2 gap-2.5">
+      <div className="mt-5 grid grid-cols-3 gap-2.5">
         <Link
           href={`/u/${user.username}`}
-          className="card !py-4 text-center text-[13.5px] font-bold"
+          className="card !py-4 text-center text-[12.5px] font-bold"
         >
-          👀 Profilim
+          Profilim
         </Link>
         <Link
           href="/card"
-          className="card !py-4 text-center text-[13.5px] font-bold"
+          className="card !py-4 text-center text-[12.5px] font-bold"
         >
-          🪪 Vibe Card
+          Vibe Card
+        </Link>
+        <Link
+          href="/invite"
+          className="card !py-4 text-center text-[12.5px] font-bold"
+        >
+          Davet et
         </Link>
       </div>
 
@@ -138,25 +161,109 @@ export default async function SettingsPage() {
       </div>
 
       <div className="mt-7">
-        <SectionTitle>Gizlilik</SectionTitle>
+        <SectionTitle>Gizlilik ve güvenlik</SectionTitle>
+
         <Card className="grid gap-3">
+          <div>
+            <p className="text-[13.5px] font-extrabold">
+              Seni kimler değerlendirebilir?
+            </p>
+            <p className="text-[12px] text-muted leading-relaxed mt-0.5">
+              Kapalı moda geçersen yalnızca senin davet linkinle katılmış
+              kişiler değerlendirme yapabilir.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2.5">
+            {[
+              { key: "EVERYONE", label: "Herkes", hint: "Açık profil" },
+              { key: "INVITED", label: "Davet ettiklerim", hint: "Kapalı çevre" },
+            ].map((opt) => {
+              const active = user.ratingPolicy === opt.key;
+              return (
+                <form key={opt.key} action={setRatingPolicyAction}>
+                  <input type="hidden" name="ratingPolicy" value={opt.key} />
+                  <button
+                    type="submit"
+                    className={`w-full rounded-[20px] p-3.5 text-left ${
+                      active ? "grad-ring" : "bg-cream border border-line"
+                    }`}
+                  >
+                    <span className="block text-[13px] font-bold">
+                      {opt.label}
+                    </span>
+                    <span className="block text-[11px] text-muted mt-0.5">
+                      {opt.hint}
+                    </span>
+                  </button>
+                </form>
+              );
+            })}
+          </div>
+        </Card>
+
+        <Card className="grid gap-3 mt-2.5">
           {[
-            ["🕶️", "Tüm oylar anonimdir", "Kimin ne yazdığı profilinde asla görünmez."],
-            ["🔒", "Korunan değerlendirmeler", "Şüpheli görülen oyların kimliği Gold üyelikte de gizli kalır."],
-            ["📝", "Güncelleme geçmişi", "Bir değerlendirme güncellendiğinde eski sürümü kayıt altına alınır."],
-            ["🎯", "Bağlam kilidi", "Kimse seni tanımadığı bir alanda değerlendiremez."],
-          ].map(([e, t, d]) => (
-            <div key={t} className="flex gap-3">
-              <span className="text-lg">{e}</span>
-              <span>
-                <span className="block text-[13px] font-bold">{t}</span>
-                <span className="block text-[12px] text-muted leading-relaxed">
-                  {d}
-                </span>
+            ["Tüm oylar anonimdir", "Kimin ne yazdığı profilinde asla görünmez."],
+            ["Korunan değerlendirmeler", "Şüpheli görülen oyların kimliği Gold üyelikte de gizli kalır."],
+            ["Güncelleme geçmişi", "Bir değerlendirme güncellendiğinde eski sürümü kayıt altına alınır."],
+            ["Bağlam kilidi", "Kimse seni tanımadığı bir alanda değerlendiremez."],
+            ["Engelleme", "Engellediğin kişi yeni değerlendirme yapamaz. Mevcut değerlendirmesi silinmez — aksi hâlde engelleme, düşük puanları temizleme aracına dönerdi. Haksız bulduğun değerlendirmeyi bildirebilirsin."],
+          ].map(([t, d]) => (
+            <div key={t}>
+              <span className="block text-[13px] font-bold">{t}</span>
+              <span className="block text-[12px] text-muted leading-relaxed mt-0.5">
+                {d}
               </span>
             </div>
           ))}
         </Card>
+      </div>
+
+      <div className="mt-7">
+        <SectionTitle>Engellediklerin</SectionTitle>
+        {blocks.length === 0 ? (
+          <Card className="!py-5 text-center">
+            <p className="text-[13px] text-muted">
+              Kimseyi engellemedin.
+            </p>
+          </Card>
+        ) : (
+          <div className="grid gap-2.5">
+            {blocks.map((b) => (
+              <Card key={b.id} className="flex items-center gap-3.5 !py-3.5">
+                <Avatar
+                  name={b.blocked.name}
+                  url={b.blocked.avatarUrl}
+                  color={b.blocked.avatarColor}
+                  size={40}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[13.5px] font-extrabold truncate">
+                    {b.blocked.name}
+                  </p>
+                  <p className="text-[11.5px] text-muted">@{b.blocked.username}</p>
+                </div>
+                <form action={toggleBlockAction}>
+                  <input type="hidden" name="username" value={b.blocked.username} />
+                  <button
+                    type="submit"
+                    className="text-[12px] font-bold text-orange rounded-full px-3.5 py-2 bg-tagbg border border-orange/20"
+                  >
+                    Kaldır
+                  </button>
+                </form>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-7">
+        <SectionTitle>Hesap</SectionTitle>
+        <div className="grid gap-2.5">
+          <DeleteAccount username={user.username} />
+        </div>
       </div>
 
       <form action={logoutAction} className="mt-6 mb-2">

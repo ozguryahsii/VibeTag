@@ -7,6 +7,7 @@ import { growthAreas, strongestTraits } from "@/lib/vibe";
 import { RELATIONSHIPS, TRAITS, VIBE_TAGS } from "@/lib/taxonomy";
 import { groupIconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
+import { ReportDialog } from "@/components/ReportDialog";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -306,6 +307,14 @@ export default async function InsightsPage() {
                           “{d.comment}”
                         </p>
                       )}
+
+                      <div className="mt-3 flex justify-end">
+                        <ReportDialog
+                          ratingId={d.id}
+                          label="Bu değerlendirmeyi bildir"
+                          compact
+                        />
+                      </div>
 
                       {isGold && (d.isProtected || d.hideIdentity) && (
                         <p className="mt-3 text-[11.5px] text-muted bg-cream rounded-xl px-3 py-2">

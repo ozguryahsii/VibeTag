@@ -142,6 +142,11 @@ function score(bias: number): number {
 
 async function main() {
   console.log("→ temizleniyor");
+  await prisma.report.deleteMany();
+  await prisma.block.deleteMany();
+  await prisma.notification.deleteMany();
+  await prisma.inviteClaim.deleteMany();
+  await prisma.invite.deleteMany();
   await prisma.ratingRevision.deleteMany();
   await prisma.ratingTrait.deleteMany();
   await prisma.ratingVibeTag.deleteMany();
@@ -335,6 +340,50 @@ async function main() {
       });
     }
   }
+
+  console.log("→ davetler ve bildirimler");
+  const invite = await prisma.invite.create({
+    data: {
+      code: "ozgurvibe",
+      inviterId: ozgur.id,
+      label: "Kişisel davet linkim",
+    },
+  });
+  for (const u of others.slice(0, 6)) {
+    await prisma.inviteClaim.create({
+      data: { inviteId: invite.id, userId: u.id },
+    });
+  }
+
+  await prisma.notification.createMany({
+    data: [
+      {
+        userId: ozgur.id,
+        type: "NEW_RATING",
+        title: "Yeni bir değerlendirme aldın ✨",
+        body: "Biri seni değerlendirdi. My Vibe profilin güncellendi.",
+        href: "/home",
+        createdAt: daysAgo(1),
+      },
+      {
+        userId: ozgur.id,
+        type: "INVITE_JOINED",
+        title: "Davetin kabul edildi 🎉",
+        body: "Davet ettiğin biri Vibe Tag'e katıldı.",
+        href: "/invite",
+        createdAt: daysAgo(3),
+      },
+      {
+        userId: ozgur.id,
+        type: "BADGE_EARNED",
+        title: "Yeni rozet: Community Favorite",
+        body: "25+ kişi seni değerlendirdi ve skorun 88'in üzerinde.",
+        href: "/home",
+        createdAt: daysAgo(9),
+        readAt: daysAgo(8),
+      },
+    ],
+  });
 
   const [users, ratings] = await Promise.all([
     prisma.user.count(),

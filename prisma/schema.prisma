@@ -32,12 +32,24 @@ model User {
   // Trust signals used by fake-rating detection.
   isVerified Boolean @default(false)
 
+  /// Who may rate this person: EVERYONE | INVITED (only people who came in
+  /// through one of their invite links).
+  ratingPolicy String @default("EVERYONE")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   sessions        Session[]
   ratingsReceived Rating[]  @relation("RatingsReceived")
   ratingsGiven    Rating[]  @relation("RatingsGiven")
+
+  invites       Invite[]
+  inviteClaim   InviteClaim?
+  notifications Notification[]
+  blocksMade    Block[]        @relation("BlocksMade")
+  blocksAgainst Block[]        @relation("BlocksAgainst")
+  reportsFiled  Report[]       @relation("ReportsFiled")
+  reportsAbout  Report[]       @relation("ReportsAbout")
 
   @@index([createdAt])
 }
@@ -130,5 +142,95 @@ model RatingRevision {
   snapshot  String // JSON: { relationship, comment, traits, vibeTags }
   createdAt DateTime @default(now())
 
+  @@index([ratingId])
+}
+
+// --------------------------------------------------------------- growth
+
+/// An invite link. A person can hold several (one per circle, say), which is
+/// what makes "only people I invited may rate me" a usable privacy setting.
+model Invite {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  label     String?
+  inviterId String
+  inviter   User     @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  claims InviteClaim[]
+
+  @@index([inviterId])
+}
+
+/// Who came in through which link. One claim per user — an account has
+/// exactly one origin, which also gives the fraud detector a signal.
+model InviteClaim {
+  id        String   @id @default(cuid())
+  inviteId  String
+  invite    Invite   @relation(fields: [inviteId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([inviteId])
+}
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// NEW_RATING | RATING_UPDATED | INVITE_JOINED | BADGE_EARNED
+  type  String
+  title String
+  body  String?
+  href  String?
+
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// --------------------------------------------------------------- safety
+
+/// Blocking stops *future* ratings and updates. Ratings already given stay
+/// counted on purpose: if blocking erased them, the block button would be a
+/// score-washing tool — you would just block everyone who rated you honestly.
+model Block {
+  id        String   @id @default(cuid())
+  blockerId String
+  blocker   User     @relation("BlocksMade", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockedId String
+  blocked   User     @relation("BlocksAgainst", fields: [blockedId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+  @@index([blockedId])
+}
+
+/// A report can name a rating without ever naming its author — the reporter
+/// does not know who wrote it, and reporting must not reveal that.
+model Report {
+  id         String @id @default(cuid())
+  reporterId String
+  reporter   User   @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  /// The rating being disputed, when the report is about one.
+  ratingId String?
+
+  /// The person being reported, when the report is about an account.
+  reportedUserId String?
+  reportedUser   User?   @relation("ReportsAbout", fields: [reportedUserId], references: [id], onDelete: SetNull)
+
+  /// UNFAIR | ABUSIVE | FAKE | SPAM | OTHER
+  reason String
+  note   String?
+
+  /// OPEN | REVIEWING | ACTIONED | DISMISSED
+  status    String   @default("OPEN")
+  createdAt DateTime @default(now())
+
+  @@index([status, createdAt])
   @@index([ratingId])
 }

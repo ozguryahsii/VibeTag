@@ -45,7 +45,10 @@ Planı uygulama içinden **Profil → Üyelik** ekranından anında değiştireb
 | Public profile   | `/u/[username]`    | Skor, etiketler, çevre dağılımı, anonim notlar              |
 | Vibe Insights    | `/insights`        | Premium analiz (Silver) + kimlik görünümü (Gold)            |
 | Vibe Card        | `/card`            | Story / kare / geniş formatta gerçek PNG üretimi            |
-| Profil & Üyelik  | `/settings`        | Avatar, bio, plan, gizlilik açıklamaları                    |
+| Davet            | `/invite`          | Kişisel davet linki, QR, paylaşım ve katılım sayısı         |
+| Davet karşılama  | `/i/[code]`        | Public — davet edenin profiliyle açılır                     |
+| Bildirimler      | `/notifications`   | Yeni değerlendirme, davet kabulü, rozet                     |
+| Profil & Üyelik  | `/settings`        | Avatar, bio, plan, gizlilik, engellenenler, hesap silme     |
 
 ---
 
@@ -98,7 +101,38 @@ alınır. Bakılan sinyaller: çok yeni hesap, itibar geçmişi olmayan değerle
 kısa sürede oy patlaması, karşılıklı tam puan alışverişi, herkese aynı tekdüze
 puanı veren profil.
 
-### 6. Skor — `src/lib/vibe.ts`
+### 6. Davet — `src/lib/invite.ts`
+
+Uygulamanın tek kapısı davet linki. Kimse yabancıları gezinerek bulmuyor;
+sizi tanıyan biri link veriyor, o da zaten değerlendirme akışının sorduğu
+ilişkinin ta kendisi.
+
+Link açıldığında kod bir çereze yazılır; kayıt tamamlanınca `InviteClaim`
+oluşur ve kullanıcı doğrudan davet edenin değerlendirme akışına düşer. Bir
+hesabın tek bir kökeni olur — bu aynı zamanda sahte hesap tespiti için sinyal.
+
+### 7. Engelleme ve bildirme — `src/lib/actions/safety.ts`
+
+**Engelleme geçmişi silmez.** Engellenen kişi yeni değerlendirme yapamaz ve
+mevcut değerlendirmesini güncelleyemez, ama verdiği puan sayılmaya devam eder.
+Aksi hâlde engelleme tuşu skor temizleme aracına dönerdi: düşük puan vereni
+engelle, puanın yükselsin. Haksız bulunan değerlendirme için doğru yol
+bildirmek.
+
+**Bildirme kimlik açmaz.** Bir değerlendirmeyi yalnızca hakkında olan kişi
+bildirebilir; sistem ona yazarın kim olduğunu söylemez, yazara da bildirildiğini
+söylemez. İkisi de aracı ya kimlik ifşasına ya da misillemeye çevirirdi.
+
+**Yorum filtresi** (`src/lib/moderation.ts`) hakaret, iletişim bilgisi ve bağlantı
+içeren notları gönderim anında reddeder. Bir kelime listesi taban seviyedir,
+çözüm değil — asıl ağ bildir düğmesi ve insan incelemesidir.
+
+### 8. Gizlilik ayarı
+
+`ratingPolicy = INVITED` seçildiğinde yalnızca kullanıcının kendi davet linkiyle
+katılmış kişiler değerlendirme yapabilir.
+
+### 9. Skor — `src/lib/vibe.ts`
 
 Ağırlıklı ortalama, 78 puanlık nötr bir öncüle doğru Bayes çekmesiyle
 yumuşatılır (`PRIOR_STRENGTH = 4`). Böylece 2 kişiden 5 alan biri 100'e
@@ -213,9 +247,11 @@ npm run db:reset   # sıfırla + şema + demo verisi
 
 Konseptte tanımlı olup bu MVP'de yer almayanlar:
 
-- Davet akışı (link/QR ile çevre daveti)
 - Fotoğrafların object storage'a (R2/S3) taşınması — şu an data URL
-- Push bildirimleri ("3 yeni kişi seni değerlendirdi")
+- Push bildirimleri (şu an yalnızca uygulama içi bildirim var)
+- Rapor kuyruğu için moderasyon paneli — `Report` kayıtları yazılıyor ama
+  inceleyecek bir arayüz henüz yok
+- Otomatik testler
 - Gerçek ödeme entegrasyonu
 - Sahte oy tespitinin periyodik toplu yeniden hesaplaması
 - Freelancer / işe alım güven profili görünümleri

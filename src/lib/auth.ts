@@ -62,6 +62,7 @@ export type SessionUser = {
   avatarColor: string;
   plan: Plan;
   isVerified: boolean;
+  ratingPolicy: string;
 };
 
 export type Plan = "FREE" | "SILVER" | "GOLD";
@@ -89,6 +90,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     avatarColor: u.avatarColor,
     plan: u.plan as Plan,
     isVerified: u.isVerified,
+    ratingPolicy: u.ratingPolicy,
   };
 });
 

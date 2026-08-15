@@ -1,0 +1,116 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth";
+import { inviteByCode } from "@/lib/invite";
+import { getVibeProfile } from "@/lib/profile";
+import { Avatar } from "@/components/Avatar";
+import { Wordmark } from "@/components/Logo";
+import { TagPill } from "@/components/ui";
+
+/**
+ * The front door. Someone you know sent you here, so the page leads with
+ * *them* — not with a product pitch and not with a signup wall.
+ */
+export default async function InvitePage({
+  params,
+}: {
+  params: Promise<{ code: string }>;
+}) {
+  const { code } = await params;
+  const invite = await inviteByCode(code);
+  if (!invite) notFound();
+
+  // The invite cookie is set by the middleware on the way in.
+  const me = await getCurrentUser();
+  const inviter = invite.inviter;
+  const profile = await getVibeProfile(inviter.id);
+  const isSelf = me?.id === inviter.id;
+
+  return (
+    <main className="min-h-dvh flex flex-col px-6 pt-14 pb-10">
+      <Wordmark size={20} />
+
+      <div className="mt-12 text-center pop">
+        <Avatar
+          name={inviter.name}
+          url={inviter.avatarUrl}
+          color={inviter.avatarColor}
+          size={92}
+          ring
+        />
+        <h1 className="mt-5 text-[27px] font-black tracking-[-0.03em] leading-tight">
+          {inviter.name.split(" ")[0]} senden bir
+          <br />
+          <span className="grad-text">Vibe</span> bekliyor
+        </h1>
+        <p className="mt-3 text-[14.5px] text-muted leading-relaxed max-w-[20rem] mx-auto">
+          Onu nereden tanıdığını seç, sadece o ilişkide gözlemlediğin şeyleri
+          değerlendir. Cevabın <b className="text-ink">anonim</b> kalır.
+        </p>
+      </div>
+
+      {profile.tags.length > 0 && (
+        <div className="mt-7 reveal">
+          <p className="text-[12px] font-bold text-muted text-center mb-2.5">
+            İnsanlar {inviter.name.split(" ")[0]} için diyor ki
+          </p>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {profile.tags.slice(0, 4).map((t) => (
+              <TagPill key={t.key} tagKey={t.key} label={t.en} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="mt-8 grid gap-2.5 reveal">
+        {[
+          "Tanışıklığını seçmeden değerlendiremezsin",
+          "Kimin ne yazdığı asla görünmez",
+          "Bir kişiyi yalnızca bir kez değerlendirirsin",
+        ].map((line) => (
+          <div
+            key={line}
+            className="card !py-3.5 flex items-center gap-3 text-[13px] font-semibold"
+          >
+            <span className="text-orange">✓</span>
+            {line}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-auto pt-8 grid gap-3">
+        {isSelf ? (
+          <p className="text-center text-[13.5px] text-muted">
+            Bu senin kendi davet linkin — paylaşmak için{" "}
+            <Link href="/invite" className="font-bold text-orange">
+              Davet ekranına
+            </Link>{" "}
+            git.
+          </p>
+        ) : me ? (
+          <Link
+            href={`/rate/${inviter.username}`}
+            className="h-13 grid place-items-center rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)]"
+          >
+            {inviter.name.split(" ")[0]}’i değerlendir
+          </Link>
+        ) : (
+          <>
+            <Link
+              href="/register"
+              className="h-13 grid place-items-center rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)]"
+            >
+              Başla ve değerlendir
+            </Link>
+            <Link
+              href="/login"
+              className="text-center text-[14px] font-bold text-muted py-2"
+            >
+              Zaten hesabım var
+            </Link>
+          </>
+        )}
+      </div>
+    </main>
+  );
+}

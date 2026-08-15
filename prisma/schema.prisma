@@ -1,0 +1,134 @@
+// Vibe Tag — Social Reputation & Human Identity Platform
+//
+// Dev uses SQLite for zero-setup. The schema is written to be
+// PostgreSQL-compatible: switch `provider` to "postgresql" and the
+// same models apply (JSON columns are stored as text for portability).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------- users
+
+model User {
+  id           String  @id @default(cuid())
+  email        String  @unique
+  username     String  @unique
+  name         String
+  passwordHash String
+  bio          String?
+  /// Uploaded profile photo (data URL in dev; object-storage URL in prod).
+  avatarUrl    String?
+  avatarColor  String  @default("#FF8A3D")
+
+  // FREE | SILVER (Vibe Insights) | GOLD (Vibe Identity)
+  plan String @default("FREE")
+
+  // Trust signals used by fake-rating detection.
+  isVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions        Session[]
+  ratingsReceived Rating[]  @relation("RatingsReceived")
+  ratingsGiven    Rating[]  @relation("RatingsGiven")
+
+  @@index([createdAt])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// -------------------------------------------------------------- ratings
+
+/// One rater may hold exactly one rating per rated user (see @@unique).
+/// Updates are allowed but throttled to one per 30 days and every version
+/// is archived in RatingRevision.
+model Rating {
+  id String @id @default(cuid())
+
+  ratedUserId String
+  ratedUser   User   @relation("RatingsReceived", fields: [ratedUserId], references: [id], onDelete: Cascade)
+
+  raterUserId String
+  raterUser   User   @relation("RatingsGiven", fields: [raterUserId], references: [id], onDelete: Cascade)
+
+  /// Relationship key from lib/taxonomy.ts — mandatory, drives which
+  /// traits and vibe tags the rater is allowed to submit.
+  relationship String
+
+  comment String?
+
+  /// The rater may hide their identity even from Gold members (§15).
+  hideIdentity Boolean @default(false)
+
+  /// Set by the fake-rating detector; protected ratings are never
+  /// attributed to a person in the UI, on any plan.
+  isProtected Boolean @default(false)
+  fraudFlags  String  @default("[]") // JSON array of flag keys
+  weight      Float   @default(1.0)  // 0..1, dampens suspicious ratings
+
+  updateCount   Int       @default(0)
+  lastUpdatedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  traits    RatingTrait[]
+  vibeTags  RatingVibeTag[]
+  revisions RatingRevision[]
+
+  @@unique([ratedUserId, raterUserId])
+  @@index([ratedUserId])
+  @@index([raterUserId])
+  @@index([createdAt])
+}
+
+model RatingTrait {
+  id       String @id @default(cuid())
+  ratingId String
+  rating   Rating @relation(fields: [ratingId], references: [id], onDelete: Cascade)
+  traitKey String
+  score    Int // 1..5
+
+  @@unique([ratingId, traitKey])
+  @@index([traitKey])
+}
+
+model RatingVibeTag {
+  id       String @id @default(cuid())
+  ratingId String
+  rating   Rating @relation(fields: [ratingId], references: [id], onDelete: Cascade)
+  tagKey   String
+
+  @@unique([ratingId, tagKey])
+  @@index([tagKey])
+}
+
+/// Immutable audit trail: a full snapshot of the rating as it was
+/// *before* each update.
+model RatingRevision {
+  id       String @id @default(cuid())
+  ratingId String
+  rating   Rating @relation(fields: [ratingId], references: [id], onDelete: Cascade)
+
+  version   Int
+  snapshot  String // JSON: { relationship, comment, traits, vibeTags }
+  createdAt DateTime @default(now())
+
+  @@index([ratingId])
+}

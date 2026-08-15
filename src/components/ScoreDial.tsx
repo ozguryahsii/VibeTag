@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * The Vibe Score hero: a gradient arc that fills while the number counts
- * up from 0. Spotify-Wrapped style reveal — the moment the app is built
- * around, so it gets its own easing and a one-time shine sweep.
+ * The editorial Vibe Score reveal. The approved card treats the score as a
+ * story, not a dashboard gauge: a quiet number at the low end, subtle rays
+ * and warm colour at the celebratory end.
  */
 export function ScoreDial({
   score,
@@ -32,7 +32,6 @@ export function ScoreDial({
 
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / duration);
-      // easeOutExpo
       const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
       setShown(Math.round(eased * score));
       if (t < 1) raf.current = requestAnimationFrame(tick);
@@ -43,68 +42,98 @@ export function ScoreDial({
     };
   }, [score]);
 
-  const stroke = 16;
-  const r = (size - stroke) / 2;
-  const c = 2 * Math.PI * r;
-  const sweep = 0.78; // 280° arc, open at the bottom
-  const arc = c * sweep;
-  const progress = (shown / 100) * arc;
+  const celebratory = score >= 85;
+  const calm = score < 72;
+  const accent = calm ? "#A67A3D" : "#F05262";
 
   return (
     <div
-      className="relative grid place-items-center"
-      style={{ width: size, height: size }}
+      className="relative grid place-items-center text-center"
+      style={{ width: size, height: size, maxWidth: "100%" }}
+      aria-label={`${label}: ${score}`}
     >
-      <svg
-        width={size}
-        height={size}
-        className="absolute inset-0 -rotate-[234deg]"
-        aria-hidden
-      >
-        <defs>
-          <linearGradient id="dial" x1="0" y1="0" x2={size} y2={size}>
-            <stop offset="0%" stopColor="#FF8A3D" />
-            <stop offset="100%" stopColor="#FF5C77" />
-          </linearGradient>
-        </defs>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke="#F0E5DD"
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeDasharray={`${arc} ${c}`}
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke="url(#dial)"
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeDasharray={`${progress} ${c}`}
-        />
-      </svg>
+      {celebratory && (
+        <svg
+          viewBox="0 0 236 236"
+          className="absolute inset-0 h-full w-full overflow-visible"
+          aria-hidden="true"
+        >
+          <g
+            fill="none"
+            strokeLinecap="round"
+            strokeWidth="2.2"
+            opacity="0.54"
+          >
+            <path d="M34 114H8M42 84 18 71M58 59 40 37M82 43 72 20M202 114h26M194 84l24-13M178 59l18-22M154 43l10-23" stroke="#F1A33E" />
+            <path d="M39 135 14 141M47 101 23 95M197 101l22-6M198 135l24 6M58 178l-18 21M178 178l18 21" stroke="#ED5B62" />
+          </g>
+          <g fill="#F2A03F" opacity="0.66">
+            <circle cx="24" cy="163" r="2" />
+            <circle cx="211" cy="162" r="2.2" />
+            <circle cx="47" cy="51" r="1.7" />
+            <circle cx="191" cy="51" r="1.7" />
+          </g>
+          <g fill="#F05262" opacity="0.62">
+            <circle cx="18" cy="124" r="1.7" />
+            <circle cx="219" cy="124" r="1.7" />
+            <circle cx="73" cy="29" r="1.4" />
+            <circle cx="165" cy="29" r="1.4" />
+          </g>
+        </svg>
+      )}
 
-      <div className="relative text-center">
-        <div className="text-[11px] font-extrabold tracking-[0.22em] text-muted mb-1">
+      <div className="relative z-10 flex flex-col items-center">
+        <div
+          className="font-semibold text-muted"
+          style={{
+            fontSize: Math.max(10, size * 0.047),
+            letterSpacing: "0.34em",
+            lineHeight: 1,
+            paddingLeft: "0.34em",
+          }}
+        >
           MY VIBE
         </div>
         <div
-          className="font-black leading-none grad-text tabular-nums"
-          style={{ fontSize: size * 0.36, letterSpacing: "-0.04em" }}
+          className={calm ? "tabular-nums" : "grad-text tabular-nums"}
+          style={{
+            marginTop: size * 0.035,
+            color: calm ? "#4C3D33" : undefined,
+            fontFamily: "var(--font-score)",
+            fontSize: size * 0.4,
+            fontWeight: 400,
+            lineHeight: 0.8,
+            letterSpacing: "-0.055em",
+            paddingRight: "0.045em",
+          }}
         >
           {shown}
         </div>
-        <div className="text-[11px] font-extrabold tracking-[0.2em] text-muted mt-2">
+        <div
+          className={calm ? "font-semibold text-muted" : "font-semibold text-coral"}
+          style={{
+            marginTop: size * 0.055,
+            fontSize: Math.max(10, size * 0.047),
+            letterSpacing: "0.28em",
+            lineHeight: 1,
+            paddingLeft: "0.28em",
+          }}
+        >
           {label}
         </div>
         {caption && (
-          <div className="text-[12px] font-semibold text-orange mt-1.5">
-            {caption}
+          <div
+            className="mt-3 inline-flex items-center justify-center gap-2 font-medium"
+            style={{ color: accent, fontSize: Math.max(12, size * 0.053) }}
+          >
+            <span
+              className="inline-grid place-items-center rounded-full border"
+              style={{ width: 24, height: 24, borderColor: accent }}
+              aria-hidden="true"
+            >
+              {celebratory ? "★" : "↗"}
+            </span>
+            <span>{caption}</span>
           </div>
         )}
       </div>

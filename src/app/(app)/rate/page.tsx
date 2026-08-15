@@ -34,8 +34,9 @@ export default async function RatePickerPage() {
   const rated = users.filter((u) => mineMap.has(u.id));
 
   return (
-    <main className="px-5 pt-12">
-      <h1 className="text-[26px] font-black tracking-[-0.02em]">
+    <main className="px-5 pt-10">
+      <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">LEAVE A VIBE</p>
+      <h1 className="vt-page-title text-[31px] tracking-[-0.02em] leading-[1.08]">
         Kimi değerlendireceksin?
       </h1>
       <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
@@ -47,15 +48,15 @@ export default async function RatePickerPage() {
         <SectionTitle>Henüz değerlendirmedin</SectionTitle>
         {fresh.length === 0 ? (
           <EmptyState
-            emoji="✅"
+            emoji="✓"
             title="Herkesi değerlendirdin"
             body="Çevrendeki yeni kişiler katıldığında burada görünecekler."
           />
         ) : (
           <div className="grid gap-2.5">
             {fresh.map((u) => (
-              <Link key={u.id} href={`/rate/${u.username}`}>
-                <Card className="flex items-center gap-3.5 !py-3.5">
+              <Link key={u.id} href={`/rate/${u.username}`} className="block min-w-0">
+                <Card className="min-w-0 flex items-center gap-3.5 !py-3.5">
                   <Avatar name={u.name}
                     url={u.avatarUrl} color={u.avatarColor} size={46} />
                   <div className="min-w-0 flex-1">
@@ -66,7 +67,7 @@ export default async function RatePickerPage() {
                       {u.bio ?? `@${u.username}`}
                     </p>
                   </div>
-                  <span className="text-[12px] font-bold text-white grad-score rounded-full px-4 py-2">
+                  <span className="shrink-0 text-[12px] font-bold text-white grad-score rounded-full px-4 py-2">
                     Değerlendir
                   </span>
                 </Card>
@@ -84,8 +85,8 @@ export default async function RatePickerPage() {
               const r = mineMap.get(u.id)!;
               const days = cooldownDaysLeft(r.lastUpdatedAt);
               return (
-                <Link key={u.id} href={`/rate/${u.username}`}>
-                  <Card className="flex items-center gap-3.5 !py-3.5 opacity-90">
+                <Link key={u.id} href={`/rate/${u.username}`} className="block min-w-0">
+                  <Card className="min-w-0 flex items-center gap-3.5 !py-3.5 opacity-90">
                     <Avatar
                       name={u.name}
                     url={u.avatarUrl}
@@ -104,14 +105,14 @@ export default async function RatePickerPage() {
                       </p>
                     </div>
                     <span
-                      className="text-[11.5px] font-bold rounded-full px-3 py-1.5"
+                      className="shrink-0 text-[11.5px] font-bold rounded-full px-3 py-1.5"
                       style={{
                         color: days > 0 ? "#6B6B6B" : "#FF8A3D",
                         background: days > 0 ? "#F5F0EA" : "#FFF0E8",
                         border: `1px solid ${days > 0 ? "#E9E1D9" : "#FFE3D2"}`,
                       }}
                     >
-                      {days > 0 ? "🔒 Kilitli" : "Güncelle"}
+                      {days > 0 ? "Kilitli" : "Güncelle"}
                     </span>
                   </Card>
                 </Link>

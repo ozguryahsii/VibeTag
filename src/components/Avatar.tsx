@@ -33,10 +33,10 @@ export function Avatar({
     borderRadius: size,
     flexShrink: 0,
     boxShadow: ring
-      ? `0 0 0 ${Math.max(2, size * 0.045)}px #fff, 0 6px 20px ${color}33`
+      ? `0 0 0 ${Math.max(2, size * 0.045)}px #fff, 0 0 0 ${Math.max(3.5, size * 0.075)}px rgba(239,118,72,.62), 0 7px 20px rgba(83,60,40,.13)`
       : undefined,
-    outline: ring ? `1.5px solid ${color}66` : `1px solid ${color}26`,
-    outlineOffset: ring ? Math.max(2, size * 0.045) - 1.5 : 0,
+    outline: ring ? "none" : `1px solid ${color}26`,
+    outlineOffset: 0,
   };
 
   if (url) {
@@ -91,7 +91,7 @@ export function AnonStack({
   const tints = [
     ["#FFD3B0", "#FFB98A"],
     ["#FFC1CE", "#FFA5B8"],
-    ["#E4D6FF", "#CFC0FF"],
+    ["#E8DCC9", "#C8B79E"],
   ];
   return (
     <span className="inline-flex" style={{ paddingLeft: size * 0.25 }}>

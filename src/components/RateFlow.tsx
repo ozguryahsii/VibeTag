@@ -117,7 +117,7 @@ export function RateFlow({
   const allScored = traits.every((t) => scores[t.key] !== undefined);
 
   return (
-    <main className="px-5 pt-12 pb-6">
+    <main className="px-5 pt-10 pb-6">
       {/* target header */}
       <header className="flex items-center gap-3.5 reveal">
         <Avatar
@@ -129,7 +129,7 @@ export function RateFlow({
         />
         <div className="min-w-0">
           <p className="text-[12px] font-bold text-muted">Değerlendiriyorsun</p>
-          <h1 className="text-[20px] font-black tracking-[-0.02em] truncate">
+          <h1 className="vt-page-title text-[22px] tracking-[-0.02em] truncate">
             {target.name}
           </h1>
         </div>
@@ -142,18 +142,18 @@ export function RateFlow({
       </header>
 
       {/* progress */}
-      <div className="mt-5 flex gap-1.5">
+      <div className="mt-6 flex gap-1.5" aria-label={`Adım ${step + 1} / 4`}>
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-1.5 flex-1 rounded-full transition-colors"
+            className="h-1 flex-1 rounded-full transition-colors"
             style={{ background: i <= step ? "#FF8A3D" : "#F0E5DD" }}
           />
         ))}
       </div>
 
       {locked && (
-        <div className="mt-5 rounded-2xl border border-orange/25 bg-tagbg px-4 py-3">
+        <div className="mt-5 rounded-[20px] border border-orange/25 bg-tagbg px-4 py-3.5">
           <p className="text-[13px] font-bold text-orange">
             Bu kişiyi zaten değerlendirdin.
           </p>
@@ -166,7 +166,7 @@ export function RateFlow({
       )}
 
       {existing && !locked && (
-        <div className="mt-5 rounded-2xl border border-line bg-warmwhite px-4 py-3">
+        <div className="mt-5 rounded-[20px] border border-line bg-warmwhite px-4 py-3.5 shadow-[0_10px_30px_rgba(93,58,42,0.04)]">
           <p className="text-[13px] font-bold">Değerlendirmeni güncelliyorsun</p>
           <p className="text-[12.5px] text-muted mt-0.5">
             Önceki cevapların yüklendi. Eski sürüm kayıt altına alınır.
@@ -200,7 +200,8 @@ export function RateFlow({
         {/* ---------------------------------------------- step 0 */}
         {step === 0 && (
           <section className="mt-6 reveal">
-            <h2 className="text-[24px] font-black leading-tight tracking-[-0.02em]">
+            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">CONTEXT</p>
+            <h2 className="vt-page-title text-[28px] leading-[1.08] tracking-[-0.02em]">
               {target.name.split(" ")[0]}’i nereden tanıyorsun?
             </h2>
             <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
@@ -228,7 +229,7 @@ export function RateFlow({
                           key={r.key}
                           type="button"
                           onClick={() => chooseRelationship(r.key)}
-                          className={`text-left rounded-[20px] p-3.5 transition-transform active:scale-[0.97] ${
+                          className={`text-left rounded-[22px] p-4 transition-transform active:scale-[0.97] ${
                             active
                               ? "grad-ring"
                               : "bg-warmwhite border border-line"
@@ -263,7 +264,8 @@ export function RateFlow({
         {/* ---------------------------------------------- step 1 */}
         {step === 1 && relationship && (
           <section className="mt-6 reveal">
-            <h2 className="text-[24px] font-black leading-tight tracking-[-0.02em]">
+            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">TRAITS</p>
+            <h2 className="vt-page-title text-[28px] leading-[1.08] tracking-[-0.02em]">
               Bu deneyimde nasıldı?
             </h2>
             <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
@@ -275,7 +277,7 @@ export function RateFlow({
               {traits.map((t) => {
                 const v = scores[t.key];
                 return (
-                  <div key={t.key} className="card p-4">
+                  <div key={t.key} className="card p-4.5">
                     <div className="flex items-baseline justify-between">
                       <span className="text-[14px] font-extrabold inline-flex items-center gap-2">
                         <TraitIcon traitKey={t.key} color="#FF8A3D" size={17} />
@@ -320,7 +322,7 @@ export function RateFlow({
 
             <div className="mt-4 rounded-2xl bg-tagbg border border-orange/15 px-4 py-3">
               <p className="text-[12px] text-orange font-semibold leading-relaxed">
-                🔒 Bu bağlamda liderlik, arkadaşlık ya da özel hayat gibi
+                Bu bağlamda liderlik, arkadaşlık ya da özel hayat gibi
                 alanlar sorulmuyor — çünkü bunları gözlemleyecek bir ilişkiniz
                 yok.
               </p>
@@ -331,7 +333,8 @@ export function RateFlow({
         {/* ---------------------------------------------- step 2 */}
         {step === 2 && relationship && (
           <section className="mt-6 reveal">
-            <h2 className="text-[24px] font-black leading-tight tracking-[-0.02em]">
+            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">VIBE TAGS</p>
+            <h2 className="vt-page-title text-[28px] leading-[1.08] tracking-[-0.02em]">
               Sende ne görüyorsun?
             </h2>
             <p className="text-[13px] text-muted mt-1.5">
@@ -379,7 +382,8 @@ export function RateFlow({
         {/* ---------------------------------------------- step 3 */}
         {step === 3 && relationship && (
           <section className="mt-6 reveal">
-            <h2 className="text-[24px] font-black leading-tight tracking-[-0.02em]">
+            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">A FINAL NOTE</p>
+            <h2 className="vt-page-title text-[28px] leading-[1.08] tracking-[-0.02em]">
               Eklemek istediğin bir şey var mı?
             </h2>
             <p className="text-[13px] text-muted mt-1.5">
@@ -391,7 +395,7 @@ export function RateFlow({
               onChange={(e) => setComment(e.target.value.slice(0, 280))}
               rows={4}
               placeholder="Örn. Söz verdiği işi zamanında teslim etti, iletişimi çok netti."
-              className="mt-4 w-full rounded-[20px] border border-line bg-warmwhite p-4 text-[14px] outline-none focus:border-orange/60 focus:ring-4 focus:ring-orange/10 transition resize-none"
+              className="mt-4 w-full rounded-[22px] border border-line bg-warmwhite p-4 text-[14px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition resize-none shadow-[0_10px_30px_rgba(93,58,42,0.035)]"
             />
             <div className="text-right text-[11px] text-muted mt-1">
               {comment.length}/280
@@ -417,7 +421,7 @@ export function RateFlow({
 
             <div className="mt-4 rounded-2xl bg-warmwhite border border-line px-4 py-3.5">
               <p className="text-[12.5px] text-muted leading-relaxed">
-                🔒 Verdiğin puanlar hiçbir zaman tek tek kişiye
+                Verdiğin puanlar hiçbir zaman tek tek kişiye
                 bağlanarak gösterilmez. Değerlendirmeni <b>ayda bir kez</b>{" "}
                 güncelleyebilirsin.
               </p>
@@ -502,9 +506,10 @@ function Success({
   isUpdate: boolean;
 }) {
   return (
-    <main className="min-h-dvh px-6 flex flex-col items-center justify-center text-center">
-      <div className="pop text-6xl">🎉</div>
-      <h1 className="mt-5 text-[26px] font-black tracking-[-0.02em] leading-tight">
+    <main className="min-h-dvh px-6 flex flex-col items-center justify-center text-center overflow-hidden">
+      <div className="pop w-20 h-20 rounded-full grid place-items-center grad-score text-white text-[28px] font-display shadow-[0_18px_44px_rgba(255,92,119,0.28)]">✓</div>
+      <p className="mt-6 text-[10px] font-extrabold tracking-[0.26em] text-coral">VIBE RECEIVED</p>
+      <h1 className="vt-page-title mt-2 text-[30px] tracking-[-0.02em] leading-tight">
         {isUpdate ? "Değerlendirmen güncellendi" : "Teşekkürler!"}
       </h1>
       <p className="mt-2.5 text-[14px] text-muted leading-relaxed max-w-[18rem]">

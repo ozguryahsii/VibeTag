@@ -27,10 +27,11 @@ export default async function InvitePage({
   const isSelf = me?.id === inviter.id;
 
   return (
-    <main className="min-h-dvh flex flex-col px-6 pt-14 pb-10">
+    <main className="min-h-dvh flex flex-col px-6 pt-12 pb-10 overflow-hidden">
       <Wordmark size={20} />
 
-      <div className="mt-12 text-center pop">
+      <div className="mt-12 text-center pop relative">
+        <div className="absolute left-1/2 top-8 -translate-x-1/2 w-48 h-48 rounded-full bg-coral/10 blur-3xl" aria-hidden />
         <Avatar
           name={inviter.name}
           url={inviter.avatarUrl}
@@ -38,7 +39,7 @@ export default async function InvitePage({
           size={92}
           ring
         />
-        <h1 className="mt-5 text-[27px] font-black tracking-[-0.03em] leading-tight">
+        <h1 className="vt-page-title relative mt-6 text-[30px] tracking-[-0.03em] leading-[1.08]">
           {inviter.name.split(" ")[0]} senden bir
           <br />
           <span className="grad-text">Vibe</span> bekliyor
@@ -72,7 +73,7 @@ export default async function InvitePage({
             key={line}
             className="card !py-3.5 flex items-center gap-3 text-[13px] font-semibold"
           >
-            <span className="text-orange">✓</span>
+            <span className="w-6 h-6 shrink-0 grid place-items-center rounded-full bg-tagbg border border-orange/20 text-[11px] font-black text-orange">✓</span>
             {line}
           </div>
         ))}

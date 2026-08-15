@@ -37,7 +37,7 @@ export function Onboarding() {
   const last = i === SLIDES.length - 1;
 
   return (
-    <main className="min-h-dvh flex flex-col px-6 pt-12 pb-10">
+    <main className="min-h-dvh flex flex-col px-6 pt-11 pb-10 overflow-hidden">
       <div className="flex items-center justify-between">
         <VibeMark size={30} />
         <Link href="/register" className="text-[13px] font-bold text-muted">
@@ -50,7 +50,10 @@ export function Onboarding() {
       </div>
 
       <div key={`${slide.key}-t`} className="mt-9 reveal">
-        <h1 className="text-[30px] font-black tracking-[-0.03em] leading-[1.12]">
+        <p className="text-[10px] font-extrabold tracking-[0.28em] text-coral mb-2.5">
+          {String(i + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}
+        </p>
+        <h1 className="vt-page-title text-[32px] tracking-[-0.03em] leading-[1.08]">
           {slide.title}
         </h1>
         <p className="mt-3.5 text-[15px] leading-relaxed text-muted">
@@ -121,25 +124,25 @@ function ArtIdentity() {
         }}
       />
       <div className="relative card px-6 py-5 text-center">
-        <div className="text-[10px] font-extrabold tracking-[0.22em] text-muted">
+        <div className="text-[10px] font-extrabold tracking-[0.26em] text-coral">
           MY VIBE
         </div>
         <div
-          className="grad-text font-black leading-none mt-1"
+          className="grad-text font-display leading-none mt-1"
           style={{ fontSize: 62, letterSpacing: "-0.04em" }}
         >
           94
         </div>
       </div>
       {[
-        ["🔥", "-top-1 -left-1"],
-        ["❤️", "top-8 -right-2"],
-        ["🤝", "bottom-2 -left-3"],
-        ["🚀", "-bottom-1 right-2"],
+        ["POSITIVE", "-top-1 -left-1"],
+        ["KIND", "top-8 -right-2"],
+        ["RELIABLE", "bottom-2 -left-3"],
+        ["CALM", "-bottom-1 right-2"],
       ].map(([e, pos]) => (
         <span
           key={e}
-          className={`absolute ${pos} card !py-2 !px-3 text-[15px] reveal`}
+          className={`absolute ${pos} card !py-2 !px-3 text-[9px] font-extrabold tracking-[0.12em] text-coral reveal`}
         >
           {e}
         </span>
@@ -152,10 +155,10 @@ function ArtContext() {
   return (
     <div className="w-full h-56 grid grid-cols-2 gap-2.5 content-center px-2">
       {[
-        ["💼", "İş arkadaşı", true],
-        ["💛", "Yakın arkadaş", false],
-        ["🛎️", "Hizmet aldım", false],
-        ["🌍", "Topluluk", false],
+        ["01", "İş arkadaşı", true],
+        ["02", "Yakın arkadaş", false],
+        ["03", "Hizmet aldım", false],
+        ["04", "Topluluk", false],
       ].map(([e, l, active]) => (
         <div
           key={String(l)}
@@ -166,7 +169,7 @@ function ArtContext() {
             active ? { boxShadow: "0 10px 26px rgba(255,138,61,0.18)" } : undefined
           }
         >
-          <div className="text-[17px]">{e}</div>
+          <div className="text-[10px] font-black tracking-[0.15em] text-coral">{e}</div>
           <div className="text-[12.5px] font-bold mt-1">{l}</div>
           {active && (
             <div className="text-[10.5px] text-orange font-bold mt-1">
@@ -197,15 +200,25 @@ function ArtShare() {
         }}
       />
       <div
-        className="relative w-40 h-52 rounded-[26px] grad-card drift grid place-items-center text-white"
-        style={{ boxShadow: "0 20px 44px rgba(255,92,119,0.34)" }}
+        className="relative w-40 h-52 overflow-hidden rounded-[26px] border border-[#F4AC78] bg-warmwhite grid place-items-center text-ink"
+        style={{ boxShadow: "0 20px 44px rgba(83,60,40,0.16)" }}
       >
-        <div className="text-center">
-          <div className="text-[9px] font-extrabold tracking-[0.24em] opacity-85">
+        <span className="absolute -left-8 -top-8 h-20 w-40 rotate-[-9deg] rounded-[50%] bg-gradient-to-br from-orange/80 via-coral/65 to-pink/35" aria-hidden />
+        <span className="absolute -bottom-7 -right-8 h-16 w-44 rotate-[-8deg] rounded-[50%] bg-gradient-to-br from-orange/45 via-coral/65 to-pink/85" aria-hidden />
+        <span className="absolute right-3 top-3" aria-hidden>
+          <VibeMark size={24} id="onboarding-card-mark" />
+        </span>
+        <div className="relative z-10 text-center">
+          <div className="text-[9px] font-extrabold tracking-[0.24em] text-coral">
             MY VIBE
           </div>
-          <div className="text-[52px] font-black leading-none">94</div>
-          <div className="text-[9px] font-bold tracking-[0.18em] opacity-85 mt-1">
+          <div
+            className="grad-text text-[56px] leading-none"
+            style={{ fontFamily: "var(--font-score)", fontWeight: 400 }}
+          >
+            94
+          </div>
+          <div className="text-[9px] font-bold tracking-[0.18em] text-coral mt-1">
             VIBE SCORE
           </div>
         </div>

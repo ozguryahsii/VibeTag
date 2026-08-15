@@ -45,12 +45,16 @@ export function InviteShare({
 
   return (
     <div>
-      <div className="card p-5 text-center">
+      <div className="card p-6 text-center relative overflow-hidden">
+        <span className="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-orange/8" aria-hidden />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={qr}
           alt="Davet QR kodu"
-          className="w-44 h-44 mx-auto rounded-2xl"
+          width={176}
+          height={176}
+          className="relative w-44 h-44 mx-auto rounded-[22px] border border-line shadow-[0_12px_30px_rgba(93,58,42,0.08)]"
+          style={{ width: 176, height: 176, maxWidth: "100%" }}
         />
         <p className="text-[12px] text-muted mt-3">
           Karşındakine okut — telefonu doğrudan senin sayfana gider.
@@ -58,7 +62,7 @@ export function InviteShare({
 
         <button
           onClick={copy}
-          className="mt-4 w-full rounded-2xl border border-line bg-cream px-4 py-3 text-[12.5px] font-semibold text-left truncate active:scale-[0.99] transition-transform"
+          className="mt-4 w-full rounded-[18px] border border-line bg-cream px-4 py-3 text-[12.5px] font-semibold text-left truncate active:scale-[0.99] transition-transform"
         >
           {url}
         </button>
@@ -77,7 +81,7 @@ export function InviteShare({
             href={`https://wa.me/?text=${encoded}`}
             target="_blank"
             rel="noreferrer"
-            className="h-12 grid place-items-center rounded-2xl bg-warmwhite border border-line text-[13px] font-bold"
+            className="h-12 grid place-items-center rounded-[18px] bg-warmwhite border border-line text-[13px] font-bold"
           >
             WhatsApp
           </a>
@@ -85,13 +89,13 @@ export function InviteShare({
             href={`https://x.com/intent/tweet?text=${encoded}`}
             target="_blank"
             rel="noreferrer"
-            className="h-12 grid place-items-center rounded-2xl bg-warmwhite border border-line text-[13px] font-bold"
+            className="h-12 grid place-items-center rounded-[18px] bg-warmwhite border border-line text-[13px] font-bold"
           >
             X
           </a>
           <button
             onClick={copy}
-            className="h-12 rounded-2xl bg-warmwhite border border-line text-[13px] font-bold"
+            className="h-12 rounded-[18px] bg-warmwhite border border-line text-[13px] font-bold"
           >
             Kopyala
           </button>

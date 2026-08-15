@@ -30,8 +30,9 @@ export default async function InvitePageApp() {
   });
 
   return (
-    <main className="px-5 pt-12">
-      <h1 className="text-[27px] font-black tracking-[-0.02em]">
+    <main className="px-5 pt-10">
+      <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">GROW YOUR CIRCLE</p>
+      <h1 className="vt-page-title text-[31px] tracking-[-0.02em]">
         Çevreni davet et
       </h1>
       <p className="text-[13px] text-muted mt-1.5 leading-relaxed">

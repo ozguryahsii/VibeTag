@@ -12,6 +12,7 @@ import { CONTEXT_GROUPS, RELATIONSHIPS } from "@/lib/taxonomy";
 import { groupIconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ScoreDial } from "@/components/ScoreDial";
+import { VibeMark } from "@/components/Logo";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
 export default async function PublicProfile({
@@ -53,33 +54,88 @@ export default async function PublicProfile({
 
   return (
     <main className="px-5 pt-12">
-      <header className="flex items-start gap-4 reveal">
-        <Avatar name={user.name}
-          url={user.avatarUrl} color={user.avatarColor} size={62} ring />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <h1 className="text-[21px] font-black tracking-[-0.02em] truncate">
+      <section
+        className="relative overflow-hidden rounded-[32px] border border-line/90 bg-warmwhite px-5 pb-5 pt-7 text-center pop"
+        style={{ boxShadow: "0 24px 56px rgba(83,60,40,0.14)" }}
+      >
+        <div
+          className="pointer-events-none absolute -left-20 -top-12 h-28 w-60 rotate-[-9deg] rounded-[50%] opacity-55"
+          style={{
+            background:
+              profile.score >= 85
+                ? "linear-gradient(135deg, rgba(245,173,60,.78), rgba(239,113,70,.56), rgba(231,61,118,.26))"
+                : "linear-gradient(135deg, rgba(228,215,200,.8), rgba(238,228,213,.24))",
+          }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -bottom-16 -right-16 h-32 w-64 rotate-[-12deg] rounded-[50%] opacity-45"
+          style={{
+            background:
+              profile.score >= 85
+                ? "linear-gradient(135deg, rgba(242,160,63,.28), rgba(240,82,98,.64), rgba(231,61,118,.86))"
+                : "linear-gradient(135deg, rgba(238,228,213,.3), rgba(228,215,200,.8))",
+          }}
+          aria-hidden="true"
+        />
+        <div className="absolute right-5 top-5 opacity-90" aria-hidden="true">
+          <VibeMark size={43} id="public-profile-mark" />
+        </div>
+
+        <div className="relative z-10 flex flex-col items-center">
+          <Avatar
+            name={user.name}
+            url={user.avatarUrl}
+            color={user.avatarColor}
+            size={84}
+            ring
+          />
+          <div className="mt-3 flex items-center justify-center gap-1.5">
+            <h1 className="font-display text-[26px] font-semibold tracking-[-0.035em] text-ink">
               {user.name}
             </h1>
             {user.isVerified && <span>✅</span>}
           </div>
           <p className="text-[12.5px] text-muted">@{user.username}</p>
           {user.bio && (
-            <p className="text-[13px] mt-1.5 leading-relaxed">{user.bio}</p>
+            <p className="mt-2 max-w-[300px] text-[13px] leading-relaxed text-ink/80">
+              {user.bio}
+            </p>
           )}
-        </div>
-      </header>
+          <div className="mt-3 flex items-center gap-1.5" aria-hidden="true">
+            <span className="h-px w-8 bg-line" />
+            <span className="h-1.5 w-1.5 rounded-full bg-coral" />
+            <span className="h-px w-8 bg-line" />
+          </div>
 
-      <section className="mt-6 grid place-items-center pop">
-        <ScoreDial
-          score={profile.score}
-          size={210}
-          caption={percentile ? `Top ${percentile}% of users` : undefined}
-        />
-        <p className="text-[13px] text-muted font-semibold -mt-1">
-          Rated by <span className="text-ink font-bold">{profile.ratingCount}</span>{" "}
-          people
-        </p>
+          <ScoreDial
+            score={profile.score}
+            size={220}
+            caption={percentile ? `Top ${percentile}% of users` : undefined}
+          />
+
+          {profile.ratingCount > 0 && (
+            <div className="w-full">
+              <p className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.22em] text-muted">
+                People see {isMe ? "you" : "them"} as
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {profile.tags.slice(0, 4).map((t) => (
+                  <TagPill key={t.key} tagKey={t.key} label={t.en} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6 w-full border-t border-line/80 pt-4 text-left">
+            <p className="text-[12px] leading-tight text-muted">
+              Rated by
+              <span className="mt-0.5 block text-[16px] font-semibold text-ink">
+                {profile.ratingCount} people
+              </span>
+            </p>
+          </div>
+        </div>
       </section>
 
       {!isMe && blockedByMe && (
@@ -152,14 +208,16 @@ export default async function PublicProfile({
         </div>
       ) : (
         <>
-          <section className="mt-6 reveal">
-            <SectionTitle>People see {isMe ? "you" : "them"} as:</SectionTitle>
-            <Card className="flex flex-wrap gap-2">
-              {profile.tags.slice(0, 8).map((t) => (
-                <TagPill key={t.key} tagKey={t.key} label={t.en} count={t.count} />
-              ))}
-            </Card>
-          </section>
+          {profile.tags.length > 4 && (
+            <section className="mt-6 reveal">
+              <SectionTitle>More of {isMe ? "your" : "their"} Vibe</SectionTitle>
+              <Card className="flex flex-wrap gap-2">
+                {profile.tags.slice(4, 8).map((t) => (
+                  <TagPill key={t.key} tagKey={t.key} label={t.en} count={t.count} />
+                ))}
+              </Card>
+            </section>
+          )}
 
           {badges.length > 0 && (
             <section className="mt-6 reveal">
@@ -170,7 +228,7 @@ export default async function PublicProfile({
                     key={b.key}
                     tagKey={b.icon}
                     label={b.label}
-                    tone="purple"
+                    tone="warm"
                   />
                 ))}
               </div>

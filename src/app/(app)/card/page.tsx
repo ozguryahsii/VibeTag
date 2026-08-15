@@ -11,8 +11,13 @@ export default async function CardPage() {
   if (profile.ratingCount === 0) {
     return (
       <main className="px-5 pt-12">
-        <h1 className="text-[27px] font-black tracking-[-0.02em]">Vibe Card</h1>
-        <p className="text-[13px] text-muted mt-1">
+        <p className="text-[10.5px] font-bold uppercase tracking-[0.24em] text-coral">
+          Your social identity
+        </p>
+        <h1 className="mt-1 font-display text-[34px] font-semibold tracking-[-0.04em] text-ink">
+          Vibe Card
+        </h1>
+        <p className="mt-1 text-[13px] leading-relaxed text-muted">
           Paylaşılabilir sosyal kimlik kartın.
         </p>
         <div className="mt-6">
@@ -29,8 +34,13 @@ export default async function CardPage() {
 
   return (
     <main className="px-5 pt-12">
-      <h1 className="text-[27px] font-black tracking-[-0.02em]">Vibe Card</h1>
-      <p className="text-[13px] text-muted mt-1">
+      <p className="text-[10.5px] font-bold uppercase tracking-[0.24em] text-coral">
+        Your social identity
+      </p>
+      <h1 className="mt-1 font-display text-[34px] font-semibold tracking-[-0.04em] text-ink">
+        Vibe Card
+      </h1>
+      <p className="mt-1 text-[13px] leading-relaxed text-muted">
         Story, kare veya geniş format — indir ve paylaş.
       </p>
 

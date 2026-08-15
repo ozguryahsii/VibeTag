@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ICONS } from "@/lib/icons";
 import { IconGlyph } from "@/components/Icon";
+import { VibeMark } from "@/components/Logo";
 
 type Tab = {
   href: string;
@@ -27,15 +28,15 @@ export function BottomNav() {
     <>
       <div className="h-24" />
       <nav className="fixed bottom-0 inset-x-0 z-40 pointer-events-none">
-        <div className="max-w-[480px] mx-auto px-4 pb-4 pointer-events-auto">
+        <div className="max-w-[500px] mx-auto px-4 pb-4 pointer-events-auto">
           <div
             className="flex items-center justify-between rounded-full px-2.5 py-2"
             style={{
-              background: "rgba(255,248,245,0.86)",
+              background: "rgba(252,248,239,0.92)",
               backdropFilter: "blur(18px)",
               WebkitBackdropFilter: "blur(18px)",
-              border: "1px solid #F0E5DD",
-              boxShadow: "0 12px 40px rgba(31,31,31,0.12)",
+              border: "1px solid #E4D7C8",
+              boxShadow: "0 14px 40px rgba(83,60,40,0.14)",
             }}
           >
             {TABS.map((t) => {
@@ -61,16 +62,22 @@ export function BottomNav() {
                   href={t.href}
                   className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-full transition-colors"
                   style={{
-                    color: active ? "#FF5C77" : "#6B6B6B",
-                    background: active ? "#FFF0E8" : "transparent",
+                    color: active ? "#F05262" : "#8E8179",
+                    background: active ? "#EEE4D5" : "transparent",
                   }}
                 >
-                  <IconGlyph
-                    def={ICONS[t.icon]}
-                    size={19}
-                    color={active ? "#FF5C77" : "#8C8177"}
-                    strokeWidth={active ? 2.1 : 1.8}
-                  />
+                  {t.icon === "fingerprint" ? (
+                    <span style={{ opacity: active ? 1 : 0.58 }}>
+                      <VibeMark size={19} id="bottom-nav-vibemark" />
+                    </span>
+                  ) : (
+                    <IconGlyph
+                      def={ICONS[t.icon]}
+                      size={19}
+                      color={active ? "#F05262" : "#8E8179"}
+                      strokeWidth={active ? 2.1 : 1.8}
+                    />
+                  )}
                   <span className="text-[10px] font-bold leading-none">
                     {t.label}
                   </span>

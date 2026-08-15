@@ -31,8 +31,9 @@ export default async function NotificationsPage() {
   await markAllRead(user.id);
 
   return (
-    <main className="px-5 pt-12">
-      <h1 className="text-[27px] font-black tracking-[-0.02em]">Bildirimler</h1>
+    <main className="px-5 pt-10">
+      <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">RECENT ACTIVITY</p>
+      <h1 className="vt-page-title text-[31px] tracking-[-0.02em]">Bildirimler</h1>
       <p className="text-[13px] text-muted mt-1">
         Kimin değerlendirdiğini burada da göremezsin — bu bilinçli.
       </p>
@@ -40,7 +41,7 @@ export default async function NotificationsPage() {
       <div className="mt-6 grid gap-2.5">
         {items.length === 0 ? (
           <EmptyState
-            emoji="🔔"
+            emoji="✦"
             title="Henüz bildirim yok"
             body="Biri seni değerlendirdiğinde ya da davetin kabul edildiğinde burada göreceksin."
           />

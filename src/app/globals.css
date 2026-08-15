@@ -1,57 +1,81 @@
 @import "tailwindcss";
 
-/* ------------------------------------------------------------------
-   Vibe Tag — "Human Warm" design tokens
-   Warm + Social + Premium + Shareable
-   ------------------------------------------------------------------ */
-
+/* Vibe Tag v1.1 — approved warm editorial system */
 @theme {
-  --color-cream: #faf7f2;
-  --color-warmwhite: #fff8f5;
-  --color-orange: #ff8a3d;
-  --color-coral: #ff5c77;
-  --color-pink: #ff7aa2;
-  --color-purple: #8b5cf6;
-  --color-ink: #1f1f1f;
-  --color-muted: #6b6b6b;
-  --color-line: #f0e5dd;
-  --color-tagbg: #fff0e8;
+  --color-cream: #fbf8f2;
+  --color-warmwhite: #fcf8ef;
+  --color-orange: #f2a03f;
+  --color-coral: #f05262;
+  --color-pink: #e73d76;
+  --color-purple: #c95c76;
+  --color-ink: #2d211c;
+  --color-brandink: #13172c;
+  --color-muted: #8e8179;
+  --color-line: #e4d7c8;
+  --color-tagbg: #eee4d5;
 
   --radius-card: 24px;
   --radius-pill: 999px;
 
-  --shadow-soft: 0 10px 40px rgba(255, 138, 61, 0.12);
-  --shadow-lift: 0 18px 50px rgba(255, 92, 119, 0.18);
+  --shadow-soft: 0 18px 48px rgba(83, 60, 40, 0.12);
+  --shadow-lift: 0 25px 52px rgba(93, 61, 35, 0.16);
 
-  --font-sans: var(--font-inter), ui-sans-serif, -apple-system,
-    BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-  --font-display: var(--font-display-serif), ui-serif, Georgia, serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: var(--font-playfair), Georgia, serif;
+  --font-brand: var(--font-syne), var(--font-dm-sans), sans-serif;
 }
 
 :root {
   color-scheme: light;
-  --grad-score: linear-gradient(135deg, #ff8a3d 0%, #ff5c77 100%);
-  --grad-card: linear-gradient(160deg, #ff9a3d 0%, #ff5c77 52%, #ff7aa2 100%);
-  --grad-premium: linear-gradient(135deg, #ff8a3d 0%, #8b5cf6 100%);
+  --grad-score: linear-gradient(135deg, #f5ad3c 11%, #f17146 50%, #e73d76 88%);
+  --grad-card: linear-gradient(145deg, #f5ad3e 5%, #ef7648 55%, #ec476d 100%);
+  --grad-premium: linear-gradient(135deg, #f5ad3c 0%, #ef7651 52%, #d95879 100%);
+  --font-score: Didot, "Bodoni 72", "Bodoni MT", var(--font-playfair),
+    "Times New Roman", serif;
+  --font-score-serif: var(--font-score);
+  /* Compatibility aliases for the canvas renderer and older leaf screens. */
+  --font-inter: var(--font-dm-sans);
+  --font-display-serif: var(--font-playfair);
 }
 
-html,
+html {
+  min-width: 320px;
+  background: #fbf8f2;
+}
+
 body {
-  background: var(--color-cream);
+  margin: 0;
+  min-width: 320px;
+  background: linear-gradient(90deg, #fbf7ef 0%, #fdfaf5 48%, #faf6ef 100%);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
+.vt-page-title {
+  margin-block: 0;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-wrap: balance;
+}
+
 * {
+  box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ------------------------------------------------------- primitives */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
 
 @utility card {
-  background: var(--color-warmwhite);
+  background: rgba(252, 248, 239, 0.94);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-soft);
@@ -76,69 +100,38 @@ body {
   color: transparent;
 }
 
-/* Gradient outline on a warm surface — used for selected connection cards. */
 @utility grad-ring {
   position: relative;
   background:
     linear-gradient(var(--color-warmwhite), var(--color-warmwhite)) padding-box,
     var(--grad-score) border-box;
-  border: 2px solid transparent;
+  border: 1.5px solid transparent;
+  box-shadow: 0 8px 22px rgba(221, 105, 55, 0.12);
 }
 
-/* --------------------------------------------------------- motion */
-
 @keyframes vt-rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes vt-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.88);
-  }
-  60% {
-    transform: scale(1.03);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+  0% { opacity: 0; transform: scale(0.92); }
+  60% { transform: scale(1.015); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes vt-drift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 @keyframes vt-shine {
-  from {
-    transform: translateX(-120%) rotate(12deg);
-  }
-  to {
-    transform: translateX(220%) rotate(12deg);
-  }
+  from { transform: translateX(-120%) rotate(12deg); }
+  to { transform: translateX(220%) rotate(12deg); }
 }
 
-.reveal {
-  animation: vt-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.pop {
-  animation: vt-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
+.reveal { animation: vt-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pop { animation: vt-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .drift {
   background-size: 220% 220%;
   animation: vt-drift 9s ease-in-out infinite;
@@ -147,71 +140,68 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .pop,
-  .drift {
-    animation: none;
-  }
+  .drift { animation: none; }
 }
 
-/* --------------------------------------------------------- chrome */
-
 .app-shell {
-  min-height: 100dvh;
-  max-width: 480px;
-  margin-inline: auto;
-  background: var(--color-cream);
   position: relative;
+  min-height: 100dvh;
+  max-width: 500px;
+  margin-inline: auto;
+  background: rgba(251, 248, 242, 0.76);
 }
 
 @media (min-width: 900px) {
   body {
     background:
-      radial-gradient(1000px 600px at 80% -10%, rgba(255, 122, 162, 0.16), transparent 60%),
-      radial-gradient(900px 520px at 10% 10%, rgba(255, 138, 61, 0.14), transparent 55%),
-      var(--color-cream);
+      radial-gradient(900px 520px at 85% -5%, rgba(240, 82, 98, 0.11), transparent 62%),
+      radial-gradient(820px 500px at 8% 12%, rgba(242, 160, 63, 0.13), transparent 58%),
+      linear-gradient(90deg, #fbf7ef 0%, #fdfaf5 48%, #faf6ef 100%);
   }
+
   .app-shell {
-    box-shadow: 0 30px 90px rgba(31, 31, 31, 0.1);
+    box-shadow: 0 30px 90px rgba(83, 60, 40, 0.1);
   }
 }
 
-/* Range input styled as a warm slider */
 input[type="range"].vt-range {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 8px;
+  height: 7px;
   border-radius: 999px;
-  background: var(--color-line);
+  background: #e9ded1;
   outline: none;
 }
+
 input[type="range"].vt-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 26px;
-  height: 26px;
+  width: 25px;
+  height: 25px;
   border-radius: 999px;
   background: var(--grad-score);
   border: 3px solid #fff;
-  box-shadow: 0 4px 14px rgba(255, 92, 119, 0.4);
+  box-shadow: 0 4px 14px rgba(240, 82, 98, 0.32);
   cursor: pointer;
 }
+
 input[type="range"].vt-range::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
+  width: 21px;
+  height: 21px;
   border: 3px solid #fff;
   border-radius: 999px;
-  background: #ff7a4d;
-  box-shadow: 0 4px 14px rgba(255, 92, 119, 0.4);
+  background: #ef7651;
+  box-shadow: 0 4px 14px rgba(240, 82, 98, 0.32);
   cursor: pointer;
 }
 
-::selection {
-  background: rgba(255, 138, 61, 0.25);
+::selection { background: rgba(242, 160, 63, 0.24); }
+
+:focus-visible {
+  outline: 3px solid rgba(240, 82, 98, 0.48);
+  outline-offset: 3px;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  scrollbar-width: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }

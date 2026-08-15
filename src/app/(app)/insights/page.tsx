@@ -58,18 +58,18 @@ export default async function InsightsPage() {
   const growth = growthAreas(profile, 2);
 
   return (
-    <main className="px-5 pt-12">
+    <main className="px-5 pt-10">
       <header className="reveal">
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-extrabold tracking-[0.2em] text-purple">
-            ✦ PREMIUM
+          <span className="text-[10px] font-extrabold tracking-[0.24em] text-coral">
+            VIBE ANALYSIS
           </span>
           <span
             className="text-[10px] font-black rounded-full px-2 py-0.5 text-white"
             style={{
               background:
                 me.plan === "GOLD"
-                  ? "linear-gradient(135deg,#FF8A3D,#8B5CF6)"
+                  ? "linear-gradient(135deg,#FF8A3D,#FF5C77)"
                   : me.plan === "SILVER"
                     ? "linear-gradient(135deg,#FF8A3D,#FF5C77)"
                     : "#C9BEB6",
@@ -78,7 +78,7 @@ export default async function InsightsPage() {
             {me.plan}
           </span>
         </div>
-        <h1 className="text-[27px] font-black tracking-[-0.02em] mt-1.5">
+        <h1 className="vt-page-title text-[31px] tracking-[-0.02em] mt-1.5">
           Vibe Insights
         </h1>
         <p className="text-[13px] text-muted mt-1">
@@ -89,7 +89,7 @@ export default async function InsightsPage() {
       {profile.ratingCount === 0 ? (
         <div className="mt-6">
           <EmptyState
-            emoji="📊"
+            emoji="✦"
             title="Analiz için veri yok"
             body="En az 3 değerlendirme sonrası analiz açılır. Çevrendeki kişileri davet ederek başlayabilirsin."
           />
@@ -99,8 +99,8 @@ export default async function InsightsPage() {
           {/* AI persona — free tier sees the headline only */}
           <section className="mt-6 reveal">
             <div
-              className="rounded-[24px] p-5 text-white grad-premium"
-              style={{ boxShadow: "0 16px 44px rgba(139,92,246,0.26)" }}
+              className="rounded-[28px] p-6 text-white grad-score border border-white/25"
+              style={{ boxShadow: "0 18px 44px rgba(255,92,119,0.24)" }}
             >
               <p className="text-[11px] font-extrabold tracking-[0.2em] opacity-85">
                 PEOPLE DESCRIBE YOU AS
@@ -184,7 +184,7 @@ export default async function InsightsPage() {
 
                 {growth.length > 0 && (
                   <div className="pt-3 border-t border-line">
-                    <p className="text-[11px] font-extrabold tracking-[0.16em] text-purple mb-2.5">
+                    <p className="text-[11px] font-extrabold tracking-[0.16em] text-coral mb-2.5">
                       GROWTH AREAS
                     </p>
                     <div className="grid gap-3">
@@ -192,14 +192,14 @@ export default async function InsightsPage() {
                         <div key={t.key}>
                           <div className="flex justify-between text-[13px] font-bold mb-1">
                             <span className="inline-flex items-center gap-2">
-                              <TraitIcon traitKey={t.key} color="#8B5CF6" />
+                              <TraitIcon traitKey={t.key} color="#FF5C77" />
                               {t.en}
                             </span>
-                            <span className="tabular-nums text-purple font-black">
+                            <span className="tabular-nums text-coral font-black">
                               {t.score}
                             </span>
                           </div>
-                          <Meter value={t.score} tone="purple" />
+                          <Meter value={t.score} />
                           <p className="text-[11.5px] text-muted mt-1">
                             {summary.growth.find((s) => s.label === t.label)?.note}
                           </p>
@@ -250,8 +250,8 @@ export default async function InsightsPage() {
                           </>
                         ) : (
                           <>
-                            <span className="w-9.5 h-9.5 grid place-items-center rounded-full bg-line text-[15px]">
-                              🕶️
+                            <span className="w-9.5 h-9.5 grid place-items-center rounded-full bg-tagbg border border-orange/15 text-[10px] font-black tracking-wider text-orange">
+                              ANON
                             </span>
                             <div>
                               <p className="text-[13.5px] font-extrabold">
@@ -318,7 +318,7 @@ export default async function InsightsPage() {
 
                       {isGold && (d.isProtected || d.hideIdentity) && (
                         <p className="mt-3 text-[11.5px] text-muted bg-cream rounded-xl px-3 py-2">
-                          🔒 Bu değerlendirmenin kimliği sistem tarafından
+                          Bu değerlendirmenin kimliği sistem tarafından
                           korunuyor — Gold üyelikte de görünmez.
                         </p>
                       )}
@@ -335,8 +335,8 @@ export default async function InsightsPage() {
               <div
                 className="rounded-[24px] p-5 text-white"
                 style={{
-                  background: "linear-gradient(135deg,#FF8A3D,#8B5CF6)",
-                  boxShadow: "0 16px 44px rgba(139,92,246,0.28)",
+                  background: "linear-gradient(135deg,#FF8A3D,#FF5C77)",
+                  boxShadow: "0 16px 44px rgba(255,92,119,0.25)",
                 }}
               >
                 <p className="text-[11px] font-extrabold tracking-[0.2em] opacity-85">
@@ -351,7 +351,7 @@ export default async function InsightsPage() {
                 </p>
                 <Link
                   href="/settings"
-                  className="inline-flex mt-4 rounded-full bg-white text-purple font-bold text-[14px] px-5 py-3"
+                  className="inline-flex mt-4 rounded-full bg-white text-coral font-bold text-[14px] px-5 py-3"
                 >
                   Gold’a geç
                 </Link>
@@ -391,10 +391,10 @@ function Gate({
       <div className="pointer-events-none select-none blur-[5px] opacity-55" aria-hidden>
         <Card className="grid gap-3.5">
           {[
-            ["💼", 62],
-            ["🫂", 44],
-            ["🛍️", 26],
-            ["🌐", 14],
+            ["01", 62],
+            ["02", 44],
+            ["03", 26],
+            ["04", 14],
           ].map(([emoji, w]) => (
             <div key={String(emoji)}>
               <div className="flex justify-between text-[13px] font-bold mb-1.5">
@@ -420,14 +420,14 @@ function Gate({
 
       <div className="absolute inset-0 grid place-items-center px-4">
         <div className="card p-6 text-center max-w-[19rem]">
-          <div className="text-3xl">🔓</div>
-          <p className="text-[16px] font-extrabold mt-2 leading-snug">{title}</p>
+          <div className="w-12 h-12 mx-auto rounded-full grid place-items-center bg-tagbg border border-orange/20 text-orange text-[11px] font-black tracking-wider">PLUS</div>
+          <p className="vt-page-title text-[20px] mt-3 leading-snug">{title}</p>
           <p className="text-[12.5px] text-muted mt-1.5 leading-relaxed">
             {blurb}
           </p>
           <Link
             href="/settings"
-            className="inline-flex mt-4 rounded-full grad-premium text-white font-bold text-[14px] px-5 py-3"
+            className="inline-flex mt-4 rounded-full grad-score text-white font-bold text-[14px] px-5 py-3"
           >
             {plan} ile aç
           </Link>

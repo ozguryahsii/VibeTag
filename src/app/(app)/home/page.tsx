@@ -7,6 +7,7 @@ import { generateVibeSummary } from "@/lib/insights";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ICONS } from "@/lib/icons";
 import { ScoreDial } from "@/components/ScoreDial";
+import { VibeMark } from "@/components/Logo";
 import { Avatar, Button, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
 function greeting(): string {
@@ -31,9 +32,11 @@ export default async function HomePage() {
       {/* header */}
       <header className="flex items-center justify-between reveal">
         <div>
-          <p className="text-[13px] text-muted font-semibold">{greeting()}</p>
-          <h1 className="text-[22px] font-black tracking-[-0.02em]">
-            {user.name.split(" ")[0]} 👋
+          <p className="text-[11px] text-muted font-semibold uppercase tracking-[0.2em]">
+            {greeting()}
+          </p>
+          <h1 className="font-display text-[27px] font-semibold tracking-[-0.035em] text-ink">
+            {user.name.split(" ")[0]}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -64,60 +67,124 @@ export default async function HomePage() {
         </div>
       </header>
 
-      {/* score hero */}
-      <section className="mt-6 grid place-items-center pop">
-        <ScoreDial
-          score={profile.score}
-          caption={
-            percentile
-              ? `Top ${percentile}% of users`
-              : profile.ratingCount > 0
-                ? `${profile.ratingCount} kişi değerlendirdi`
-                : "İlk değerlendirmeni bekliyor"
-          }
+      {/* Vibe identity card */}
+      <section
+        className="relative mt-6 overflow-hidden rounded-[32px] border border-line/90 bg-warmwhite px-5 pb-5 pt-7 text-center pop"
+        style={{ boxShadow: "0 24px 56px rgba(83,60,40,0.14)" }}
+      >
+        <div
+          className="pointer-events-none absolute -left-20 -top-12 h-28 w-60 rotate-[-9deg] rounded-[50%] opacity-55"
+          style={{
+            background:
+              profile.score >= 85
+                ? "linear-gradient(135deg, rgba(245,173,60,.78), rgba(239,113,70,.56), rgba(231,61,118,.26))"
+                : "linear-gradient(135deg, rgba(228,215,200,.8), rgba(238,228,213,.24))",
+          }}
+          aria-hidden="true"
         />
-        <p className="text-[13px] text-muted font-semibold -mt-1">
-          Rated by <span className="text-ink font-bold">{profile.ratingCount}</span>{" "}
-          people
-        </p>
-      </section>
+        <div
+          className="pointer-events-none absolute -bottom-16 -right-16 h-32 w-64 rotate-[-12deg] rounded-[50%] opacity-45"
+          style={{
+            background:
+              profile.score >= 85
+                ? "linear-gradient(135deg, rgba(242,160,63,.28), rgba(240,82,98,.64), rgba(231,61,118,.86))"
+                : "linear-gradient(135deg, rgba(238,228,213,.3), rgba(228,215,200,.8))",
+          }}
+          aria-hidden="true"
+        />
+        <div className="absolute right-5 top-5 opacity-90" aria-hidden="true">
+          <VibeMark size={43} id="home-card-mark" />
+        </div>
 
-      {/* tags */}
-      <section className="mt-7 reveal" style={{ animationDelay: "120ms" }}>
-        <SectionTitle
-          action={
-            profile.tags.length > 0 ? (
-              <Link href="/card" className="text-[12px] font-bold text-orange">
+        <div className="relative z-10 flex flex-col items-center">
+          <Avatar
+            name={user.name}
+            url={user.avatarUrl}
+            color={user.avatarColor}
+            size={82}
+            ring
+          />
+          <h2 className="mt-3 font-display text-[25px] font-semibold tracking-[-0.035em] text-ink">
+            {user.name}
+          </h2>
+          <div className="mt-2 flex items-center gap-1.5" aria-hidden="true">
+            <span className="h-px w-8 bg-line" />
+            <span className="h-1.5 w-1.5 rounded-full bg-coral" />
+            <span className="h-px w-8 bg-line" />
+          </div>
+
+          <ScoreDial
+            score={profile.score}
+            caption={
+              percentile
+                ? `Top ${percentile}% of users`
+                : profile.ratingCount > 0
+                  ? `${profile.ratingCount} kişi değerlendirdi`
+                  : "İlk değerlendirmeni bekliyor"
+            }
+          />
+
+          {profile.tags.length > 0 && (
+            <div className="w-full">
+              <p className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.22em] text-muted">
+                People see you as
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {profile.tags.slice(0, 4).map((t) => (
+                  <TagPill key={t.key} tagKey={t.key} label={t.en} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6 flex w-full items-center justify-between border-t border-line/80 pt-4 text-left">
+            <p className="text-[12px] leading-tight text-muted">
+              Rated by
+              <span className="mt-0.5 block text-[16px] font-semibold text-ink">
+                {profile.ratingCount} people
+              </span>
+            </p>
+            {profile.tags.length > 0 && (
+              <Link
+                href="/card"
+                className="rounded-full border border-orange/35 bg-warmwhite/80 px-4 py-2 text-[12px] font-semibold text-coral shadow-[0_5px_14px_rgba(221,105,55,0.1)]"
+              >
                 Kartını paylaş →
               </Link>
-            ) : null
-          }
-        >
-          People see you as:
-        </SectionTitle>
+            )}
+          </div>
+        </div>
+      </section>
 
-        {profile.tags.length === 0 ? (
+      {profile.tags.length === 0 && (
+        <section className="mt-7 reveal" style={{ animationDelay: "120ms" }}>
+          <SectionTitle>People see you as:</SectionTitle>
           <EmptyState
             emoji="🌱"
             title="Vibe profilin henüz boş"
             body="Seni tanıyan birkaç kişiyi davet et. İlk değerlendirmeler geldiğinde burada sende gördükleri özellikler belirecek."
             action={<Button href="/invite">Çevreni davet et</Button>}
           />
-        ) : (
+        </section>
+      )}
+
+      {profile.tags.length > 4 && (
+        <section className="mt-6 reveal" style={{ animationDelay: "150ms" }}>
+          <SectionTitle>More of your Vibe</SectionTitle>
           <Card className="flex flex-wrap gap-2">
-            {profile.tags.slice(0, 8).map((t) => (
+            {profile.tags.slice(4, 8).map((t) => (
               <TagPill key={t.key} tagKey={t.key} label={t.en} count={t.count} />
             ))}
           </Card>
-        )}
-      </section>
+        </section>
+      )}
 
       {/* AI summary teaser */}
       {profile.ratingCount > 0 && (
         <section className="mt-6 reveal" style={{ animationDelay: "200ms" }}>
           <SectionTitle
             action={
-              <Link href="/insights" className="text-[12px] font-bold text-purple">
+              <Link href="/insights" className="text-[12px] font-bold text-coral">
                 Tümü →
               </Link>
             }
@@ -126,7 +193,7 @@ export default async function HomePage() {
           </SectionTitle>
           <Card>
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-[11px] font-extrabold tracking-[0.16em] text-purple">
+              <span className="text-[11px] font-extrabold tracking-[0.16em] text-coral">
                 ✦ AI ANALİZ
               </span>
             </div>
@@ -216,7 +283,7 @@ export default async function HomePage() {
       <section className="mt-6 mb-2 reveal" style={{ animationDelay: "380ms" }}>
         <div
           className="rounded-[24px] p-5 text-white grad-premium"
-          style={{ boxShadow: "0 16px 40px rgba(139,92,246,0.28)" }}
+          style={{ boxShadow: "0 16px 40px rgba(221,105,55,0.24)" }}
         >
           <div className="text-[11px] font-extrabold tracking-[0.2em] opacity-85">
             VIBE INSIGHTS
@@ -229,7 +296,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/insights"
-            className="inline-flex mt-4 items-center gap-2 rounded-full bg-white text-purple font-bold text-[14px] px-5 py-3"
+            className="inline-flex mt-4 items-center gap-2 rounded-full bg-white text-coral font-bold text-[14px] px-5 py-3"
           >
             Analizi aç
           </Link>

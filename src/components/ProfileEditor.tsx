@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { updateProfileAction, type FormState } from "@/lib/actions/auth";
 import { Avatar } from "@/components/Avatar";
 
-const COLORS = ["#FF8A3D", "#FF5C77", "#FF7AA2", "#8B5CF6", "#E8845C", "#5AA9E6"];
+const COLORS = ["#FF8A3D", "#FF5C77", "#FF7AA2", "#E8845C", "#D96C5F", "#F3A76F"];
 
 /** Downscale to a square 512px JPEG before it ever leaves the device. */
 async function toSquareDataUrl(file: File, size = 512): Promise<string> {
@@ -65,7 +65,7 @@ export function ProfileEditor({
   }
 
   return (
-    <form action={action} className="card p-5 grid gap-4">
+    <form action={action} className="card p-5 grid gap-5">
       <input type="hidden" name="avatarUrl" value={photo ?? ""} />
       <input type="hidden" name="avatarColor" value={color} />
 
@@ -78,10 +78,10 @@ export function ProfileEditor({
         >
           <Avatar name={name} url={photo} color={color} size={68} ring />
           <span
-            className="absolute -bottom-0.5 -right-0.5 w-7 h-7 rounded-full grid place-items-center text-[13px] text-white grad-score"
+            className="absolute -bottom-0.5 -right-0.5 w-7 h-7 rounded-full grid place-items-center text-[12px] font-black text-white grad-score"
             style={{ boxShadow: "0 0 0 2.5px #FFF8F5" }}
           >
-            ✎
+            +
           </span>
         </button>
 
@@ -115,7 +115,7 @@ export function ProfileEditor({
       />
 
       <div>
-        <span className="block text-[12px] font-bold text-muted mb-2 ml-1">
+        <span className="block text-[10.5px] font-extrabold tracking-[0.14em] uppercase text-muted mb-2.5 ml-1">
           Vurgu rengi
         </span>
         <div className="flex gap-2">
@@ -136,18 +136,18 @@ export function ProfileEditor({
       </div>
 
       <label className="block">
-        <span className="block text-[12px] font-bold text-muted mb-1.5 ml-1">
+        <span className="block text-[10.5px] font-extrabold tracking-[0.14em] uppercase text-muted mb-2 ml-1">
           İsim
         </span>
         <input
           name="name"
           defaultValue={name}
-          className="w-full rounded-2xl border border-line bg-cream px-4 h-12 text-[14.5px] outline-none focus:border-orange/60 transition"
+          className="w-full rounded-[18px] border border-line bg-cream px-4 h-12 text-[14.5px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition"
         />
       </label>
 
       <label className="block">
-        <span className="block text-[12px] font-bold text-muted mb-1.5 ml-1">
+        <span className="block text-[10.5px] font-extrabold tracking-[0.14em] uppercase text-muted mb-2 ml-1">
           Bio
         </span>
         <textarea
@@ -156,7 +156,7 @@ export function ProfileEditor({
           rows={2}
           maxLength={160}
           placeholder="Kendini bir cümleyle anlat"
-          className="w-full rounded-2xl border border-line bg-cream px-4 py-3 text-[14.5px] outline-none focus:border-orange/60 transition resize-none"
+          className="w-full rounded-[18px] border border-line bg-cream px-4 py-3 text-[14.5px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition resize-none"
         />
       </label>
 

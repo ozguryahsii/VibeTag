@@ -78,8 +78,9 @@ export default async function PeoplePage({
     .sort((a, b) => b.profile.ratingCount - a.profile.ratingCount);
 
   return (
-    <main className="px-5 pt-12">
-      <h1 className="text-[26px] font-black tracking-[-0.02em]">Kişiler</h1>
+    <main className="px-5 pt-10">
+      <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">YOUR CIRCLE</p>
+      <h1 className="vt-page-title text-[31px] tracking-[-0.02em]">Kişiler</h1>
       <p className="text-[13px] text-muted mt-1">
         Tanıdığın birini bul, ona bir Vibe bırak.
       </p>
@@ -89,7 +90,7 @@ export default async function PeoplePage({
           name="q"
           defaultValue={query}
           placeholder="İsim veya kullanıcı adı ara…"
-          className="w-full rounded-full border border-line bg-warmwhite px-5 h-13 text-[14.5px] outline-none focus:border-orange/60 focus:ring-4 focus:ring-orange/10 transition"
+          className="w-full rounded-full border border-line bg-warmwhite px-5 h-13 text-[14.5px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition shadow-[0_10px_30px_rgba(93,58,42,0.04)]"
         />
       </form>
 
@@ -115,7 +116,7 @@ export default async function PeoplePage({
                       <span className="text-[14.5px] font-extrabold truncate">
                         {u.name}
                       </span>
-                      {u.isVerified && <span className="text-[12px]">✅</span>}
+                      {u.isVerified && <span className="w-4 h-4 grid place-items-center rounded-full grad-score text-white text-[9px] font-black">✓</span>}
                       {ratedByMe.has(u.id) && (
                         <span className="text-[10px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-2 py-0.5">
                           Değerlendirdin

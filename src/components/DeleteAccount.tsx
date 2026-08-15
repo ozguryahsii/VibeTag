@@ -23,7 +23,8 @@ export function DeleteAccount({ username }: { username: string }) {
 
   return (
     <form action={action} className="card p-5 border-coral/30">
-      <p className="text-[14px] font-extrabold text-coral">
+      <p className="text-[10px] font-extrabold tracking-[0.2em] text-coral mb-2">DANGER ZONE</p>
+      <p className="vt-page-title text-[21px] leading-tight text-ink">
         Hesabını kalıcı olarak silmek üzeresin
       </p>
       <p className="text-[12.5px] text-muted mt-2 leading-relaxed">
@@ -33,13 +34,13 @@ export function DeleteAccount({ username }: { username: string }) {
       </p>
 
       <label className="block mt-4">
-        <span className="block text-[12px] font-bold text-muted mb-1.5 ml-1">
+        <span className="block text-[11px] font-extrabold tracking-[0.08em] text-muted mb-2 ml-1">
           Onaylamak için <b className="text-ink">{username}</b> yaz
         </span>
         <input
           name="confirm"
           autoComplete="off"
-          className="w-full rounded-2xl border border-line bg-cream px-4 h-12 text-[14.5px] outline-none focus:border-coral/60"
+          className="w-full rounded-[18px] border border-line bg-cream px-4 h-12 text-[14.5px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10"
         />
       </label>
 

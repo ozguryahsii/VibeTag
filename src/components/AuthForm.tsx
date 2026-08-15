@@ -13,12 +13,12 @@ function Field({
 }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <label className="block">
-      <span className="block text-[12px] font-bold text-muted mb-1.5 ml-1">
+      <span className="block text-[11px] font-extrabold tracking-[0.12em] uppercase text-muted mb-2 ml-1">
         {label}
       </span>
       <input
         {...props}
-        className="w-full rounded-2xl border border-line bg-warmwhite px-4 h-13 text-[15px] font-medium outline-none focus:border-orange/60 focus:ring-4 focus:ring-orange/10 transition"
+        className="w-full rounded-[18px] border border-line bg-warmwhite px-4 h-13 text-[15px] font-medium outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition shadow-[0_8px_24px_rgba(93,58,42,0.035)]"
       />
     </label>
   );
@@ -28,7 +28,7 @@ function Submit({ label }: { label: string }) {
   return (
     <button
       type="submit"
-      className="w-full h-13 rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)] active:scale-[0.98] transition-transform"
+      className="w-full h-13 rounded-full grad-score text-white font-bold text-[15px] tracking-[-0.01em] shadow-[0_12px_30px_rgba(255,92,119,0.28)] active:scale-[0.98] transition-transform"
     >
       {label}
     </button>
@@ -39,16 +39,17 @@ export function LoginForm() {
   const [state, action, pending] = useActionState(loginAction, initial);
 
   return (
-    <main className="min-h-dvh px-6 pt-14 pb-10 flex flex-col">
+    <main className="min-h-dvh px-6 pt-12 pb-10 flex flex-col overflow-hidden">
       <Wordmark size={20} />
-      <h1 className="mt-10 text-[30px] font-black tracking-[-0.03em] leading-tight">
-        Tekrar hoş geldin 👋
+      <p className="mt-11 text-[10px] font-extrabold tracking-[0.28em] text-coral">WELCOME BACK</p>
+      <h1 className="vt-page-title mt-2 text-[34px] tracking-[-0.03em] leading-tight">
+        Tekrar hoş geldin
       </h1>
       <p className="text-[14px] text-muted mt-1.5">
         Vibe profilin seni bekliyor.
       </p>
 
-      <form action={action} className="mt-8 grid gap-4">
+      <form action={action} className="mt-8 grid gap-4 relative">
         <Field
           label="E-posta"
           name="email"
@@ -89,9 +90,10 @@ export function RegisterForm() {
   const [state, action, pending] = useActionState(registerAction, initial);
 
   return (
-    <main className="min-h-dvh px-6 pt-14 pb-10 flex flex-col">
+    <main className="min-h-dvh px-6 pt-12 pb-10 flex flex-col overflow-hidden">
       <Wordmark size={20} />
-      <h1 className="mt-10 text-[30px] font-black tracking-[-0.03em] leading-tight">
+      <p className="mt-11 text-[10px] font-extrabold tracking-[0.28em] text-coral">CREATE YOUR SIGNATURE</p>
+      <h1 className="vt-page-title mt-2 text-[34px] tracking-[-0.03em] leading-tight">
         My Vibe’ını oluştur
       </h1>
       <p className="text-[14px] text-muted mt-1.5">

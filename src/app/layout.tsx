@@ -1,26 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Serif_Display, Inter } from "next/font/google";
+import { DM_Sans, Playfair_Display, Syne } from "next/font/google";
 import "./globals.css";
 
-// Self-hosted at build time — no external request at runtime, and the
-// Vibe Card canvas can rely on the family actually being there.
-const inter = Inter({
+// The approved Vibe Tag pairing: friendly clarity for product UI, an
+// editorial serif for story moments, and a distinctive geometric wordmark.
+const dmSans = DM_Sans({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-dm-sans",
 });
 
-// The editorial half of the pairing: names and the big Vibe Score number.
-// Inter alone reads like a dashboard; the serif is what makes the card feel
-// like something you would want on your story. DM Serif Display specifically:
-// it has lining figures, so "93" sits on the baseline instead of dropping
-// descenders into the label underneath it.
-const displaySerif = DM_Serif_Display({
+const playfair = Playfair_Display({
   subsets: ["latin", "latin-ext"],
-  weight: ["400"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-display-serif",
+  variable: "--font-playfair",
+});
+
+const syne = Syne({
+  subsets: ["latin", "latin-ext"],
+  weight: ["700", "800"],
+  display: "swap",
+  variable: "--font-syne",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +36,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#FAF7F2",
+  themeColor: "#FBF8F2",
 };
 
 export default function RootLayout({
@@ -43,7 +45,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="tr" className={`${inter.variable} ${displaySerif.variable}`}>
+    <html
+      lang="tr"
+      className={`${dmSans.variable} ${playfair.variable} ${syne.variable}`}
+    >
       <head>
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
       </head>

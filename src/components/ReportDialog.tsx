@@ -47,15 +47,15 @@ export function ReportDialog({
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-[480px] mx-auto rounded-t-[28px] sm:rounded-[28px] bg-warmwhite p-6 pb-8"
+            className="w-full max-w-[480px] mx-auto rounded-t-[30px] sm:rounded-[30px] bg-warmwhite p-6 pb-8 border border-line shadow-[0_24px_70px_rgba(76,44,31,0.18)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-10 h-1 rounded-full bg-line mx-auto mb-5 sm:hidden" />
 
             {state.ok ? (
               <div className="text-center py-4">
-                <div className="text-3xl">✓</div>
-                <p className="text-[15px] font-extrabold mt-2">Bildirimin alındı</p>
+                <div className="w-14 h-14 mx-auto rounded-full grid place-items-center grad-score text-white text-xl font-black">✓</div>
+                <p className="vt-page-title text-[22px] mt-4">Bildirimin alındı</p>
                 <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
                   {state.ok}
                 </p>
@@ -75,7 +75,8 @@ export function ReportDialog({
                   <input type="hidden" name="username" value={username} />
                 )}
 
-                <h2 className="text-[19px] font-black tracking-[-0.02em]">
+                <p className="text-[10px] font-extrabold tracking-[0.22em] text-coral mb-2">SAFETY</p>
+                <h2 className="vt-page-title text-[24px] tracking-[-0.02em]">
                   Neyi bildirmek istiyorsun?
                 </h2>
                 <p className="text-[12.5px] text-muted mt-1.5 leading-relaxed">
@@ -88,7 +89,7 @@ export function ReportDialog({
                   {REPORT_REASONS.map((r, i) => (
                     <label
                       key={r.key}
-                      className="flex items-center gap-3 rounded-2xl border border-line bg-cream px-4 py-3 cursor-pointer"
+                      className="flex items-center gap-3 rounded-[18px] border border-line bg-cream px-4 py-3 cursor-pointer has-[:checked]:border-coral/40 has-[:checked]:bg-tagbg"
                     >
                       <input
                         type="radio"
@@ -109,7 +110,7 @@ export function ReportDialog({
                   rows={3}
                   maxLength={500}
                   placeholder="Kısaca ne olduğunu anlatabilirsin (isteğe bağlı)"
-                  className="mt-3 w-full rounded-2xl border border-line bg-cream p-4 text-[14px] outline-none focus:border-orange/60 resize-none"
+                  className="mt-3 w-full rounded-[18px] border border-line bg-cream p-4 text-[14px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 resize-none"
                 />
 
                 {state.error && (

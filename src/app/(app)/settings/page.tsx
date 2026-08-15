@@ -57,8 +57,9 @@ export default async function SettingsPage() {
   });
 
   return (
-    <main className="px-5 pt-12">
-      <h1 className="text-[27px] font-black tracking-[-0.02em]">Profil</h1>
+    <main className="px-5 pt-10">
+      <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">YOUR VIBE IDENTITY</p>
+      <h1 className="vt-page-title text-[31px] tracking-[-0.02em]">Profil</h1>
       <p className="text-[13px] text-muted mt-1">
         @{user.username} · {user.email}
       </p>
@@ -102,7 +103,7 @@ export default async function SettingsPage() {
             return (
               <div
                 key={p.key}
-                className={`rounded-[24px] p-5 ${
+                className={`rounded-[26px] p-5 ${
                   active ? "grad-ring" : "bg-warmwhite border border-line"
                 }`}
                 style={{
@@ -114,7 +115,7 @@ export default async function SettingsPage() {
                 <div className="flex items-baseline justify-between">
                   <div>
                     <span className="text-[16px] font-black">{p.name}</span>
-                    <span className="text-[12px] font-bold text-purple ml-2">
+                    <span className="text-[12px] font-bold text-coral ml-2">
                       {p.tagline}
                     </span>
                   </div>
@@ -142,9 +143,7 @@ export default async function SettingsPage() {
                     <input type="hidden" name="plan" value={p.key} />
                     <button
                       type="submit"
-                      className={`h-11 w-full rounded-full font-bold text-[14px] text-white active:scale-[0.98] transition-transform ${
-                        p.key === "GOLD" ? "grad-premium" : "grad-score"
-                      }`}
+                      className="h-11 w-full rounded-full font-bold text-[14px] text-white active:scale-[0.98] transition-transform grad-score"
                     >
                       {p.key === "FREE" ? "Free'ye dön" : `${p.name}'a geç`}
                     </button>

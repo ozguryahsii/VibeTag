@@ -24,8 +24,8 @@ export function TagPill({
   tone?: "warm" | "purple" | "solid";
 }) {
   const tones = {
-    warm: { bg: "#FFF0E8", fg: "#FF8A3D", bd: "#FFE3D2" },
-    purple: { bg: "#F3EEFF", fg: "#8B5CF6", bd: "#E7DEFF" },
+    warm: { bg: "#EEE4D5", fg: "#967043", bd: "#E4D7C8" },
+    purple: { bg: "rgba(255,249,235,0.76)", fg: "#D65B74", bd: "#F0C298" },
     solid: { bg: "rgba(255,255,255,0.18)", fg: "#fff", bd: "rgba(255,255,255,0.35)" },
   }[tone];
 
@@ -38,6 +38,7 @@ export function TagPill({
         background: tones.bg,
         color: tones.fg,
         border: `1px solid ${tones.bd}`,
+        boxShadow: tone === "purple" ? "0 4px 9px rgba(221,105,55,.1)" : undefined,
       }}
     >
       {tagKey ? (
@@ -78,7 +79,7 @@ export function SectionTitle({
 }) {
   return (
     <div className="flex items-end justify-between mb-3 px-1">
-      <h2 className="text-[15px] font-extrabold tracking-tight text-ink">
+      <h2 className="font-display text-[17px] font-semibold tracking-[-0.02em] text-ink">
         {children}
       </h2>
       {action}
@@ -100,9 +101,9 @@ type ButtonProps = {
 };
 
 const VARIANTS: Record<string, string> = {
-  primary: "text-white grad-score shadow-[0_10px_30px_rgba(255,92,119,0.35)]",
-  premium: "text-white grad-premium shadow-[0_10px_30px_rgba(139,92,246,0.3)]",
-  ghost: "text-ink bg-white border border-line",
+  primary: "text-white grad-score shadow-[0_10px_28px_rgba(221,105,55,0.25)]",
+  premium: "text-white grad-premium shadow-[0_10px_28px_rgba(216,89,121,0.24)]",
+  ghost: "text-ink bg-warmwhite border border-line shadow-[0_5px_16px_rgba(83,60,40,0.06)]",
   outline: "text-orange bg-transparent border-2 border-orange/40",
 };
 
@@ -116,7 +117,7 @@ export function Button({
   disabled,
   className = "",
 }: ButtonProps) {
-  const cls = `inline-flex items-center justify-center gap-2 rounded-full px-6 h-13 py-3.5 text-[15px] font-bold transition-transform active:scale-[0.97] disabled:opacity-40 ${
+  const cls = `inline-flex items-center justify-center gap-2 rounded-full px-6 h-13 py-3.5 text-[15px] font-semibold transition-transform active:scale-[0.97] disabled:opacity-40 ${
     VARIANTS[variant]
   } ${full ? "w-full" : ""} ${className}`;
 

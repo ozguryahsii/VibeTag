@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ICONS, iconFor, type IconDef } from "@/lib/icons";
+import { iconFor, type IconDef } from "@/lib/icons";
 import { initialsOf } from "@/components/Avatar";
 
 /**
@@ -47,7 +47,7 @@ const THEMES = {
   },
   glow: {
     label: "Glow",
-    swatch: "linear-gradient(135deg,#FF9A3D,#FF5C77,#FF7AA2)",
+    swatch: "linear-gradient(135deg,#F5AD3E,#EF7648,#EC476D)",
   },
   calm: {
     label: "Calm",
@@ -55,7 +55,7 @@ const THEMES = {
   },
   aura: {
     label: "Aura",
-    swatch: "linear-gradient(135deg,#FF8A3D,#FF5C77,#8B5CF6)",
+    swatch: "linear-gradient(135deg,#F2A03F,#F05262,#C95C76)",
   },
 } as const;
 
@@ -81,10 +81,11 @@ function cssVar(name: string, fallback: string): string {
 }
 
 function sans(weight: number, size: number) {
-  return `${weight} ${size}px ${cssVar("--font-inter", "sans-serif")}, sans-serif`;
+  return `${weight} ${size}px ${cssVar("--font-dm-sans", "DM Sans")}, sans-serif`;
 }
 function serif(weight: number, size: number) {
-  return `${weight} ${size}px ${cssVar("--font-display-serif", "Georgia")}, Georgia, serif`;
+  const playfair = cssVar("--font-playfair", '"Playfair Display"');
+  return `${weight} ${size}px Didot, "Bodoni 72", ${playfair}, Georgia, serif`;
 }
 
 function roundRect(
@@ -120,6 +121,180 @@ function bloom(
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.restore();
+}
+
+const FINGERPRINT_PATHS = [
+  "M8.5 27C15 13 27 5.5 40 5.5S66 13.5 72 28",
+  "M4.5 52V43C4.5 24 20 12.5 40 12.5S75.5 25 75.5 44V52",
+  "M13.5 63V44C13.5 29 24.8 20 40 20S66.8 30 66.8 45.5V63",
+  "M22.7 73.5V46C22.7 34.7 29.9 27.6 40.1 27.6 51.3 27.6 59 35.4 59 47V64.5",
+  "M40.6 35.2C33.4 35.2 29.3 40.3 29.3 47.5 29.3 58.3 34.2 76.9 38.5 88.7 40 92.9 44.3 93 46 88.8 50.5 77.6 55.7 59.2 55.7 47.6 55.7 40 49.9 35.2 40.6 35.2Z",
+];
+
+function drawFingerprint(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  muted = false,
+) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(width / 80, width / 80);
+  const g = ctx.createLinearGradient(5, 18, 76, 68);
+  g.addColorStop(0, "#FF9B3F");
+  g.addColorStop(0.48, "#FF705C");
+  g.addColorStop(1, "#F1436D");
+  ctx.strokeStyle = muted ? "#C6B49D" : g;
+  ctx.globalAlpha = muted ? 0.5 : 1;
+  ctx.lineWidth = 3.7;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  for (const d of FINGERPRINT_PATHS) ctx.stroke(new Path2D(d));
+  ctx.restore();
+}
+
+function drawSparkle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  r: number,
+  color = "#FFFFFF",
+) {
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x, y - r);
+  ctx.lineTo(x + r * 0.28, y - r * 0.28);
+  ctx.lineTo(x + r, y);
+  ctx.lineTo(x + r * 0.28, y + r * 0.28);
+  ctx.lineTo(x, y + r);
+  ctx.lineTo(x - r * 0.28, y + r * 0.28);
+  ctx.lineTo(x - r, y);
+  ctx.lineTo(x - r * 0.28, y - r * 0.28);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawGlowWaves(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
+  const top = (fill: string, alpha: number, depth: number, reach: number) => {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + w * reach, y);
+    ctx.bezierCurveTo(
+      x + w * (reach - 0.12),
+      y + h * 0.025,
+      x + w * 0.38,
+      y + h * depth * 0.72,
+      x,
+      y + h * depth,
+    );
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  };
+  top("#F7BD68", 0.55, 0.22, 0.94);
+  top("#F58458", 0.78, 0.18, 0.72);
+  top("#EF5962", 0.9, 0.12, 0.5);
+
+  const bottom = (
+    fill: string,
+    alpha: number,
+    start: number,
+    crest: number,
+  ) => {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    ctx.moveTo(x, y + h * start);
+    ctx.bezierCurveTo(
+      x + w * 0.22,
+      y + h * crest,
+      x + w * 0.57,
+      y + h * (start + 0.06),
+      x + w,
+      y + h * (crest - 0.01),
+    );
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  };
+  bottom("#F8C16F", 0.5, 0.9, 0.84);
+  bottom("#F58D5D", 0.68, 0.94, 0.86);
+  bottom("#EF596A", 0.86, 0.975, 0.9);
+  bottom("#E93E75", 0.62, 0.995, 0.94);
+
+  drawSparkle(ctx, x + w * 0.08, y + h * 0.035, w * 0.008);
+  drawSparkle(ctx, x + w * 0.14, y + h * 0.052, w * 0.006);
+  drawSparkle(ctx, x + w * 0.88, y + h * 0.94, w * 0.008);
+}
+
+function drawCalmWaves(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
+  for (const [offset, color, alpha] of [
+    [0.13, "#EEE7DC", 0.46],
+    [0.17, "#E7DED1", 0.56],
+  ] as const) {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.globalAlpha = alpha;
+    ctx.beginPath();
+    ctx.moveTo(x, y + h * offset);
+    ctx.bezierCurveTo(
+      x + w * 0.15,
+      y + h * (offset - 0.07),
+      x + w * 0.24,
+      y + h * (offset + 0.07),
+      x + w * 0.42,
+      y + h * (offset + 0.1),
+    );
+    ctx.bezierCurveTo(
+      x + w * 0.62,
+      y + h * (offset + 0.13),
+      x + w * 0.74,
+      y + h * (offset - 0.02),
+      x + w,
+      y + h * (offset + 0.06),
+    );
+    ctx.lineTo(x + w, y + h * (offset + 0.11));
+    ctx.bezierCurveTo(
+      x + w * 0.75,
+      y + h * (offset + 0.04),
+      x + w * 0.62,
+      y + h * (offset + 0.2),
+      x + w * 0.41,
+      y + h * (offset + 0.16),
+    );
+    ctx.bezierCurveTo(
+      x + w * 0.23,
+      y + h * (offset + 0.13),
+      x + w * 0.14,
+      y + h * (offset + 0.01),
+      x,
+      y + h * (offset + 0.08),
+    );
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
 }
 
 /** Draw a 24×24 line icon centred at (x, y) with the given box size. */
@@ -192,13 +367,13 @@ export function VibeCardStudio({ data }: { data: CardData }) {
         : theme === "calm"
           ? "calm"
           : toneFor(data.score);
-    const purple = theme === "aura";
+    const rose = theme === "aura";
 
     // ---------------------------------------------------------- backdrop
-    ctx.fillStyle = "#FAF7F2";
+    ctx.fillStyle = "#FBF8F2";
     ctx.fillRect(0, 0, w, h);
-    bloom(ctx, w * 0.85, h * 0.05, w * 0.8, "rgba(255,138,61,0.18)", 1);
-    bloom(ctx, w * 0.1, h * 0.95, w * 0.8, "rgba(255,122,162,0.14)", 1);
+    bloom(ctx, w * 0.86, h * 0.04, w * 0.7, "rgba(242,160,63,0.13)", 1);
+    bloom(ctx, w * 0.12, h * 0.96, w * 0.72, "rgba(240,82,98,0.1)", 1);
 
     // ------------------------------------------------------------- card
     const isWide = format === "wide";
@@ -207,17 +382,24 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     const cardX = (w - cardW) / 2;
     const cardH = isWide
       ? h - margin * 2
-      : Math.min(h - margin * 2.4, cardW * 1.5);
+      : Math.min(
+          h - margin * 2.4,
+          cardW * (tone === "calm" ? 1.76 : 1.65),
+        );
     const cardY = (h - cardH) / 2 - (isWide ? 0 : h * 0.012);
-    const radius = cardW * 0.085;
-    const u = cardW; // every measurement scales off the card width
+    const radius = cardW * 0.07;
+    // Portrait uses the card width as its design unit. Square and wide cards
+    // are height-constrained, so the same composition scales down intact
+    // instead of letting the score or footer escape the rounded surface.
+    const designRatio = tone === "calm" ? 1.76 : 1.65;
+    const u = Math.min(cardW, cardH / designRatio);
 
     ctx.save();
     ctx.shadowColor =
-      tone === "celebratory" ? "rgba(255,92,119,0.26)" : "rgba(31,31,31,0.10)";
+      tone === "celebratory" ? "rgba(240,82,98,0.2)" : "rgba(83,60,40,0.12)";
     ctx.shadowBlur = u * 0.13;
     ctx.shadowOffsetY = u * 0.035;
-    ctx.fillStyle = "#FFFDFB";
+    ctx.fillStyle = "#FCF8EF";
     roundRect(ctx, cardX, cardY, cardW, cardH, radius);
     ctx.fill();
     ctx.restore();
@@ -228,51 +410,32 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     ctx.clip();
 
     if (tone === "celebratory") {
-      ctx.fillStyle = "#FFF9F3";
+      ctx.fillStyle = "#FCF8EF";
       ctx.fillRect(cardX, cardY, cardW, cardH);
-      bloom(ctx, cardX + cardW * 0.04, cardY + cardH * 0.03, cardW * 0.85, "rgba(255,168,90,0.9)", 0.72);
-      bloom(ctx, cardX + cardW * 1.04, cardY + cardH * 0.14, cardW * 0.66, "rgba(255,206,152,0.85)", 0.6);
-      bloom(
-        ctx,
-        cardX + cardW * 1.0,
-        cardY + cardH * 1.0,
-        cardW * 0.95,
-        purple ? "rgba(163,124,246,0.75)" : "rgba(255,122,162,0.85)",
-        0.72,
-      );
-      bloom(ctx, cardX - cardW * 0.1, cardY + cardH * 0.86, cardW * 0.66, "rgba(255,190,130,0.75)", 0.48);
+      drawGlowWaves(ctx, cardX, cardY, cardW, cardH);
     } else if (tone === "warm") {
-      ctx.fillStyle = "#FFFBF7";
+      ctx.fillStyle = "#FCF8EF";
       ctx.fillRect(cardX, cardY, cardW, cardH);
-      bloom(ctx, cardX + cardW * 0.95, cardY, cardW * 0.8, "rgba(255,190,140,0.55)", 0.6);
-      bloom(ctx, cardX, cardY + cardH, cardW * 0.8, "rgba(255,172,192,0.45)", 0.5);
+      drawGlowWaves(ctx, cardX, cardY, cardW, cardH);
+      ctx.save();
+      ctx.globalAlpha = 0.42;
+      ctx.fillStyle = "#FCF8EF";
+      ctx.fillRect(cardX, cardY, cardW, cardH);
+      ctx.restore();
     } else {
-      ctx.fillStyle = "#FBF8F4";
+      ctx.fillStyle = "#FCF8EF";
       ctx.fillRect(cardX, cardY, cardW, cardH);
-      // barely-there hills, so a modest score still looks designed, not empty
-      ctx.fillStyle = "rgba(31,31,31,0.028)";
-      ctx.beginPath();
-      ctx.ellipse(cardX + cardW * 0.2, cardY + cardH * 0.2, cardW * 0.44, cardH * 0.1, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(cardX + cardW * 0.86, cardY + cardH * 0.26, cardW * 0.34, cardH * 0.075, 0, 0, Math.PI * 2);
-      ctx.fill();
+      drawCalmWaves(ctx, cardX, cardY, cardW, cardH);
     }
 
     // ------------------------------------------------ fingerprint watermark
-    const fpX = cardX + cardW - u * 0.125;
-    const fpY = cardY + u * 0.115;
-    ctx.save();
-    ctx.globalAlpha = tone === "calm" ? 0.15 : 0.26;
-    drawIcon(
+    drawFingerprint(
       ctx,
-      ICONS.fingerprint,
-      fpX,
-      fpY,
-      u * 0.115,
-      tone === "calm" ? "#8A7F76" : "#FF7A4D",
+      cardX + cardW - u * 0.19,
+      cardY + u * 0.06,
+      u * 0.13,
+      tone === "calm",
     );
-    ctx.restore();
 
     // ------------------------------------------------------------ helpers
     const cx = cardX + cardW / 2;
@@ -282,11 +445,9 @@ export function VibeCardStudio({ data }: { data: CardData }) {
       ctx.textAlign = "left";
     };
 
-    let y = cardY + cardH * (isWide ? 0.1 : 0.085);
-
     // ------------------------------------------------------------- avatar
-    const ar = u * 0.115;
-    y += ar;
+    const ar = u * 0.154;
+    let y = cardY + u * (isWide ? 0.065 : 0.09) + ar;
     ctx.save();
     ctx.shadowColor = "rgba(31,31,31,0.15)";
     ctx.shadowBlur = u * 0.05;
@@ -329,28 +490,29 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     ctx.arc(cx, y, ar, 0, Math.PI * 2);
     if (tone === "celebratory") {
       const rg = ctx.createLinearGradient(cx - ar, y - ar, cx + ar, y + ar);
-      rg.addColorStop(0, "#FF8A3D");
-      rg.addColorStop(1, purple ? "#8B5CF6" : "#FF5C77");
+      rg.addColorStop(0, "#F5AD3E");
+      rg.addColorStop(0.55, "#EF7648");
+      rg.addColorStop(1, rose ? "#C95C76" : "#EC476D");
       ctx.strokeStyle = rg;
-      ctx.lineWidth = u * 0.011;
+      ctx.lineWidth = u * 0.008;
     } else {
-      ctx.strokeStyle = "rgba(31,31,31,0.09)";
-      ctx.lineWidth = u * 0.007;
+      ctx.strokeStyle = "rgba(198,180,157,0.55)";
+      ctx.lineWidth = u * 0.006;
     }
     ctx.stroke();
 
     // --------------------------------------------------------------- name
-    y += ar + u * 0.082;
-    ctx.fillStyle = "#241F1B";
-    ctx.font = serif(600, u * 0.079);
+    y += ar + u * 0.075;
+    ctx.fillStyle = "#2D211C";
+    ctx.font = sans(600, u * 0.068);
     center(data.name, y);
 
     // ------------------------------------------------------------ divider
-    y += u * 0.048;
-    const dw = u * 0.185;
+    y += u * 0.055;
+    const dw = u * 0.11;
     ctx.strokeStyle =
-      tone === "calm" ? "rgba(31,31,31,0.14)" : "rgba(255,138,61,0.5)";
-    ctx.lineWidth = u * 0.0035;
+      tone === "calm" ? "rgba(173,156,137,0.75)" : "rgba(240,82,98,0.64)";
+    ctx.lineWidth = u * 0.002;
     ctx.beginPath();
     ctx.moveTo(cx - dw, y);
     ctx.lineTo(cx - u * 0.022, y);
@@ -358,48 +520,48 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     ctx.lineTo(cx + dw, y);
     ctx.stroke();
     ctx.beginPath();
-    ctx.arc(cx, y, u * 0.0075, 0, Math.PI * 2);
-    ctx.fillStyle = tone === "calm" ? "#B9AEA4" : "#FF6B52";
+    ctx.arc(cx, y, u * 0.007, 0, Math.PI * 2);
+    ctx.fillStyle = tone === "calm" ? "#AD9C89" : "#F05262";
     ctx.fill();
 
     // ---------------------------------------------------------- MY VIBE
-    y += u * 0.072;
-    ctx.fillStyle = tone === "calm" ? "#8A7F76" : "#B0705A";
-    ctx.font = sans(600, u * 0.035);
-    ctx.letterSpacing = `${u * 0.017}px`;
+    y += u * 0.075;
+    ctx.fillStyle = tone === "calm" ? "#665A51" : "#F05262";
+    ctx.font = sans(600, u * 0.04);
+    ctx.letterSpacing = `${u * 0.0155}px`;
     center("MY VIBE", y);
     ctx.letterSpacing = "0px";
 
     if (showScore) {
-      const scoreSize = u * 0.275;
-      const scoreCy = y + u * 0.14;
+      const scoreSize = u * 0.39;
+      const scoreCy = y + u * 0.22;
 
       // ---------------------------------------------------------- rays
       if (tone === "celebratory") {
         ctx.save();
-        ctx.strokeStyle = purple
-          ? "rgba(139,92,246,0.5)"
-          : "rgba(255,138,61,0.5)";
+        ctx.strokeStyle = rose
+          ? "rgba(201,92,118,0.45)"
+          : "rgba(242,160,63,0.52)";
         ctx.lineCap = "round";
-        for (let i = 0; i < 26; i++) {
-          const a = (i / 26) * Math.PI * 2 + 0.12;
-          const inner = u * (0.235 + noise(i) * 0.05);
-          const outer = inner + u * (0.032 + noise(i + 40) * 0.05);
-          ctx.globalAlpha = 0.22 + noise(i + 7) * 0.5;
-          ctx.lineWidth = u * 0.0042;
+        for (let i = 0; i < 14; i++) {
+          const a = (i / 14) * Math.PI * 2 + 0.12;
+          const inner = u * (0.27 + noise(i) * 0.025);
+          const outer = inner + u * (0.045 + noise(i + 40) * 0.035);
+          ctx.globalAlpha = 0.28 + noise(i + 7) * 0.42;
+          ctx.lineWidth = u * 0.003;
           ctx.beginPath();
           ctx.moveTo(cx + Math.cos(a) * inner, scoreCy + Math.sin(a) * inner * 0.8);
           ctx.lineTo(cx + Math.cos(a) * outer, scoreCy + Math.sin(a) * outer * 0.8);
           ctx.stroke();
         }
-        for (let i = 0; i < 16; i++) {
+        for (let i = 0; i < 12; i++) {
           const a = noise(i + 90) * Math.PI * 2;
           const d = u * (0.22 + noise(i + 130) * 0.16);
           const sy = scoreCy + Math.sin(a) * d * 0.82;
           // keep the label band clear
           if (sy > scoreCy + u * 0.12) continue;
           ctx.globalAlpha = 0.18 + noise(i + 200) * 0.4;
-          ctx.fillStyle = i % 3 === 0 ? "#FF5C77" : "#FF9A3D";
+          ctx.fillStyle = i % 3 === 0 ? "#F05262" : "#F2A03F";
           ctx.beginPath();
           ctx.arc(
             cx + Math.cos(a) * d,
@@ -414,10 +576,10 @@ export function VibeCardStudio({ data }: { data: CardData }) {
       }
 
       // --------------------------------------------------------- score
-      y += u * 0.238;
-      ctx.font = serif(700, scoreSize);
+      y += u * 0.31;
+      ctx.font = serif(400, scoreSize);
       if (tone === "calm") {
-        ctx.fillStyle = "#5C5049";
+        ctx.fillStyle = "#4C3D33";
       } else {
         const sg = ctx.createLinearGradient(
           cx - u * 0.2,
@@ -425,17 +587,18 @@ export function VibeCardStudio({ data }: { data: CardData }) {
           cx + u * 0.2,
           y,
         );
-        sg.addColorStop(0, "#FF9A3D");
-        sg.addColorStop(1, purple ? "#8B5CF6" : "#FF4E73");
+        sg.addColorStop(0, "#F5AD3C");
+        sg.addColorStop(0.5, "#F17146");
+        sg.addColorStop(1, rose ? "#C95C76" : "#E73D76");
         ctx.fillStyle = sg;
       }
       center(String(data.score), y);
 
       // ---------------------------------------------------- VIBE SCORE
       y += u * 0.075;
-      ctx.fillStyle = tone === "calm" ? "#8A7F76" : "#E0567A";
-      ctx.font = sans(700, u * 0.035);
-      ctx.letterSpacing = `${u * 0.016}px`;
+      ctx.fillStyle = tone === "calm" ? "#665A51" : "#F05262";
+      ctx.font = sans(600, u * 0.0365);
+      ctx.letterSpacing = `${u * 0.0135}px`;
       center("VIBE SCORE", y);
       ctx.letterSpacing = "0px";
     } else {
@@ -443,7 +606,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     }
 
     // ----------------------------------------------------------- mood line
-    y += u * 0.072;
+    y += u * 0.085;
     const moodText = !showScore
       ? "People see me as"
       : data.percentile && data.score >= 80
@@ -454,20 +617,20 @@ export function VibeCardStudio({ data }: { data: CardData }) {
             ? "Growing strong"
             : "Room to grow";
 
-    ctx.font = sans(600, u * 0.042);
+    ctx.font = sans(600, u * 0.0445);
     const mw = ctx.measureText(moodText).width;
     const badgeR = u * 0.026;
     const moodStart = cx - (mw + badgeR * 2 + u * 0.022) / 2;
 
     ctx.beginPath();
     ctx.arc(moodStart + badgeR, y - u * 0.013, badgeR, 0, Math.PI * 2);
-    ctx.fillStyle =
-      tone === "calm" ? "rgba(31,31,31,0.06)" : "rgba(255,138,61,0.17)";
-    ctx.fill();
+    ctx.strokeStyle = tone === "calm" ? "#A67A3D" : "#F05262";
+    ctx.lineWidth = u * 0.0025;
+    ctx.stroke();
     ctx.font = sans(400, u * 0.027);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = tone === "calm" ? "#9A8E84" : "#FF6B3D";
+    ctx.fillStyle = tone === "calm" ? "#A67A3D" : "#F05262";
     ctx.fillText(
       tone === "calm" ? "↗" : data.percentile && data.score >= 80 ? "★" : "✦",
       moodStart + badgeR,
@@ -476,14 +639,14 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     ctx.textBaseline = "alphabetic";
     ctx.textAlign = "left";
 
-    ctx.font = sans(600, u * 0.042);
-    ctx.fillStyle = tone === "calm" ? "#6B6B6B" : "#C4405F";
+    ctx.font = sans(500, u * 0.0445);
+    ctx.fillStyle = tone === "calm" ? "#A67A3D" : "#F05262";
     ctx.fillText(moodText, moodStart + badgeR * 2 + u * 0.022, y);
 
     // --------------------------------------------------------- trait pills
-    y += u * 0.078;
-    const pillH = u * 0.096;
-    const pillGap = u * 0.026;
+    y += u * 0.07;
+    const pillH = u * 0.107;
+    const pillGap = u * 0.022;
     let pillFont = u * 0.041;
     const chosen = data.tags.slice(0, 4);
 
@@ -525,15 +688,15 @@ export function VibeCardStudio({ data }: { data: CardData }) {
       for (const i of r) {
         const t = chosen[i];
         ctx.fillStyle =
-          tone === "calm" ? "rgba(31,31,31,0.035)" : "rgba(255,255,255,0.6)";
+          tone === "calm" ? "#EEE4D5" : "rgba(255,249,235,0.72)";
         ctx.strokeStyle =
-          tone === "calm" ? "rgba(31,31,31,0.10)" : "rgba(255,138,61,0.4)";
-        ctx.lineWidth = u * 0.0035;
+          tone === "calm" ? "rgba(238,228,213,0)" : "#F0C298";
+        ctx.lineWidth = u * 0.0025;
         roundRect(ctx, x, y, widths[i], pillH, pillH / 2);
         ctx.fill();
         ctx.stroke();
 
-        const ink = tone === "calm" ? "#6A5C53" : "#D2543F";
+        const ink = tone === "calm" ? "#967043" : "#ED6A49";
         drawIcon(
           ctx,
           iconFor(t.key),
@@ -554,22 +717,22 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     }
 
     // ------------------------------------------------------- rater footer
-    const footY = cardY + cardH - u * 0.1;
-    ctx.strokeStyle = "rgba(31,31,31,0.08)";
+    const footY =
+      cardY + cardH - u * (tone === "calm" ? 0.18 : 0.14);
+    const footLineY =
+      cardY + cardH - u * (tone === "calm" ? 0.31 : 0.25);
+    ctx.strokeStyle = "rgba(228,215,200,0.95)";
     ctx.lineWidth = u * 0.003;
     ctx.beginPath();
-    ctx.moveTo(cardX + u * 0.1, footY - u * 0.07);
-    ctx.lineTo(cardX + cardW - u * 0.1, footY - u * 0.07);
+    ctx.moveTo(cardX + u * 0.09, footLineY);
+    ctx.lineTo(cardX + cardW - u * 0.09, footLineY);
     ctx.stroke();
 
     // Stand-in avatars: raters are anonymous by design, so these are
     // decorative silhouettes — never the actual people who rated you.
-    const stackR = u * 0.032;
+    const stackR = u * 0.041;
     const shown = Math.min(3, data.ratingCount);
-    ctx.font = sans(500, u * 0.039);
-    const labelW = ctx.measureText(`Rated by ${data.ratingCount} people`).width;
-    const stackW = shown > 0 ? stackR * 2 + (shown - 1) * stackR * 1.25 : 0;
-    let sx = cx - (stackW + labelW + u * 0.035) / 2 + stackR;
+    let sx = cardX + u * 0.11 + stackR;
 
     for (let i = 0; i < shown; i++) {
       ctx.beginPath();
@@ -586,8 +749,8 @@ export function VibeCardStudio({ data }: { data: CardData }) {
         sx + stackR,
         footY + stackR,
       );
-      pg.addColorStop(0, ["#FFD3B0", "#FFC1CE", "#E4D6FF"][i % 3]);
-      pg.addColorStop(1, ["#FFB98A", "#FFA5B8", "#CFC0FF"][i % 3]);
+      pg.addColorStop(0, ["#FFD3B0", "#FFC1CE", "#E8DCC9"][i % 3]);
+      pg.addColorStop(1, ["#FFB98A", "#FFA5B8", "#C8B79E"][i % 3]);
       ctx.fillStyle = pg;
       ctx.fillRect(sx - stackR, footY - stackR, stackR * 2, stackR * 2);
       ctx.fillStyle = "rgba(255,255,255,0.8)";
@@ -602,21 +765,24 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     }
 
     ctx.textBaseline = "middle";
-    const textX = shown > 0 ? sx + stackR * 0.55 : cx - labelW / 2;
-    ctx.font = sans(500, u * 0.039);
-    ctx.fillStyle = "#6B6B6B";
-    ctx.fillText("Rated by ", textX, footY);
-    const byW = ctx.measureText("Rated by ").width;
-    ctx.font = sans(800, u * 0.039);
-    ctx.fillStyle = "#241F1B";
-    ctx.fillText(`${data.ratingCount}`, textX + byW, footY);
-    const nW = ctx.measureText(`${data.ratingCount}`).width;
-    ctx.font = sans(500, u * 0.039);
-    ctx.fillStyle = "#6B6B6B";
-    ctx.fillText(" people", textX + byW + nW, footY);
+    const textX = shown > 0 ? sx + stackR * 0.7 : cardX + u * 0.11;
+    ctx.font = sans(500, u * 0.034);
+    ctx.fillStyle = "#746860";
+    ctx.fillText("Rated by", textX, footY - u * 0.022);
+    ctx.font = sans(500, u * 0.045);
+    ctx.fillStyle = "#2D211C";
+    ctx.fillText(`${data.ratingCount} people`, textX, footY + u * 0.028);
     ctx.textBaseline = "alphabetic";
 
     ctx.restore(); // end card clip
+
+    ctx.save();
+    roundRect(ctx, cardX, cardY, cardW, cardH, radius);
+    ctx.strokeStyle =
+      tone === "calm" ? "rgba(224,211,192,0.82)" : "#F4AC78";
+    ctx.lineWidth = u * 0.003;
+    ctx.stroke();
+    ctx.restore();
 
     // ------------------------------------------------------ outer branding
     ctx.textAlign = "center";
@@ -650,7 +816,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
 
   useEffect(() => {
     draw();
-    // Redraw once the webfonts land, so the export uses Inter + Playfair
+    // Redraw once the webfonts land, so the export uses DM Sans + Playfair
     // rather than whatever fallback happened to be up on first paint.
     if (typeof document !== "undefined" && "fonts" in document) {
       document.fonts.ready.then(draw).catch(() => {});
@@ -746,8 +912,8 @@ export function VibeCardStudio({ data }: { data: CardData }) {
               aria-label={THEMES[k].label}
               className="flex-1 rounded-2xl p-1.5 transition-transform active:scale-95"
               style={{
-                border: theme === k ? "2px solid #FF5C77" : "1px solid #F0E5DD",
-                background: "#FFF8F5",
+                border: theme === k ? "2px solid #F05262" : "1px solid #E4D7C8",
+                background: "#FCF8EF",
               }}
             >
               <span
@@ -771,7 +937,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
           type="checkbox"
           checked={showScore}
           onChange={(e) => setShowScore(e.target.checked)}
-          className="w-5 h-5 accent-[#FF5C77]"
+          className="w-5 h-5 accent-[#F05262]"
         />
         <span>
           <span className="block text-[13.5px] font-bold">Skoru göster</span>
@@ -790,7 +956,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
         </button>
         <button
           onClick={download}
-          className="h-13 rounded-full bg-white border border-line font-bold text-[15px] active:scale-[0.98] transition-transform"
+          className="h-13 rounded-full bg-warmwhite border border-line font-bold text-[15px] shadow-[0_5px_16px_rgba(83,60,40,0.06)] active:scale-[0.98] transition-transform"
         >
           PNG indir ({f.w}×{f.h})
         </button>

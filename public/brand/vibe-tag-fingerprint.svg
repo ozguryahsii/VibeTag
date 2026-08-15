@@ -1,12 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 0 96 96" width="96" height="96" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="960" viewBox="-8 0 96 96" fill="none">
   <defs>
-    <linearGradient id="g" x1="5" y1="18" x2="76" y2="68" gradientUnits="userSpaceOnUse">
+    <linearGradient id="vibe-gradient" x1="5" y1="18" x2="76" y2="68" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#FF9B3F"/>
       <stop offset="0.48" stop-color="#FF705C"/>
       <stop offset="1" stop-color="#F1436D"/>
     </linearGradient>
   </defs>
-  <g stroke="url(#g)" stroke-width="3.7" stroke-linecap="round" stroke-linejoin="round">
+  <g stroke="url(#vibe-gradient)" stroke-width="3.7" stroke-linecap="round" stroke-linejoin="round">
     <path d="M8.5 27C15 13 27 5.5 40 5.5S66 13.5 72 28"/>
     <path d="M4.5 52V43C4.5 24 20 12.5 40 12.5S75.5 25 75.5 44V52"/>
     <path d="M13.5 63V44C13.5 29 24.8 20 40 20S66.8 30 66.8 45.5V63"/>

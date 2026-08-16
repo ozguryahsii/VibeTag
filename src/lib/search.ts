@@ -1,26 +1,20 @@
 import type { Prisma } from "@prisma/client";
 
 /**
- * Case-insensitive name/username search that behaves the same on both
- * databases.
+ * Case-insensitive name/username search.
  *
- * `contains` is not portable: SQLite's LIKE ignores case for ASCII, Postgres's
- * does not. Searching "elif" would quietly stop matching "Elif Demir" the day
- * we switch providers — the kind of break that ships silently because the dev
- * database says it works.
+ * `mode: "insensitive"` is required on PostgreSQL and easy to forget, because
+ * SQLite's LIKE ignores case for free — which is exactly how this shipped
+ * broken once: searching "elif" matched "Elif Demir" on the dev database and
+ * would have stopped matching in production. It lives in one function so
+ * there is a single place to get it right.
  *
- * `mode: "insensitive"` is the Postgres answer and SQLite rejects it, so the
- * mode is only attached when the provider needs it — and the generated client
- * only types `mode` once the schema is Postgres, hence the cast. Username is
- * stored lower-case already, so it needs neither.
+ * Usernames are stored lower-case at registration, so they need nothing.
  */
-const NEEDS_MODE = (process.env.DATABASE_URL ?? "").startsWith("postgres");
-
 export function nameSearch(query: string): Prisma.UserWhereInput[] {
   const q = query.trim();
-  const name = (
-    NEEDS_MODE ? { contains: q, mode: "insensitive" } : { contains: q }
-  ) as Prisma.StringFilter<"User">;
-
-  return [{ name }, { username: { contains: q.toLowerCase() } }];
+  return [
+    { name: { contains: q, mode: "insensitive" } },
+    { username: { contains: q.toLowerCase() } },
+  ];
 }

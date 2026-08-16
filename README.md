@@ -15,12 +15,24 @@ Bu repo, ürün konseptinin ve **Human Warm** tema sisteminin birleştirildiği
 
 ## Hızlı başlangıç
 
+Veritabanı PostgreSQL — geliştirmede de, canlıda da. İkisini farklı motorda
+çalıştırmak, az önce yakaladığımız türden hataların kaynağı: SQLite'ın `LIKE`'ı
+harf duyarsız, Postgres'inki değil, ve geliştirme veritabanı her şey yolunda
+diyor.
+
 ```bash
 npm install
 cp .env.example .env
-npm run db:reset      # şema + demo verisi (41 kullanıcı, ~400 değerlendirme)
-npm run dev           # http://localhost:3000
+
+docker compose up -d db   # yerel Postgres (tek komut)
+npm run db:reset          # migration + demo verisi (41 kullanıcı, ~400 değerlendirme)
+npm run dev               # http://localhost:3000
 ```
+
+Docker yoksa: `brew install postgresql@16 && brew services start postgresql@16`,
+sonra `createdb vibetag` ve `.env` içindeki `DATABASE_URL`'i kendi kullanıcı
+adınla güncelle. Ya da Neon/Supabase'de ücretsiz bir geliştirme veritabanı aç
+ve bağlantı adresini yapıştır — yerel kurulum gerekmez.
 
 ### Demo hesapları (şifre hepsinde `vibetag`)
 
@@ -230,39 +242,15 @@ alttan yükselir, gradient yavaşça sürüklenir. Hepsi
 Ürün planındaki React Native hedefi için: tüm iş mantığı (`src/lib/*`) UI'dan
 bağımsız saf TypeScript — mobil istemci aynı kuralları paylaşabilir.
 
-### Production'a geçerken
+### Production
 
-**PostgreSQL.** Şema Postgres uyumlu yazıldı; tek değişiklik:
+Adım adım deploy: **[DEPLOY.md](DEPLOY.md)** — Vercel + Neon ve kendi
+sunucun (Docker + Caddy) için iki ayrı yol, ve yayına almadan önce koşulacak
+kontroller.
 
-```prisma
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-```
-
-Sonra `npx prisma migrate dev --name init`. Dikkat edilecek tek davranış farkı
-arama: SQLite'ta `contains` büyük/küçük harf duyarsız, Postgres'te değil.
-`src/lib/search.ts` bunu sağlayıcıya göre çözüyor — yeni bir metin araması
-eklerken oradan geç.
-
-**Ortam değişkenleri.** `.env.example` hepsini açıklıyor. Üçü isteğe bağlı ve
-tanımlanmazsa ilgili özellik sessizce kapalı kalır:
-
-| Değişken | Ne olur? |
-| --- | --- |
-| `SUPPORT_EMAIL` | Askıya alınan kişiye ve yasal metinlere yazılan adres |
-| `CRON_SECRET` | Tanımsızsa `/api/cron/fraud-sweep` 503 döner |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` | Tanımsızsa push kapalı, ayarlarda seçenek de görünmez |
-
-**Sahtecilik taraması.** Canlı kontrol yalnızca oy verildiği anı görür.
-Sonradan kapanan karşılıklı oy halkaları için gecelik bir tarama gerekir:
-
-```bash
-curl -X POST -H "Authorization: Bearer $CRON_SECRET" https://…/api/cron/fraud-sweep
-```
-
-Aynı işi moderasyon panelindeki düğme elle yapar.
+Kısaca: `Dockerfile` kendi sunucun için hazır (`output: "standalone"`),
+`/api/health` veritabanına dokunarak cevap veriyor, migration'lar
+`npm run db:deploy` ile uygulanıyor.
 
 ---
 
@@ -275,10 +263,22 @@ npm run start      # production sunucusu
 npm run typecheck  # tip kontrolü
 npm run test       # testler (vitest)
 npm run test:watch # testleri izleyerek çalıştır
-npm run db:push    # şemayı veritabanına uygula
-npm run db:seed    # demo verisi
-npm run db:reset   # sıfırla + şema + demo verisi
+
+npm run db:up      # yerel Postgres'i başlat (docker)
+npm run db:down    # durdur
+npm run db:reset   # sıfırla + migration + demo verisi
+npm run db:migrate # şema değişikliğinden sonra yeni migration üret
+npm run db:deploy  # mevcut migration'ları uygula (canlıda bu çalışır)
+npm run db:seed    # sadece demo verisi
+npm run db:studio  # veritabanını tarayıcıda gez
 ```
+
+`db:reset` veritabanını sıfırdan kurar; verilerin gitmesini istemiyorsan
+`npm run db:deploy && npm run db:seed` yeterli.
+
+Şemayı değiştirdiğinde `npm run db:migrate` çalıştır ve üretilen
+`prisma/migrations/…` klasörünü commit'e dahil et — canlıdaki veritabanı
+yalnızca bu dosyalardan güncelleniyor.
 
 ---
 

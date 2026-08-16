@@ -1,15 +1,23 @@
 // Vibe Tag — Social Reputation & Human Identity Platform
 //
-// Dev uses SQLite for zero-setup. The schema is written to be
-// PostgreSQL-compatible: switch `provider` to "postgresql" and the
-// same models apply (JSON columns are stored as text for portability).
+// PostgreSQL, in development as well as production. Running the two on
+// different engines is how you ship a bug like case-sensitive search: SQLite's
+// LIKE ignores case, Postgres's does not, and the dev database cheerfully
+// says everything works.
+//
+// `docker compose up -d db` gives you one locally; see README.
+//
+// JSON-shaped columns (fraudFlags, snapshot, notification vars) are stored as
+// text rather than `Json`. They are written and read by our own code as whole
+// values — never queried into — so a native JSON column would buy nothing and
+// cost a migration the day we want to move.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

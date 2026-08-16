@@ -31,14 +31,15 @@ so it can be pasted straight in.
 git fetch --tags
 git checkout vX.Y
 npm install           # only when dependencies changed
-npm run db:reset      # only when the schema changed — stop the server first
+docker compose up -d db
+npm run db:reset      # only when the schema changed
 npm run dev
 ```
 
 Then a short list of what to look at, with the exact route or menu path.
 
 Version numbering: minor bump (`v1.2` → `v1.3`) for a normal feature package,
-patch (`v1.2.1`) for a fix on its own. Current: **v1.2**.
+patch (`v1.2.1`) for a fix on its own. Current: **v1.3**.
 
 ## Language
 
@@ -58,6 +59,16 @@ npm run typecheck
 npm run test
 npm run build
 ```
+
+The database is PostgreSQL in development too (`docker compose up -d db`).
+Never verify against a different engine than production runs — that is how
+the case-sensitive search bug got as far as it did.
+
+`npm run db:reset` wraps `prisma migrate reset`, which Prisma refuses to run
+for an AI agent without explicit consent. That guard is correct — do not route
+around it with an alias. For your own verification use `npx prisma migrate
+deploy && npm run db:seed`, which proves the same ground without dropping
+anything. When a real reset is genuinely needed, ask Özgür to run it.
 
 And verify in a real browser, in **both languages**, not just by reading the
 diff. Playwright with `executablePath: '/opt/pw-browsers/chromium'` works here.

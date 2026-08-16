@@ -3,29 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import {
-  createInvite,
-  isPresetKey,
-  redeemInviteFor,
-  revokeInvite,
-} from "@/lib/invite";
+import { redeemInviteFor, rotateInvite } from "@/lib/invite";
 
-export async function createInviteAction(formData: FormData): Promise<void> {
+/** Revoke the current link and mint a replacement. */
+export async function rotateInviteAction(): Promise<void> {
   const user = await requireUser();
-  const preset = String(formData.get("preset") ?? "group");
-  if (!isPresetKey(preset)) return;
-
-  await createInvite(user.id, preset);
-  revalidatePath("/invite");
-  revalidatePath("/rate");
-}
-
-export async function revokeInviteAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
-  const inviteId = String(formData.get("inviteId") ?? "");
-  if (!inviteId) return;
-
-  await revokeInvite(user.id, inviteId);
+  await rotateInvite(user.id);
   revalidatePath("/invite");
   revalidatePath("/rate");
 }

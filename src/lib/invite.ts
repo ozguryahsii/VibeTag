@@ -10,10 +10,10 @@ import { INVITE_COOKIE } from "@/lib/invite-cookie";
  * strangers — someone you actually know hands you a link, which is exactly
  * the relationship the rating flow then asks you to declare.
  *
- * Every link is minted fresh and bounded. A single permanent code would
- * quietly defeat the "only people I invited may rate me" setting the first
- * time someone forwards it, so links carry a use limit and an expiry, and
- * their owner can revoke them.
+ * One link at a time, and it is unique to the person who owns it. A code
+ * that could not be retired would quietly defeat the "only people I invited
+ * may rate me" setting the first time someone forwarded it — so revoking is
+ * the control: it kills the old link everywhere and mints a fresh one.
  */
 
 export { INVITE_COOKIE };
@@ -27,52 +27,10 @@ function newCode(): string {
   return out;
 }
 
-const DAY = 86_400_000;
-
-export type InvitePresetKey = "single" | "group" | "open";
-
-export const INVITE_PRESETS: Record<
-  InvitePresetKey,
-  { label: string; hint: string; maxUses: number | null; days: number | null }
-> = {
-  single: {
-    label: "Tek kişilik",
-    hint: "1 kişi · 7 gün",
-    maxUses: 1,
-    days: 7,
-  },
-  group: {
-    label: "Küçük grup",
-    hint: "10 kişi · 14 gün",
-    maxUses: 10,
-    days: 14,
-  },
-  open: {
-    label: "Açık link",
-    hint: "Sınırsız · süresiz",
-    maxUses: null,
-    days: null,
-  },
-};
-
-export function isPresetKey(v: unknown): v is InvitePresetKey {
-  return typeof v === "string" && v in INVITE_PRESETS;
-}
-
-export async function createInvite(
-  userId: string,
-  preset: InvitePresetKey = "group",
-  label?: string,
-) {
-  const p = INVITE_PRESETS[preset];
+/** One shape of link: unique, unlimited, no expiry, revocable. */
+export async function createInvite(userId: string) {
   return prisma.invite.create({
-    data: {
-      code: newCode(),
-      inviterId: userId,
-      label: label?.trim() || p.label,
-      maxUses: p.maxUses,
-      expiresAt: p.days ? new Date(Date.now() + p.days * DAY) : null,
-    },
+    data: { code: newCode(), inviterId: userId, maxUses: null, expiresAt: null },
   });
 }
 
@@ -92,39 +50,29 @@ export function inviteStatus(invite: {
   return "ACTIVE";
 }
 
-/**
- * The link the share screen shows. Reuses an active one so a link already
- * sent to someone keeps working; mints a fresh one when there is none.
- */
+/** The one live link. Minted on first use and after every revoke. */
 export async function getShareableInvite(userId: string) {
-  const candidates = await prisma.invite.findMany({
+  const active = await prisma.invite.findFirst({
     where: { inviterId: userId, revokedAt: null },
     include: { _count: { select: { grants: true } } },
     orderBy: { createdAt: "desc" },
   });
-
-  const active = candidates.find((i) => inviteStatus(i) === "ACTIVE");
   if (active) return active;
 
-  const fresh = await createInvite(userId, "group");
+  const fresh = await createInvite(userId);
   return { ...fresh, _count: { grants: 0 } };
 }
 
-export async function listInvites(userId: string) {
-  const invites = await prisma.invite.findMany({
-    where: { inviterId: userId },
-    include: { _count: { select: { grants: true, claims: true } } },
-    orderBy: { createdAt: "desc" },
-    take: 20,
-  });
-  return invites.map((i) => ({ ...i, status: inviteStatus(i) }));
-}
-
-export async function revokeInvite(userId: string, inviteId: string) {
+/**
+ * Retire the current link and hand back a new one. Anyone still holding the
+ * old URL now hits a dead link — which is the entire point of the button.
+ */
+export async function rotateInvite(userId: string) {
   await prisma.invite.updateMany({
-    where: { id: inviteId, inviterId: userId, revokedAt: null },
+    where: { inviterId: userId, revokedAt: null },
     data: { revokedAt: new Date() },
   });
+  return createInvite(userId);
 }
 
 export async function inviteByCode(code: string) {

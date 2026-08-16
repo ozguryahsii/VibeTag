@@ -1,40 +1,21 @@
 import QRCode from "qrcode";
 import { requireUser } from "@/lib/auth";
-import {
-  INVITE_PRESETS,
-  getShareableInvite,
-  inviteStats,
-  listInvites,
-  type InvitePresetKey,
-} from "@/lib/invite";
-import { createInviteAction, revokeInviteAction } from "@/lib/actions/invite";
+import { getShareableInvite, inviteStats } from "@/lib/invite";
+import { rotateInviteAction } from "@/lib/actions/invite";
 import { baseUrl } from "@/lib/base-url";
+import { getDict } from "@/lib/i18n/server";
 import { getVibeProfile } from "@/lib/profile";
 import { InviteShare } from "@/components/InviteShare";
 import { Card, SectionTitle } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
-const STATUS_LABEL: Record<string, string> = {
-  ACTIVE: "Aktif",
-  EXPIRED: "Süresi doldu",
-  REVOKED: "İptal edildi",
-  EXHAUSTED: "Hakkı doldu",
-};
-
-function fmt(d: Date): string {
-  return new Intl.DateTimeFormat("tr-TR", {
-    day: "numeric",
-    month: "short",
-  }).format(d);
-}
-
 export default async function InvitePageApp() {
   const user = await requireUser();
+  const d = await getDict();
   const invite = await getShareableInvite(user.id);
-  const [{ granted, joined }, invites, profile] = await Promise.all([
+  const [{ granted, joined }, profile] = await Promise.all([
     inviteStats(user.id),
-    listInvites(user.id),
     getVibeProfile(user.id),
   ]);
 
@@ -49,21 +30,20 @@ export default async function InvitePageApp() {
   return (
     <main className="px-5 pt-10">
       <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">
-        INVITE
+        {d.invite.kicker}
       </p>
       <h1 className="vt-page-title text-[28px] tracking-[-0.02em]">
-        Çevreni davet et
+        {d.invite.title}
       </h1>
       <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
-        Vibe profilin, seni gerçekten tanıyan insanlarla anlam kazanır. Herkes
-        yalnızca seni tanıdığı alanda değerlendirebilir.
+        {d.invite.body}
       </p>
 
       <div className="mt-5 grid grid-cols-3 gap-2.5">
         {[
-          [profile.ratingCount, "değerlendirme"],
-          [granted, "davet kullanıldı"],
-          [joined, "yeni üye"],
+          [profile.ratingCount, d.invite.statRatings],
+          [granted, d.invite.statUsed],
+          [joined, d.invite.statJoined],
         ].map(([n, label]) => (
           <Card key={String(label)} className="!py-4 text-center">
             <div className="text-[22px] font-black grad-text tabular-nums leading-none">
@@ -77,108 +57,28 @@ export default async function InvitePageApp() {
       </div>
 
       <div className="mt-6">
-        <SectionTitle>Davet linkin</SectionTitle>
-        <InviteShare
-          url={url}
-          qr={qr}
-          name={user.name}
-          expiresAt={invite.expiresAt ? fmt(invite.expiresAt) : null}
-          remaining={
-            invite.maxUses === null
-              ? null
-              : Math.max(0, invite.maxUses - invite._count.grants)
-          }
-        />
+        <SectionTitle>{d.invite.yourLink}</SectionTitle>
+        <InviteShare url={url} qr={qr} name={user.name} dict={d} />
       </div>
 
-      <div className="mt-7">
-        <SectionTitle>Yeni link üret</SectionTitle>
-        <div className="grid grid-cols-3 gap-2.5">
-          {(Object.keys(INVITE_PRESETS) as InvitePresetKey[]).map((k) => (
-            <form key={k} action={createInviteAction}>
-              <input type="hidden" name="preset" value={k} />
-              <button
-                type="submit"
-                className="w-full rounded-[20px] bg-warmwhite border border-line p-3.5 text-left active:scale-95 transition-transform"
-              >
-                <span className="block text-[12.5px] font-extrabold">
-                  {INVITE_PRESETS[k].label}
-                </span>
-                <span className="block text-[10.5px] text-muted mt-0.5">
-                  {INVITE_PRESETS[k].hint}
-                </span>
-              </button>
-            </form>
-          ))}
-        </div>
-        <p className="text-[11.5px] text-muted mt-2.5 px-1 leading-relaxed">
-          Her link ayrı üretilir. Sadece davet ettiklerinden değerlendirme
-          alıyorsan, elden ele dolaşan tek bir kalıcı link bu ayarı işlevsiz
-          bırakırdı — bu yüzden linkler süreli ve sayılıdır.
+      <div className="mt-5">
+        <p className="text-[11.5px] text-muted px-1 leading-relaxed">
+          {d.invite.linkUnique}
         </p>
+        <form action={rotateInviteAction} className="mt-3">
+          <button
+            type="submit"
+            className="w-full h-12 rounded-full bg-white border border-line text-[13.5px] font-bold text-muted active:scale-[0.98] transition-transform"
+          >
+            {d.invite.revoke}
+          </button>
+        </form>
       </div>
-
-      {invites.length > 0 && (
-        <div className="mt-7">
-          <SectionTitle>Linklerin</SectionTitle>
-          <div className="grid gap-2.5">
-            {invites.map((i) => {
-              const active = i.status === "ACTIVE";
-              return (
-                <Card key={i.id} className="!py-4">
-                  <div className="flex items-start gap-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-extrabold truncate">
-                        {i.label ?? "Davet linki"}
-                      </p>
-                      <p className="text-[11.5px] text-muted mt-0.5 font-mono truncate">
-                        /i/{i.code}
-                      </p>
-                      <p className="text-[11.5px] text-muted mt-1">
-                        {i._count.grants}
-                        {i.maxUses !== null ? `/${i.maxUses}` : ""} kullanım
-                        {i.expiresAt ? ` · ${fmt(i.expiresAt)}'e kadar` : " · süresiz"}
-                      </p>
-                    </div>
-
-                    <span
-                      className="text-[10.5px] font-bold rounded-full px-2.5 py-1 shrink-0"
-                      style={{
-                        color: active ? "#C4562F" : "#8C8177",
-                        background: active ? "#FFF0E8" : "#F3EDE7",
-                        border: `1px solid ${active ? "#FFDCC6" : "#E9E1D9"}`,
-                      }}
-                    >
-                      {STATUS_LABEL[i.status]}
-                    </span>
-                  </div>
-
-                  {active && (
-                    <form action={revokeInviteAction} className="mt-3">
-                      <input type="hidden" name="inviteId" value={i.id} />
-                      <button
-                        type="submit"
-                        className="text-[11.5px] font-bold text-muted underline underline-offset-2"
-                      >
-                        Bu linki iptal et
-                      </button>
-                    </form>
-                  )}
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       <div className="mt-7 mb-2">
         <Card className="grid gap-3">
-          <p className="text-[13px] font-extrabold">Nasıl işliyor?</p>
-          {[
-            "Linki paylaş — açan kişi doğrudan senin değerlendirme sayfana düşer.",
-            "Seni nereden tanıdığını seçer; sadece o ilişkiye uygun kriterler açılır.",
-            "Cevabı anonim eklenir, sen kimin ne yazdığını görmezsin.",
-          ].map((line, i) => (
+          <p className="text-[13px] font-extrabold">{d.invite.howTitle}</p>
+          {d.invite.how.map((line, i) => (
             <div key={line} className="flex gap-3">
               <span className="w-5 h-5 shrink-0 grid place-items-center rounded-full grad-score text-white text-[11px] font-black">
                 {i + 1}

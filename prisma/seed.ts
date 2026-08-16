@@ -142,6 +142,9 @@ function score(bias: number): number {
 
 async function main() {
   console.log("→ temizleniyor");
+  await prisma.message.deleteMany();
+  await prisma.conversation.deleteMany();
+  await prisma.friendship.deleteMany();
   await prisma.report.deleteMany();
   await prisma.block.deleteMany();
   await prisma.notification.deleteMany();
@@ -347,19 +350,16 @@ async function main() {
     data: {
       code: "ozgurvibe",
       inviterId: ozgur.id,
-      label: "Küçük grup",
-      maxUses: 10,
-      expiresAt: new Date(Date.now() + 14 * 86_400_000),
+      label: "Davet linkim",
     },
   });
-  // An expired link, so the "spent link" state is visible in the demo.
+  // A revoked link, so the dead-link state is visible in the demo.
   await prisma.invite.create({
     data: {
       code: "ozgureski",
       inviterId: ozgur.id,
-      label: "Tek kişilik",
-      maxUses: 1,
-      expiresAt: new Date(Date.now() - 2 * 86_400_000),
+      label: "Eski link",
+      revokedAt: new Date(Date.now() - 2 * 86_400_000),
     },
   });
 
@@ -398,6 +398,45 @@ async function main() {
         href: "/home",
         createdAt: daysAgo(9),
         readAt: daysAgo(8),
+      },
+    ],
+  });
+
+  console.log("→ arkadaşlıklar ve mesajlar");
+  for (const u of others.slice(0, 5)) {
+    await prisma.friendship.create({
+      data: {
+        requesterId: ozgur.id,
+        addresseeId: u.id,
+        status: "ACCEPTED",
+        acceptedAt: daysAgo(20),
+      },
+    });
+  }
+  // one pending request waiting for Özgür to answer
+  await prisma.friendship.create({
+    data: { requesterId: others[7].id, addresseeId: ozgur.id, status: "PENDING" },
+  });
+
+  const friend = others[0];
+  const [fa, fb] = ozgur.id < friend.id ? [ozgur.id, friend.id] : [friend.id, ozgur.id];
+  const thread = await prisma.conversation.create({
+    data: { userAId: fa, userBId: fb, kind: "FRIEND", lastMessageAt: daysAgo(1) },
+  });
+  await prisma.message.createMany({
+    data: [
+      {
+        conversationId: thread.id,
+        senderId: friend.id,
+        body: "Değerlendirmeni yaptım, gerçekten keyifliydi birlikte çalışmak.",
+        createdAt: daysAgo(2),
+        readAt: daysAgo(2),
+      },
+      {
+        conversationId: thread.id,
+        senderId: ozgur.id,
+        body: "Çok teşekkürler! Ben de senin profiline bir Vibe bıraktım.",
+        createdAt: daysAgo(1),
       },
     ],
   });

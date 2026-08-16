@@ -12,7 +12,10 @@ export type NotificationType =
   | "NEW_RATING"
   | "RATING_UPDATED"
   | "INVITE_JOINED"
-  | "BADGE_EARNED";
+  | "BADGE_EARNED"
+  | "FRIEND_REQUEST"
+  | "FRIEND_ACCEPTED"
+  | "NEW_MESSAGE";
 
 export async function notify(
   userId: string,

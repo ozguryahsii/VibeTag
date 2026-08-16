@@ -1,22 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { fill, type Dictionary } from "@/lib/i18n";
 
 export function InviteShare({
   url,
   qr,
   name,
-  expiresAt,
-  remaining,
+  dict,
 }: {
   url: string;
   qr: string;
   name: string;
-  /** Formatted expiry date, or null for a link that never expires. */
-  expiresAt?: string | null;
-  /** Uses left, or null for an unlimited link. */
-  remaining?: number | null;
+  dict: Dictionary;
 }) {
+  const d = dict;
   const [status, setStatus] = useState<string | null>(null);
 
   function flash(msg: string) {
@@ -24,14 +22,14 @@ export function InviteShare({
     setTimeout(() => setStatus(null), 2200);
   }
 
-  const text = `${name} olarak Vibe Tag'deyim — beni nasıl gördüğünü merak ediyorum. 30 saniye sürüyor, cevabın anonim kalıyor:`;
+  const text = fill(d.invite.shareText, { name });
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(url);
-      flash("Link kopyalandı ✓");
+      flash(d.common.copied);
     } catch {
-      flash("Kopyalanamadı, linki elle seçebilirsin");
+      flash(d.common.copyFailed);
     }
   }
 
@@ -56,22 +54,13 @@ export function InviteShare({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={qr}
-          alt="Davet QR kodu"
+          alt={d.invite.qrAlt}
           width={176}
           height={176}
           className="relative w-44 h-44 mx-auto rounded-[22px] border border-line shadow-[0_12px_30px_rgba(93,58,42,0.08)]"
           style={{ width: 176, height: 176, maxWidth: "100%" }}
         />
-        <p className="text-[12px] text-muted mt-3">
-          Karşındakine okut — telefonu doğrudan senin sayfana gider.
-        </p>
-
-        <p className="relative text-[11.5px] font-semibold text-orange mt-2">
-          {remaining === null || remaining === undefined
-            ? "Sınırsız kullanım"
-            : `${remaining} kullanım hakkı kaldı`}
-          {expiresAt ? ` · ${expiresAt} tarihine kadar` : " · süresiz"}
-        </p>
+        <p className="text-[12px] text-muted mt-3">{d.invite.qrHint}</p>
 
         <button
           onClick={copy}
@@ -86,7 +75,7 @@ export function InviteShare({
           onClick={share}
           className="h-13 rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)] active:scale-[0.98] transition-transform"
         >
-          Davetini paylaş
+          {d.invite.shareCta}
         </button>
 
         <div className="grid grid-cols-3 gap-2.5">
@@ -110,7 +99,7 @@ export function InviteShare({
             onClick={copy}
             className="h-12 rounded-[18px] bg-warmwhite border border-line text-[13px] font-bold"
           >
-            Kopyala
+            {d.common.copy}
           </button>
         </div>
       </div>

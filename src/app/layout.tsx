@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Playfair_Display, Syne } from "next/font/google";
 import "./globals.css";
+import { getLocale } from "@/lib/i18n/server";
+import { dictionaryFor } from "@/lib/i18n";
+import { LocaleProvider } from "@/components/LocaleProvider";
 
 // The approved Vibe Tag pairing: friendly clarity for product UI, an
 // editorial serif for story moments, and a distinctive geometric wordmark.
@@ -39,21 +42,27 @@ export const viewport: Viewport = {
   themeColor: "#FBF8F2",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+
   return (
     <html
-      lang="tr"
+      lang={locale}
       className={`${dmSans.variable} ${playfair.variable} ${syne.variable}`}
     >
       <head>
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
       </head>
       <body>
-        <div className="app-shell">{children}</div>
+        <div className="app-shell">
+          <LocaleProvider locale={locale} dict={dictionaryFor(locale)}>
+            {children}
+          </LocaleProvider>
+        </div>
       </body>
     </html>
   );

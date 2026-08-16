@@ -1,8 +1,18 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { getDict } from "@/lib/i18n/server";
+import { fill } from "@/lib/i18n";
+import { listFriendRequests, listFriends } from "@/lib/social";
+import {
+  openFriendThreadAction,
+  requestFriendAction,
+  respondFriendAction,
+} from "@/lib/actions/social";
 import { buildVibeProfile } from "@/lib/vibe";
-import { Avatar, Card, SectionTitle } from "@/components/ui";
+import { Avatar } from "@/components/Avatar";
+import { LangToggle } from "@/components/LangToggle";
+import { Card, SectionTitle } from "@/components/ui";
 import type { RelationshipKey, TraitKey, VibeTagKey } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
@@ -13,50 +23,58 @@ export default async function PeoplePage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const me = await requireUser();
+  const d = await getDict();
   const { q } = await searchParams;
   const query = (q ?? "").trim();
 
-  const users = await prisma.user.findMany({
-    where: {
-      id: { not: me.id },
-      ...(query
-        ? {
-            OR: [
-              { name: { contains: query } },
-              { username: { contains: query.toLowerCase() } },
-            ],
-          }
-        : {}),
-    },
-    select: {
-      id: true,
-      name: true,
-      username: true,
-      bio: true,
-      avatarUrl: true,
-      avatarColor: true,
-      isVerified: true,
-      ratingsReceived: {
-        select: {
-          relationship: true,
-          weight: true,
-          createdAt: true,
-          traits: { select: { traitKey: true, score: true } },
-          vibeTags: { select: { tagKey: true } },
+  const [users, friends, requests, mine, pendingOut] = await Promise.all([
+    prisma.user.findMany({
+      where: {
+        id: { not: me.id },
+        ...(query
+          ? {
+              OR: [
+                { name: { contains: query } },
+                { username: { contains: query.toLowerCase() } },
+              ],
+            }
+          : {}),
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        bio: true,
+        avatarUrl: true,
+        avatarColor: true,
+        isVerified: true,
+        ratingsReceived: {
+          select: {
+            relationship: true,
+            weight: true,
+            createdAt: true,
+            traits: { select: { traitKey: true, score: true } },
+            vibeTags: { select: { tagKey: true } },
+          },
         },
       },
-    },
-    take: 40,
-  });
+      take: 40,
+    }),
+    listFriends(me.id),
+    listFriendRequests(me.id),
+    prisma.rating.findMany({
+      where: { raterUserId: me.id },
+      select: { ratedUserId: true },
+    }),
+    prisma.friendship.findMany({
+      where: { requesterId: me.id, status: "PENDING" },
+      select: { addresseeId: true },
+    }),
+  ]);
 
-  const ratedByMe = new Set(
-    (
-      await prisma.rating.findMany({
-        where: { raterUserId: me.id },
-        select: { ratedUserId: true },
-      })
-    ).map((r) => r.ratedUserId),
-  );
+  const ratedByMe = new Set(mine.map((r) => r.ratedUserId));
+  const friendIds = new Set(friends.map((f) => f.id));
+  const requestedIds = new Set(pendingOut.map((f) => f.addresseeId));
 
   const rows = users
     .map((u) => ({
@@ -75,72 +93,187 @@ export default async function PeoplePage({
         })),
       ),
     }))
+    // Friends already have their own section above; do not list them twice.
+    .filter((u) => !friendIds.has(u.id))
     .sort((a, b) => b.profile.ratingCount - a.profile.ratingCount);
 
   return (
     <main className="px-5 pt-10">
-      <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">YOUR CIRCLE</p>
-      <h1 className="vt-page-title text-[31px] tracking-[-0.02em]">Kişiler</h1>
-      <p className="text-[13px] text-muted mt-1">
-        Tanıdığın birini bul, ona bir Vibe bırak.
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">
+            YOUR CIRCLE
+          </p>
+          <h1 className="vt-page-title text-[31px] tracking-[-0.02em]">
+            {d.people.title}
+          </h1>
+          <p className="text-[13px] text-muted mt-1">{d.people.subtitle}</p>
+        </div>
+        <LangToggle className="mt-1 shrink-0" />
+      </div>
 
       <form className="mt-5">
         <input
           name="q"
           defaultValue={query}
-          placeholder="İsim veya kullanıcı adı ara…"
+          placeholder={d.people.search}
           className="w-full rounded-full border border-line bg-warmwhite px-5 h-13 text-[14.5px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition shadow-[0_10px_30px_rgba(93,58,42,0.04)]"
         />
       </form>
 
-      <div className="mt-6">
-        <SectionTitle>{query ? "Sonuçlar" : "Topluluk"}</SectionTitle>
+      {/* Incoming requests sit above everything — they need an answer. */}
+      {requests.length > 0 && (
+        <div className="mt-6">
+          <SectionTitle>{d.people.requests}</SectionTitle>
+          <div className="grid gap-2.5">
+            {requests.map((r) => (
+              <Card key={r.id} className="flex items-center gap-3.5 !py-3.5">
+                <Avatar
+                  name={r.requester.name}
+                  url={r.requester.avatarUrl}
+                  color={r.requester.avatarColor}
+                  size={44}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-extrabold truncate">
+                    {r.requester.name}
+                  </p>
+                  <p className="text-[11.5px] text-muted">{d.people.incoming}</p>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <form action={respondFriendAction}>
+                    <input type="hidden" name="friendshipId" value={r.id} />
+                    <input type="hidden" name="decision" value="accept" />
+                    <button className="text-[12px] font-bold text-white grad-score rounded-full px-3.5 py-2">
+                      {d.people.accept}
+                    </button>
+                  </form>
+                  <form action={respondFriendAction}>
+                    <input type="hidden" name="friendshipId" value={r.id} />
+                    <input type="hidden" name="decision" value="decline" />
+                    <button className="text-[12px] font-bold text-muted bg-white border border-line rounded-full px-3.5 py-2">
+                      {d.people.decline}
+                    </button>
+                  </form>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
-        {rows.length === 0 ? (
-          <Card className="text-center py-8">
-            <p className="text-[14px] font-bold">Kimse bulunamadı</p>
-            <p className="text-[12.5px] text-muted mt-1">
-              Farklı bir isim deneyebilirsin.
+      {/* Friends first: rating someone you know should be one tap. */}
+      <div className="mt-6">
+        <SectionTitle>{d.people.friends}</SectionTitle>
+        {friends.length === 0 ? (
+          <Card className="!py-5">
+            <p className="text-[12.5px] text-muted leading-relaxed">
+              {d.people.friendsEmpty}
             </p>
           </Card>
         ) : (
           <div className="grid gap-2.5">
-            {rows.map((u) => (
-              <Link key={u.id} href={`/u/${u.username}`}>
-                <Card className="flex items-center gap-3.5 !py-3.5">
-                  <Avatar name={u.name}
-                    url={u.avatarUrl} color={u.avatarColor} size={46} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[14.5px] font-extrabold truncate">
-                        {u.name}
-                      </span>
-                      {u.isVerified && <span className="w-4 h-4 grid place-items-center rounded-full grad-score text-white text-[9px] font-black">✓</span>}
-                      {ratedByMe.has(u.id) && (
-                        <span className="text-[10px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-2 py-0.5">
-                          Değerlendirdin
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[12px] text-muted truncate">
-                      @{u.username}
-                      {u.profile.ratingCount > 0 &&
-                        ` · ${u.profile.ratingCount} değerlendirme`}
-                    </p>
-                  </div>
-                  {u.profile.ratingCount > 0 && (
-                    <div className="text-right">
-                      <div className="text-[19px] font-black grad-text tabular-nums leading-none">
-                        {u.profile.score}
-                      </div>
-                      <div className="text-[9px] font-bold text-muted tracking-wider">
-                        VIBE
-                      </div>
-                    </div>
+            {friends.map((f) => (
+              <Card key={f.id} className="flex items-center gap-3.5 !py-3.5">
+                <Link href={`/u/${f.username}`} className="shrink-0">
+                  <Avatar
+                    name={f.name}
+                    url={f.avatarUrl}
+                    color={f.avatarColor}
+                    size={44}
+                  />
+                </Link>
+                <Link href={`/u/${f.username}`} className="min-w-0 flex-1">
+                  <p className="text-[14px] font-extrabold truncate">{f.name}</p>
+                  <p className="text-[11.5px] text-muted truncate">
+                    @{f.username}
+                  </p>
+                </Link>
+                <div className="flex gap-2 shrink-0">
+                  <form action={openFriendThreadAction}>
+                    <input type="hidden" name="username" value={f.username} />
+                    <button
+                      className="text-[12px] font-bold text-muted bg-white border border-line rounded-full px-3.5 py-2"
+                      aria-label={d.people.message}
+                    >
+                      {d.people.message}
+                    </button>
+                  </form>
+                  {!ratedByMe.has(f.id) && (
+                    <Link
+                      href={`/rate/${f.username}`}
+                      className="text-[12px] font-bold text-white grad-score rounded-full px-3.5 py-2"
+                    >
+                      {d.rate.rateCta}
+                    </Link>
                   )}
-                </Card>
-              </Link>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-7">
+        <SectionTitle>{query ? d.people.results : d.people.community}</SectionTitle>
+
+        {rows.length === 0 ? (
+          <Card className="text-center py-8">
+            <p className="text-[14px] font-bold">{d.people.noneTitle}</p>
+            <p className="text-[12.5px] text-muted mt-1">{d.people.noneBody}</p>
+          </Card>
+        ) : (
+          <div className="grid gap-2.5">
+            {rows.map((u) => (
+              <Card key={u.id} className="flex items-center gap-3.5 !py-3.5">
+                <Link href={`/u/${u.username}`} className="shrink-0">
+                  <Avatar
+                    name={u.name}
+                    url={u.avatarUrl}
+                    color={u.avatarColor}
+                    size={46}
+                  />
+                </Link>
+
+                <Link href={`/u/${u.username}`} className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[14.5px] font-extrabold truncate">
+                      {u.name}
+                    </span>
+                    {u.isVerified && (
+                      <span className="w-4 h-4 grid place-items-center rounded-full grad-score text-white text-[9px] font-black">
+                        ✓
+                      </span>
+                    )}
+                    {ratedByMe.has(u.id) && (
+                      <span className="text-[10px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-2 py-0.5">
+                        {d.people.youRated}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[12px] text-muted truncate">
+                    @{u.username}
+                    {u.profile.ratingCount > 0 &&
+                      ` · ${fill(d.people.ratingsCount, { n: u.profile.ratingCount })}`}
+                  </p>
+                </Link>
+
+                {requestedIds.has(u.id) ? (
+                  <span className="shrink-0 text-[11px] font-bold text-muted">
+                    {d.people.requestSent}
+                  </span>
+                ) : (
+                  <form action={requestFriendAction} className="shrink-0">
+                    <input type="hidden" name="username" value={u.username} />
+                    <button
+                      className="text-[12px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-3 py-2"
+                      aria-label={d.people.addFriend}
+                    >
+                      +
+                    </button>
+                  </form>
+                )}
+              </Card>
             ))}
           </div>
         )}

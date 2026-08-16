@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { unreadCount } from "@/lib/notifications";
+import { unreadMessageCount } from "@/lib/social";
+import { getDict } from "@/lib/i18n/server";
+import { fill } from "@/lib/i18n";
+import { LangToggle } from "@/components/LangToggle";
 import { getPercentile, getVibeProfile } from "@/lib/profile";
 import { computeBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
@@ -10,12 +14,12 @@ import { ScoreDial } from "@/components/ScoreDial";
 import { VibeMark } from "@/components/Logo";
 import { Avatar, Button, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
-function greeting(): string {
+function greetingKey(): "greetingNight" | "greetingMorning" | "greetingDay" | "greetingEvening" {
   const h = new Date().getHours();
-  if (h < 6) return "İyi geceler";
-  if (h < 12) return "Günaydın";
-  if (h < 18) return "İyi günler";
-  return "İyi akşamlar";
+  if (h < 6) return "greetingNight";
+  if (h < 12) return "greetingMorning";
+  if (h < 18) return "greetingDay";
+  return "greetingEvening";
 }
 
 export default async function HomePage() {
@@ -25,7 +29,11 @@ export default async function HomePage() {
   const badges = computeBadges(profile);
   const earned = badges.filter((b) => b.earned);
   const summary = generateVibeSummary(profile, user.name.split(" ")[0]);
-  const unread = await unreadCount(user.id);
+  const [unread, unreadDm, d] = await Promise.all([
+    unreadCount(user.id),
+    unreadMessageCount(user.id),
+    getDict(),
+  ]);
 
   return (
     <main className="px-5 pt-12">
@@ -33,16 +41,32 @@ export default async function HomePage() {
       <header className="flex items-center justify-between reveal">
         <div>
           <p className="text-[11px] text-muted font-semibold uppercase tracking-[0.2em]">
-            {greeting()}
+            {d.home[greetingKey()]}
           </p>
           <h1 className="font-display text-[27px] font-semibold tracking-[-0.035em] text-ink">
             {user.name.split(" ")[0]}
           </h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          <LangToggle />
+          <Link
+            href="/messages"
+            aria-label={d.nav.messages}
+            className="relative w-11 h-11 grid place-items-center rounded-full bg-warmwhite border border-line"
+          >
+            <IconGlyph def={ICONS.envelope} size={19} color="#6B6B6B" />
+            {unreadDm > 0 && (
+              <span
+                className="absolute -top-1 -right-1 min-w-5 h-5 px-1.5 grid place-items-center rounded-full grad-score text-white text-[10px] font-black"
+                style={{ boxShadow: "0 0 0 2.5px #FAF7F2" }}
+              >
+                {unreadDm > 9 ? "9+" : unreadDm}
+              </span>
+            )}
+          </Link>
           <Link
             href="/notifications"
-            aria-label="Bildirimler"
+            aria-label={d.nav.notifications}
             className="relative w-11 h-11 grid place-items-center rounded-full bg-warmwhite border border-line"
           >
             <IconGlyph def={ICONS.bell} size={19} color="#6B6B6B" />

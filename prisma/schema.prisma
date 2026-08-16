@@ -45,6 +45,11 @@ model User {
 
   invites       Invite[]
   inviteClaim   InviteClaim?
+  friendsSent      Friendship[]  @relation("FriendRequester")
+  friendsReceived  Friendship[]  @relation("FriendAddressee")
+  conversationsA   Conversation[] @relation("ConvA")
+  conversationsB   Conversation[] @relation("ConvB")
+  messagesSent     Message[]
   grantsGiven   InviteGrant[]  @relation("GrantsGiven")
   grantsHeld    InviteGrant[]  @relation("GrantsHeld")
   notifications Notification[]
@@ -271,4 +276,81 @@ model Report {
 
   @@index([status, createdAt])
   @@index([ratingId])
+}
+
+
+// -------------------------------------------------------------- friends
+
+/// A friendship, stored once from the requester's side.
+///
+/// Friends are what make direct messages possible at all, and they let the
+/// People tab put the folks you actually know at the top instead of burying
+/// them in the community list.
+model Friendship {
+  id          String @id @default(cuid())
+  requesterId String
+  requester   User   @relation("FriendRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  addresseeId String
+  addressee   User   @relation("FriendAddressee", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  /// PENDING | ACCEPTED
+  status String @default("PENDING")
+
+  createdAt  DateTime  @default(now())
+  acceptedAt DateTime?
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+  @@index([requesterId, status])
+}
+
+// ------------------------------------------------------------- messages
+
+/// A one-to-one thread.
+///
+/// Two ways one can exist:
+///   FRIEND — the two people are friends, both may write freely.
+///   RATING — a premium member opened a thread about a rating they received.
+///            The rater's identity stays hidden from the initiator unless the
+///            rating was already identity-visible, and the rater may only
+///            answer after the first message arrives, so a rating can never
+///            become an open channel into the person who wrote it.
+model Conversation {
+  id String @id @default(cuid())
+
+  /// FRIEND | RATING
+  kind String @default("FRIEND")
+
+  /// Stored with the lower id first so a pair can only ever have one thread.
+  userAId String
+  userA   User   @relation("ConvA", fields: [userAId], references: [id], onDelete: Cascade)
+  userBId String
+  userB   User   @relation("ConvB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  /// For RATING threads: the rating it grew out of, and who is hidden.
+  ratingId       String?
+  anonymousSide  String? // "A" | "B" — that participant is shown as Anonymous
+
+  createdAt     DateTime @default(now())
+  lastMessageAt DateTime @default(now())
+
+  messages Message[]
+
+  @@unique([userAId, userBId])
+  @@index([lastMessageAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId String
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  body      String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([conversationId, createdAt])
 }

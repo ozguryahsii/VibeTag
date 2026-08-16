@@ -8,6 +8,8 @@ import { RELATIONSHIPS, TRAITS, VIBE_TAGS } from "@/lib/taxonomy";
 import { groupIconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ReportDialog } from "@/components/ReportDialog";
+import { openRatingThreadAction } from "@/lib/actions/social";
+import { getDict } from "@/lib/i18n/server";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +24,7 @@ function fmtDate(d: Date): string {
 
 export default async function InsightsPage() {
   const me = await requireUser();
+  const d = await getDict();
   const profile = await getVibeProfile(me.id);
   const summary = generateVibeSummary(profile, me.name.split(" ")[0]);
 
@@ -216,32 +219,32 @@ export default async function InsightsPage() {
                 {isGold ? "Değerlendirmeler" : "Anonim oy detayları"}
               </SectionTitle>
               <div className="grid gap-2.5">
-                {details.map((d) => {
+                {details.map((row) => {
                   const rel = RELATIONSHIPS[
-                    d.relationship as keyof typeof RELATIONSHIPS
+                    row.relationship as keyof typeof RELATIONSHIPS
                   ];
                   // §15 — identity is revealed only for Gold, and never for
                   // protected or explicitly anonymised ratings.
                   const showIdentity =
-                    isGold && !d.isProtected && !d.hideIdentity;
+                    isGold && !row.isProtected && !row.hideIdentity;
 
                   return (
-                    <Card key={d.id} className="!py-4">
+                    <Card key={row.id} className="!py-4">
                       <div className="flex items-center gap-3">
                         {showIdentity ? (
                           <>
                             <Avatar
-                              name={d.raterUser.name}
-                              url={d.raterUser.avatarUrl}
-                              color={d.raterUser.avatarColor}
+                              name={row.raterUser.name}
+                              url={row.raterUser.avatarUrl}
+                              color={row.raterUser.avatarColor}
                               size={38}
                             />
                             <div className="min-w-0">
                               <Link
-                                href={`/u/${d.raterUser.username}`}
+                                href={`/u/${row.raterUser.username}`}
                                 className="text-[13.5px] font-extrabold truncate block"
                               >
-                                {d.raterUser.name}
+                                {row.raterUser.name}
                               </Link>
                               <p className="text-[11.5px] text-muted">
                                 {rel.label}
@@ -264,12 +267,12 @@ export default async function InsightsPage() {
                           </>
                         )}
                         <span className="ml-auto text-[11px] text-muted">
-                          {fmtDate(d.createdAt)}
+                          {fmtDate(row.createdAt)}
                         </span>
                       </div>
 
                       <div className="mt-3 grid gap-1.5">
-                        {d.traits.map((t) => (
+                        {row.traits.map((t) => (
                           <div
                             key={t.traitKey}
                             className="flex justify-between text-[12.5px]"
@@ -285,9 +288,9 @@ export default async function InsightsPage() {
                         ))}
                       </div>
 
-                      {d.vibeTags.length > 0 && (
+                      {row.vibeTags.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1.5">
-                          {d.vibeTags.map((t) => {
+                          {row.vibeTags.map((t) => {
                             const tag =
                               VIBE_TAGS[t.tagKey as keyof typeof VIBE_TAGS];
                             return tag ? (
@@ -302,21 +305,27 @@ export default async function InsightsPage() {
                         </div>
                       )}
 
-                      {d.comment && (
+                      {row.comment && (
                         <p className="mt-3 text-[13px] leading-relaxed border-l-2 border-orange/30 pl-3">
-                          “{d.comment}”
+                          “{row.comment}”
                         </p>
                       )}
 
-                      <div className="mt-3 flex justify-end">
+                      <div className="mt-3 flex items-center justify-between gap-3">
+                        <form action={openRatingThreadAction}>
+                          <input type="hidden" name="ratingId" value={row.id} />
+                          <button className="text-[11.5px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-3 py-1.5">
+                            {d.messages.newFromRating}
+                          </button>
+                        </form>
                         <ReportDialog
-                          ratingId={d.id}
-                          label="Bu değerlendirmeyi bildir"
+                          ratingId={row.id}
+                          label={d.insights.reportRating}
                           compact
                         />
                       </div>
 
-                      {isGold && (d.isProtected || d.hideIdentity) && (
+                      {isGold && (row.isProtected || row.hideIdentity) && (
                         <p className="mt-3 text-[11.5px] text-muted bg-cream rounded-xl px-3 py-2">
                           Bu değerlendirmenin kimliği sistem tarafından
                           korunuyor — Gold üyelikte de görünmez.

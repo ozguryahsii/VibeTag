@@ -2,14 +2,8 @@ import QRCode from "qrcode";
 import { requireUser } from "@/lib/auth";
 import { baseUrl } from "@/lib/base-url";
 import { getShareableInvite } from "@/lib/invite";
+import { getDict } from "@/lib/i18n/server";
 import { InviteShare } from "@/components/InviteShare";
-
-function fmt(d: Date): string {
-  return new Intl.DateTimeFormat("tr-TR", {
-    day: "numeric",
-    month: "short",
-  }).format(d);
-}
 
 /**
  * The share card, rendered wherever it belongs. It appears on the invite
@@ -18,7 +12,10 @@ function fmt(d: Date): string {
  */
 export async function InviteShareBlock() {
   const user = await requireUser();
-  const invite = await getShareableInvite(user.id);
+  const [invite, dict] = await Promise.all([
+    getShareableInvite(user.id),
+    getDict(),
+  ]);
 
   const url = `${await baseUrl()}/i/${invite.code}`;
   const qr = await QRCode.toDataURL(url, {
@@ -28,17 +25,5 @@ export async function InviteShareBlock() {
     errorCorrectionLevel: "M",
   });
 
-  return (
-    <InviteShare
-      url={url}
-      qr={qr}
-      name={user.name}
-      expiresAt={invite.expiresAt ? fmt(invite.expiresAt) : null}
-      remaining={
-        invite.maxUses === null
-          ? null
-          : Math.max(0, invite.maxUses - invite._count.grants)
-      }
-    />
-  );
+  return <InviteShare url={url} qr={qr} name={user.name} dict={dict} />;
 }

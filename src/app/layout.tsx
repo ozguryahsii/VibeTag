@@ -28,12 +28,14 @@ const syne = Syne({
   variable: "--font-syne",
 });
 
-export const metadata: Metadata = {
-  title: "Vibe Tag — Discover how people see you",
-  description:
-    "Vibe Tag, çevrendeki insanların sende gördüğü güzel özellikleri dijital bir sosyal kimliğe dönüştürür.",
-  applicationName: "Vibe Tag",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const d = dictionaryFor(await getLocale());
+  return {
+    title: d.meta.title,
+    description: d.meta.description,
+    applicationName: d.common.appName,
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",

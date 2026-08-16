@@ -2,8 +2,9 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { unreadCount } from "@/lib/notifications";
 import { unreadMessageCount } from "@/lib/social";
-import { getDict } from "@/lib/i18n/server";
+import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
+import { badgeDescription, badgeLabel, tagLabel, traitLabel } from "@/lib/labels";
 import { LangToggle } from "@/components/LangToggle";
 import { getPercentile, getVibeProfile } from "@/lib/profile";
 import { computeBadges } from "@/lib/badges";
@@ -28,12 +29,13 @@ export default async function HomePage() {
   const percentile = await getPercentile(user.id, profile.score);
   const badges = computeBadges(profile);
   const earned = badges.filter((b) => b.earned);
-  const summary = generateVibeSummary(profile, user.name.split(" ")[0]);
-  const [unread, unreadDm, d] = await Promise.all([
+  const [unread, unreadDm, d, locale] = await Promise.all([
     unreadCount(user.id),
     unreadMessageCount(user.id),
     getDict(),
+    getLocale(),
   ]);
+  const summary = generateVibeSummary(profile, user.name.split(" ")[0], d, locale);
 
   return (
     <main className="px-5 pt-12">
@@ -79,7 +81,7 @@ export default async function HomePage() {
               </span>
             )}
           </Link>
-          <Link href="/settings" aria-label="Profil">
+          <Link href="/settings" aria-label={d.nav.profile}>
             <Avatar
               name={user.name}
               url={user.avatarUrl}
@@ -141,21 +143,21 @@ export default async function HomePage() {
             score={profile.score}
             caption={
               percentile
-                ? `Top ${percentile}% of users`
+                ? fill(d.home.topPercent, { n: percentile })
                 : profile.ratingCount > 0
-                  ? `${profile.ratingCount} kişi değerlendirdi`
-                  : "İlk değerlendirmeni bekliyor"
+                  ? fill(d.home.ratedCount, { n: profile.ratingCount })
+                  : d.home.awaitingFirst
             }
           />
 
           {profile.tags.length > 0 && (
             <div className="w-full">
               <p className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.22em] text-muted">
-                People see you as
+                {d.home.seeYouAs}
               </p>
               <div className="flex flex-wrap justify-center gap-2">
                 {profile.tags.slice(0, 4).map((t) => (
-                  <TagPill key={t.key} tagKey={t.key} label={t.en} />
+                  <TagPill key={t.key} tagKey={t.key} label={tagLabel(t.key, locale)} />
                 ))}
               </div>
             </div>
@@ -163,9 +165,9 @@ export default async function HomePage() {
 
           <div className="mt-6 flex w-full items-center justify-between border-t border-line/80 pt-4 text-left">
             <p className="text-[12px] leading-tight text-muted">
-              Rated by
+              {d.common.ratedBy}
               <span className="mt-0.5 block text-[16px] font-semibold text-ink">
-                {profile.ratingCount} people
+                {profile.ratingCount} {d.common.people}
               </span>
             </p>
             {profile.tags.length > 0 && (
@@ -173,7 +175,7 @@ export default async function HomePage() {
                 href="/card"
                 className="rounded-full border border-orange/35 bg-warmwhite/80 px-4 py-2 text-[12px] font-semibold text-coral shadow-[0_5px_14px_rgba(221,105,55,0.1)]"
               >
-                Kartını paylaş →
+                {d.home.shareCard}
               </Link>
             )}
           </div>
@@ -182,22 +184,22 @@ export default async function HomePage() {
 
       {profile.tags.length === 0 && (
         <section className="mt-7 reveal" style={{ animationDelay: "120ms" }}>
-          <SectionTitle>People see you as:</SectionTitle>
+          <SectionTitle>{d.home.seeYouAs}</SectionTitle>
           <EmptyState
             emoji="🌱"
-            title="Vibe profilin henüz boş"
-            body="Seni tanıyan birkaç kişiyi davet et. İlk değerlendirmeler geldiğinde burada sende gördükleri özellikler belirecek."
-            action={<Button href="/invite">Çevreni davet et</Button>}
+            title={d.home.emptyTitle}
+            body={d.home.emptyBody}
+            action={<Button href="/invite">{d.home.emptyCta}</Button>}
           />
         </section>
       )}
 
       {profile.tags.length > 4 && (
         <section className="mt-6 reveal" style={{ animationDelay: "150ms" }}>
-          <SectionTitle>More of your Vibe</SectionTitle>
+          <SectionTitle>{d.home.moreVibe}</SectionTitle>
           <Card className="flex flex-wrap gap-2">
             {profile.tags.slice(4, 8).map((t) => (
-              <TagPill key={t.key} tagKey={t.key} label={t.en} count={t.count} />
+              <TagPill key={t.key} tagKey={t.key} label={tagLabel(t.key, locale)} count={t.count} />
             ))}
           </Card>
         </section>
@@ -209,16 +211,16 @@ export default async function HomePage() {
           <SectionTitle
             action={
               <Link href="/insights" className="text-[12px] font-bold text-coral">
-                Tümü →
+                {d.home.seeAll}
               </Link>
             }
           >
-            AI My Vibe Summary
+            {d.home.aiSummary}
           </SectionTitle>
           <Card>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-[11px] font-extrabold tracking-[0.16em] text-coral">
-                ✦ AI ANALİZ
+                {d.home.aiBadge}
               </span>
             </div>
             <p className="text-[17px] font-extrabold leading-snug tracking-[-0.01em]">
@@ -234,14 +236,14 @@ export default async function HomePage() {
       {/* strongest traits */}
       {profile.traits.length > 0 && (
         <section className="mt-6 reveal" style={{ animationDelay: "260ms" }}>
-          <SectionTitle>En güçlü yönlerin</SectionTitle>
+          <SectionTitle>{d.home.strongest}</SectionTitle>
           <Card className="grid gap-4">
             {profile.traits.slice(0, 4).map((t) => (
               <div key={t.key}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[13.5px] font-bold inline-flex items-center gap-2">
                     <TraitIcon traitKey={t.key} color="#FF8A3D" />
-                    {t.label}
+                    {traitLabel(t.key, locale)}
                   </span>
                   <span className="text-[13px] font-black tabular-nums grad-text">
                     {t.score}
@@ -256,7 +258,7 @@ export default async function HomePage() {
 
       {/* badges */}
       <section className="mt-6 reveal" style={{ animationDelay: "320ms" }}>
-        <SectionTitle>Rozetlerin</SectionTitle>
+        <SectionTitle>{d.home.badges}</SectionTitle>
         <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
           {(earned.length ? earned : badges).slice(0, 6).map((b) => (
             <div
@@ -268,9 +270,11 @@ export default async function HomePage() {
                 <IconGlyph def={ICONS[b.icon]} size={24} color="#FF7A4D" strokeWidth={1.8} />
               </div>
               <div className="text-[12.5px] font-extrabold mt-1.5 leading-tight">
-                {b.label}
+                {badgeLabel(b.key, d)}
               </div>
-              <div className="text-[10.5px] text-muted mt-0.5">{b.tr}</div>
+              <div className="text-[10.5px] text-muted mt-0.5">
+                {badgeDescription(b.key, d)}
+              </div>
               {!b.earned && (
                 <div className="mt-2">
                   <Meter value={b.progress * 100} />
@@ -290,11 +294,10 @@ export default async function HomePage() {
               </span>
               <span className="flex-1">
                 <span className="block text-[13.5px] font-extrabold">
-                  Profilini güçlendir
+                  {d.home.boostTitle}
                 </span>
                 <span className="block text-[12px] text-muted leading-relaxed">
-                  Farklı çevrelerden {10 - profile.ratingCount} kişi daha,
-                  profilini belirgin şekilde gerçekçi kılar.
+                  {fill(d.home.boostBody, { n: 10 - profile.ratingCount })}
                 </span>
               </span>
               <span className="text-orange font-bold text-[18px]">→</span>
@@ -313,16 +316,16 @@ export default async function HomePage() {
             VIBE INSIGHTS
           </div>
           <p className="text-[17px] font-extrabold mt-1.5 leading-snug">
-            Seni hangi çevrelerden tanıyorlar?
+            {d.home.insightsTitle}
           </p>
           <p className="text-[13px] opacity-85 mt-1 leading-relaxed">
-            Çevre dağılımı, güçlü yönler ve anonim değerlendirme detayları.
+            {d.home.insightsBody}
           </p>
           <Link
             href="/insights"
             className="inline-flex mt-4 items-center gap-2 rounded-full bg-white text-coral font-bold text-[14px] px-5 py-3"
           >
-            Analizi aç
+            {d.home.insightsCta}
           </Link>
         </div>
       </section>

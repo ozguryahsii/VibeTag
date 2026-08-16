@@ -1,19 +1,24 @@
+"use client";
+
 import { setLocaleAction } from "@/lib/actions/locale";
-import { getLocale } from "@/lib/i18n/server";
 import { LOCALES } from "@/lib/i18n/config";
+import { useD, useLocale } from "@/components/LocaleProvider";
 
 /**
- * EN | TR switch. A form rather than a client toggle because the choice
- * lives in a cookie, and only a server action may write one.
+ * EN | TR switch. A form rather than a fetch because the choice lives in a
+ * cookie and only a server action may write one; a client component so the
+ * sign-in and onboarding screens — which are themselves client trees — can
+ * offer the switch before an account exists.
  */
-export async function LangToggle({ className = "" }: { className?: string }) {
-  const current = await getLocale();
+export function LangToggle({ className = "" }: { className?: string }) {
+  const current = useLocale();
+  const d = useD();
 
   return (
     <div
       className={`inline-flex items-center rounded-full border border-line bg-warmwhite p-0.5 ${className}`}
       role="group"
-      aria-label="Language"
+      aria-label={d.common.language}
     >
       {LOCALES.map((l) => {
         const active = l === current;

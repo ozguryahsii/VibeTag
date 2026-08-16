@@ -1,31 +1,38 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { getDict, getLocale } from "@/lib/i18n/server";
+import { tagLabel } from "@/lib/labels";
+import { fill } from "@/lib/i18n";
 import { VibeMark, Wordmark } from "@/components/Logo";
+import { LangToggle } from "@/components/LangToggle";
 import { AnonStack, Avatar, Button, Card, TagPill } from "@/components/ui";
 
 export default async function Welcome() {
   const user = await getCurrentUser();
   if (user) redirect("/home");
+  const d = await getDict();
+  const locale = await getLocale();
 
   return (
     <main className="min-h-dvh flex flex-col px-6 pt-12 pb-10 overflow-hidden">
-      <div className="reveal relative z-10">
+      <div className="reveal relative z-10 flex items-start justify-between gap-3">
         <Wordmark size={22} />
+        <LangToggle />
       </div>
 
       <div className="mt-12 reveal relative z-10" style={{ animationDelay: "80ms" }}>
         <p className="text-[10px] font-extrabold tracking-[0.3em] text-coral mb-3">
-          YOUR SOCIAL SIGNATURE
+          {d.welcome.kicker}
         </p>
         <h1 className="vt-page-title text-[43px] leading-[1.02] tracking-[-0.035em]">
-          Discover how
+          {d.welcome.titleA}
           <br />
-          people <span className="grad-text">see you.</span>
+          {d.welcome.titleB}{" "}
+          <span className="grad-text">{d.welcome.titleC}</span>
         </h1>
         <p className="mt-4 text-[15px] leading-relaxed text-muted max-w-[19rem]">
-          Vibe Tag bir puanlama uygulaması değil. Çevrendeki insanların sende
-          gördüğü güzel özellikleri keşfettiğin yer.
+          {d.welcome.body}
         </p>
       </div>
 
@@ -100,21 +107,27 @@ export default async function Welcome() {
             </p>
             <p className="mt-3 inline-flex items-center gap-2 text-[14px] font-semibold text-coral">
               <span className="grid h-7 w-7 place-items-center rounded-full border border-coral">★</span>
-              Top 5% of users
+              {fill(d.home.topPercent, { n: 5 })}
             </p>
 
             <div className="mt-5 flex max-w-[310px] flex-wrap justify-center gap-2">
-              <TagPill tagKey="positiveEnergy" label="Positive Energy" tone="purple" />
-              <TagPill tagKey="reliable" label="Reliable" tone="purple" />
-              <TagPill tagKey="kind" label="Kind" tone="purple" />
-              <TagPill tagKey="leader" label="Leader" tone="purple" />
+              {["positiveEnergy", "reliable", "kind", "leader"].map((key) => (
+                <TagPill
+                  key={key}
+                  tagKey={key}
+                  label={tagLabel(key, locale)}
+                  tone="purple"
+                />
+              ))}
             </div>
 
             <div className="mt-6 flex w-full items-center gap-3 border-t border-line/80 pt-4 text-left">
               <AnonStack count={3} size={34} />
               <p className="text-[11px] leading-tight text-muted">
-                Rated by
-                <span className="mt-0.5 block text-[15px] font-semibold text-ink">126 people</span>
+                {d.common.ratedBy}
+                <span className="mt-0.5 block text-[15px] font-semibold text-ink">
+                  126 {d.common.people}
+                </span>
               </p>
             </div>
           </div>
@@ -122,16 +135,14 @@ export default async function Welcome() {
       </div>
 
       <div className="mt-7 grid gap-2.5 reveal" style={{ animationDelay: "240ms" }}>
-        {[
-          ["01", "Tüm oylar anonim", "Kimin ne yazdığını kimse göremez."],
-          ["02", "Bağlama göre değerlendirme", "Seni nereden tanıyorsa onu puanlar."],
-          ["03", "AI Vibe analizi", "Sosyal algını sade bir dille özetler."],
-        ].map(([e, t, d]) => (
-          <Card key={t} className="flex items-center gap-3.5 !py-3.5">
-            <span className="w-8 h-8 shrink-0 grid place-items-center rounded-full border border-coral/20 bg-tagbg text-[10px] font-black tracking-wider text-coral">{e}</span>
+        {d.welcome.points.map((point, i) => (
+          <Card key={point.title} className="flex items-center gap-3.5 !py-3.5">
+            <span className="w-8 h-8 shrink-0 grid place-items-center rounded-full border border-coral/20 bg-tagbg text-[10px] font-black tracking-wider text-coral">
+              {String(i + 1).padStart(2, "0")}
+            </span>
             <span>
-              <span className="block text-[13.5px] font-bold">{t}</span>
-              <span className="block text-[12px] text-muted">{d}</span>
+              <span className="block text-[13.5px] font-bold">{point.title}</span>
+              <span className="block text-[12px] text-muted">{point.body}</span>
             </span>
           </Card>
         ))}
@@ -139,13 +150,13 @@ export default async function Welcome() {
 
       <div className="mt-auto pt-8 grid gap-3 reveal" style={{ animationDelay: "320ms" }}>
         <Button href="/onboarding" full>
-          Başla — ücretsiz
+          {d.welcome.start}
         </Button>
         <Link
           href="/login"
           className="text-center text-[14px] font-bold text-muted py-2"
         >
-          Zaten hesabım var
+          {d.welcome.haveAccount}
         </Link>
       </div>
     </main>

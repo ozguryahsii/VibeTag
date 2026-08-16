@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { redeemInviteFor } from "@/lib/invite";
+import { getDict } from "@/lib/i18n/server";
 import {
   createSession,
   destroySession,
@@ -37,6 +38,7 @@ export async function registerAction(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  const d = await getDict();
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "")
     .trim()
@@ -44,19 +46,18 @@ export async function registerAction(
   const username = normalizeUsername(String(formData.get("username") ?? ""));
   const password = String(formData.get("password") ?? "");
 
-  if (name.length < 2) return { error: "İsmini yazar mısın?" };
+  if (name.length < 2) return { error: d.auth.errors.name };
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
-    return { error: "Geçerli bir e-posta gerekli." };
-  if (username.length < 3)
-    return { error: "Kullanıcı adı en az 3 karakter olmalı." };
-  if (password.length < 6) return { error: "Şifre en az 6 karakter olmalı." };
+    return { error: d.auth.errors.email };
+  if (username.length < 3) return { error: d.auth.errors.username };
+  if (password.length < 6) return { error: d.auth.errors.password };
 
   const clash = await prisma.user.findFirst({
     where: { OR: [{ email }, { username }] },
     select: { email: true, username: true },
   });
-  if (clash?.email === email) return { error: "Bu e-posta zaten kayıtlı." };
-  if (clash) return { error: "Bu kullanıcı adı alınmış." };
+  if (clash?.email === email) return { error: d.auth.errors.emailTaken };
+  if (clash) return { error: d.auth.errors.usernameTaken };
 
   const user = await prisma.user.create({
     data: {
@@ -80,6 +81,7 @@ export async function loginAction(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  const d = await getDict();
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
@@ -87,7 +89,7 @@ export async function loginAction(
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !verifyPassword(password, user.passwordHash)) {
-    return { error: "E-posta veya şifre hatalı." };
+    return { error: d.auth.errors.badCredentials };
   }
 
   await createSession(user.id);
@@ -118,21 +120,22 @@ export async function updateProfileAction(
   formData: FormData,
 ): Promise<FormState> {
   const user = await requireUser();
+  const d = await getDict();
   const name = String(formData.get("name") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
   const avatarColor = String(formData.get("avatarColor") ?? "#FF8A3D");
   const rawAvatar = String(formData.get("avatarUrl") ?? "").trim();
 
-  if (name.length < 2) return { error: "İsim en az 2 karakter olmalı." };
-  if (bio.length > 160) return { error: "Bio en fazla 160 karakter olabilir." };
+  if (name.length < 2) return { error: d.auth.errors.nameShort };
+  if (bio.length > 160) return { error: d.auth.errors.bioLong };
 
   let avatarUrl: string | null = null;
   if (rawAvatar) {
     if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(rawAvatar)) {
-      return { error: "Görsel biçimi desteklenmiyor." };
+      return { error: d.auth.errors.imageFormat };
     }
     if (rawAvatar.length > MAX_AVATAR_BYTES) {
-      return { error: "Görsel çok büyük, daha küçük bir fotoğraf dene." };
+      return { error: d.auth.errors.imageLarge };
     }
     avatarUrl = rawAvatar;
   }

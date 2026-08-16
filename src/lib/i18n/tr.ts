@@ -27,6 +27,12 @@ export const tr: Dictionary = {
     language: "Dil",
   },
 
+  meta: {
+    title: "Vibe Tag — İnsanlar seni nasıl görüyor?",
+    description:
+      "Vibe Tag, çevrendeki insanların sende gördüğü güzel özellikleri dijital bir sosyal kimliğe dönüştürür.",
+  },
+
   nav: {
     myVibe: "My Vibe",
     people: "Kişiler",
@@ -81,10 +87,17 @@ export const tr: Dictionary = {
         body: "My Vibe profilin, Vibe Score'un ve paylaşılabilir Vibe Card'ın hazır. Story'de paylaş, çevreni davet et.",
       },
     ],
-    art: { criteriaOpened: "6 kriter açıldı" },
+    art: {
+      criteriaOpened: "6 kriter açıldı",
+      chips: ["İş arkadaşı", "Yakın arkadaş", "Hizmet aldım", "Topluluk"],
+    },
   },
 
   auth: {
+    loginKicker: "TEKRAR HOŞ GELDİN",
+    registerKicker: "SOSYAL İMZANI OLUŞTUR",
+    emailPlaceholder: "sen@ornek.com",
+    namePlaceholder: "Özgür Yahşi",
     loginTitle: "Tekrar hoş geldin 👋",
     loginBody: "Vibe profilin seni bekliyor.",
     registerTitle: "My Vibe'ını oluştur",
@@ -147,6 +160,7 @@ export const tr: Dictionary = {
   },
 
   people: {
+    kicker: "ÇEVREN",
     title: "Kişiler",
     subtitle: "Tanıdığın birini bul, ona bir Vibe bırak.",
     search: "İsim veya kullanıcı adı ara…",
@@ -167,6 +181,20 @@ export const tr: Dictionary = {
       "Henüz arkadaşın yok. Tanıdığın kişileri ekle — en üstte çıkarlar, değerlendirmek tek dokunuş olur.",
     incoming: "arkadaş olmak istiyor",
     message: "Mesaj",
+    nearby: "Yakınındakiler",
+    nearbyOn: "Yakınımdaki kişileri göster",
+    nearbyBody:
+      "Konumunu tam olarak değil, kabaca saklarız ve yalnızca bu listeyi sıralamak için kullanırız. İstediğin an kapatabilirsin.",
+    nearbyEnable: "Yakındakileri aç",
+    nearbyDisable: "Yakındakileri kapat",
+    nearbyAsking: "Konumun alınıyor…",
+    nearbyDenied:
+      "Konum izni reddedildi. Tarayıcı ayarlarından izin verebilirsin.",
+    nearbyUnsupported: "Bu cihaz konum paylaşamıyor.",
+    nearbyNone: "Yakınında konum paylaşan kimse yok.",
+    distanceClose: "1 km'den yakın",
+    distanceKm: "{n} km uzakta",
+    distanceFar: "uzakta",
   },
 
   rate: {
@@ -244,6 +272,7 @@ export const tr: Dictionary = {
     you: "seni",
     them: "onu",
     badges: "Rozetler",
+    moreVibe: "Diğer Vibe'ları",
     strengths: "Güçlü yönler",
     circles: "Nereden tanınıyor?",
     aiSummary: "AI özeti",
@@ -267,6 +296,7 @@ export const tr: Dictionary = {
 
   insights: {
     premium: "✦ PREMIUM",
+    kicker: "VIBE ANALİZİ",
     title: "Vibe Insights",
     subtitle: "Sosyal algının arkasındaki veri.",
     describedAs: "İNSANLAR SENİ ŞÖYLE TARİF EDİYOR",
@@ -293,9 +323,13 @@ export const tr: Dictionary = {
   },
 
   card: {
+    kicker: "SOSYAL KİMLİĞİN",
     title: "Vibe Card",
     subtitle: "Story, kare veya geniş format — indir ve paylaş.",
     format: "FORMAT",
+    formatStory: "Story",
+    formatSquare: "Kare",
+    formatWide: "Geniş",
     theme: "TEMA",
     themeHint:
       "Auto, kartın tonunu skoruna göre seçer — yüksek skor ışıldar, sakin skor zarif kalır.",
@@ -372,6 +406,7 @@ export const tr: Dictionary = {
     justNow: "az önce",
     minutesAgo: "{n} dk önce",
     hoursAgo: "{n} sa önce",
+    dayAgo: "1 gün önce",
     daysAgo: "{n} gün önce",
     newRating: "Yeni bir değerlendirme aldın ✨",
     newRatingBody: "Biri seni değerlendirdi. My Vibe profilin güncellendi.",
@@ -386,6 +421,10 @@ export const tr: Dictionary = {
     friendAcceptedBody: "{name} arkadaşlık isteğini kabul etti.",
     newMessage: "Yeni mesaj",
     newMessageBody: "Kutunda yeni bir mesajın var.",
+    badgeEarned: "Yeni bir rozet kazandın 🏅",
+    badgeEarnedBody: "“{badge}” artık My Vibe profilinde.",
+    generic: "Profilinde bir gelişme var",
+    kicker: "SON HAREKETLER",
   },
 
   messages: {
@@ -416,6 +455,7 @@ export const tr: Dictionary = {
   },
 
   settings: {
+    kicker: "VIBE KİMLİĞİN",
     title: "Profil",
     myProfile: "Profilim",
     vibeCard: "Vibe Card",
@@ -426,6 +466,9 @@ export const tr: Dictionary = {
     photoChange: "Değiştirmek için dokun.",
     photoNone: "Fotoğraf yoksa baş harflerin gösterilir.",
     photoRemove: "Fotoğrafı kaldır",
+    photoPick: "Profil fotoğrafı seç",
+    photoBadType: "JPG, PNG veya WebP bir görsel seç.",
+    photoUnreadable: "Görsel okunamadı, başka bir dosya dener misin?",
     accentColour: "Vurgu rengi",
     name: "İsim",
     bio: "Bio",
@@ -646,6 +689,29 @@ export const tr: Dictionary = {
   },
 
   ai: {
+    personaFallback: "Kendine Özgü",
+    personas: {
+      reliability: "Sözünün Eri",
+      leadership: "Doğal Lider",
+      kindness: "İyi Kalpli",
+      empathy: "Anlayan Kişi",
+      problemSolving: "Çözüm Bulan",
+      creativity: "Yaratıcı Zihin",
+      positivity: "Enerji Veren",
+      teamwork: "Takımın Çıpası",
+      communication: "İletişimci",
+      honesty: "Dobra",
+      supportiveness: "Destek Olan",
+      professionalism: "Profesyonel",
+      workQuality: "Ustalık Sahibi",
+      helpfulness: "Yardım Eli",
+      punctuality: "Saat Gibi",
+      diligence: "Çalışkan",
+      responsibility: "Sahip Çıkan",
+      fairness: "Adil Davranan",
+      respect: "Saygılı",
+      funToBeAround: "Keyifli İnsan",
+    },
     emptyPersona: "Yeni Başlangıç",
     emptyHeadline: "Henüz yeterli değerlendirme yok.",
     emptyParagraph:

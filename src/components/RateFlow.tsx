@@ -7,7 +7,6 @@ import {
   type RatingState,
 } from "@/lib/actions/rating";
 import {
-  CONTEXT_GROUPS,
   MAX_VIBE_TAGS_PER_RATING,
   RELATIONSHIPS,
   allowedTraits,
@@ -19,8 +18,16 @@ import {
 import { Avatar } from "@/components/ui";
 import { IconGlyph, TagIcon, TraitIcon } from "@/components/Icon";
 import { groupIconFor, relationshipIconFor } from "@/lib/icons";
+import { fill, useD, useLocale } from "@/components/LocaleProvider";
+import {
+  groupBlurb,
+  groupLabel,
+  relationshipLabel,
+  tagLabel,
+  traitHint,
+  traitLabel,
+} from "@/lib/labels";
 
-const SCORE_WORDS = ["", "Zayıf", "İdare eder", "İyi", "Çok iyi", "Mükemmel"];
 const DEFAULT_SCORE = 4;
 const GROUP_ORDER: ContextGroup[] = [
   "PROFESSIONAL",
@@ -53,6 +60,9 @@ export function RateFlow({
   target: RateTarget;
   existing: ExistingSummary | null;
 }) {
+  const d = useD();
+  const locale = useLocale();
+  const firstName = target.name.split(" ")[0];
   const [state, formAction, pending] = useActionState<RatingState, FormData>(
     submitRatingAction,
     {},
@@ -91,7 +101,7 @@ export function RateFlow({
   function chooseRelationship(key: RelationshipKey) {
     setRelationship(key);
     // Drop any score/tag the new context does not permit, and open the
-    // remaining criteria at 4 ("Çok iyi") so the rater adjusts instead of
+    // remaining criteria at 4 ("very good") so the rater adjusts instead of
     // dragging six sliders from zero on a phone.
     const allowedTraitKeys = RELATIONSHIPS[key].traits as string[];
     setScores((prev) =>
@@ -128,7 +138,9 @@ export function RateFlow({
           ring
         />
         <div className="min-w-0">
-          <p className="text-[12px] font-bold text-muted">Değerlendiriyorsun</p>
+          <p className="text-[12px] font-bold text-muted">
+            {d.rateFlow.youAreRating}
+          </p>
           <h1 className="vt-page-title text-[22px] tracking-[-0.02em] truncate">
             {target.name}
           </h1>
@@ -137,12 +149,15 @@ export function RateFlow({
           href={`/u/${target.username}`}
           className="ml-auto text-[12px] font-bold text-muted"
         >
-          Vazgeç
+          {d.rateFlow.quit}
         </Link>
       </header>
 
       {/* progress */}
-      <div className="mt-6 flex gap-1.5" aria-label={`Adım ${step + 1} / 4`}>
+      <div
+        className="mt-6 flex gap-1.5"
+        aria-label={fill(d.rateFlow.step, { n: step + 1 })}
+      >
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
@@ -155,21 +170,24 @@ export function RateFlow({
       {locked && (
         <div className="mt-5 rounded-[20px] border border-orange/25 bg-tagbg px-4 py-3.5">
           <p className="text-[13px] font-bold text-orange">
-            Bu kişiyi zaten değerlendirdin.
+            {d.rateFlow.alreadyRated}
           </p>
-          <p className="text-[12.5px] text-muted mt-0.5 leading-relaxed">
-            Değerlendirmeni ayda bir kez güncelleyebilirsin —{" "}
-            <b>{existing!.cooldownDaysLeft} gün</b> sonra tekrar
-            düzenleyebilirsin.
-          </p>
+          <p
+            className="text-[12.5px] text-muted mt-0.5 leading-relaxed"
+            dangerouslySetInnerHTML={{
+              __html: fill(d.rateFlow.alreadyRatedBody, {
+                n: existing!.cooldownDaysLeft,
+              }),
+            }}
+          />
         </div>
       )}
 
       {existing && !locked && (
         <div className="mt-5 rounded-[20px] border border-line bg-warmwhite px-4 py-3.5 shadow-[0_10px_30px_rgba(93,58,42,0.04)]">
-          <p className="text-[13px] font-bold">Değerlendirmeni güncelliyorsun</p>
+          <p className="text-[13px] font-bold">{d.rateFlow.updating}</p>
           <p className="text-[12.5px] text-muted mt-0.5">
-            Önceki cevapların yüklendi. Eski sürüm kayıt altına alınır.
+            {d.rateFlow.updatingBody}
           </p>
         </div>
       )}
@@ -200,13 +218,14 @@ export function RateFlow({
         {/* ---------------------------------------------- step 0 */}
         {step === 0 && (
           <section className="mt-6 reveal">
-            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">CONTEXT</p>
+            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">
+              {d.rateFlow.contextKicker}
+            </p>
             <h2 className="vt-page-title text-[28px] leading-[1.08] tracking-[-0.02em]">
-              {target.name.split(" ")[0]}’i nereden tanıyorsun?
+              {fill(d.rateFlow.contextTitle, { name: firstName })}
             </h2>
             <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
-              Bu soru zorunlu. Sadece gerçekten deneyimlediğin alanlarda
-              değerlendirme yapabilirsin.
+              {d.rateFlow.contextBody}
             </p>
 
             <div className="mt-5 grid gap-5">
@@ -215,10 +234,10 @@ export function RateFlow({
                   <div className="flex items-center gap-2 mb-2.5 px-1">
                     <IconGlyph def={groupIconFor(g)} size={16} color="#FF8A3D" />
                     <span className="text-[13px] font-extrabold">
-                      {CONTEXT_GROUPS[g].label}
+                      {groupLabel(g, d)}
                     </span>
                     <span className="text-[11.5px] text-muted">
-                      · {CONTEXT_GROUPS[g].blurb}
+                      · {groupBlurb(g, d)}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2.5">
@@ -246,10 +265,12 @@ export function RateFlow({
                             color={active ? "#FF5C77" : "#8C8177"}
                           />
                           <div className="text-[13px] font-bold leading-tight mt-1.5">
-                            {r.label}
+                            {relationshipLabel(r.key, d)}
                           </div>
                           <div className="text-[11px] text-muted mt-0.5">
-                            {r.traits.length} kriter
+                            {fill(d.rateFlow.criteriaCount, {
+                              n: r.traits.length,
+                            })}
                           </div>
                         </button>
                       );
@@ -264,13 +285,17 @@ export function RateFlow({
         {/* ---------------------------------------------- step 1 */}
         {step === 1 && relationship && (
           <section className="mt-6 reveal">
-            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">TRAITS</p>
+            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">
+              {d.rateFlow.scoreKicker}
+            </p>
             <h2 className="vt-page-title text-[28px] leading-[1.08] tracking-[-0.02em]">
-              Bu deneyimde nasıldı?
+              {d.rateFlow.scoreTitle}
             </h2>
             <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
-              <b className="text-ink">{RELATIONSHIPS[relationship].label}</b> —
-              sadece bu ilişkide gözlemleyebileceğin kriterler gösteriliyor.
+              <b className="text-ink">
+                {relationshipLabel(relationship, d)}
+              </b>{" "}
+              {d.rateFlow.scoreBody}
             </p>
 
             <div className="mt-5 grid gap-3">
@@ -281,14 +306,14 @@ export function RateFlow({
                     <div className="flex items-baseline justify-between">
                       <span className="text-[14px] font-extrabold inline-flex items-center gap-2">
                         <TraitIcon traitKey={t.key} color="#FF8A3D" size={17} />
-                        {t.label}
+                        {traitLabel(t.key, locale)}
                       </span>
                       <span className="text-[12px] font-bold text-orange">
-                        {v ? SCORE_WORDS[v] : "—"}
+                        {v ? d.rateFlow.scoreWords[v] : "—"}
                       </span>
                     </div>
                     <p className="text-[11.5px] text-muted mt-0.5 mb-3">
-                      {t.hint}
+                      {traitHint(t.key, d)}
                     </p>
                     <input
                       type="range"
@@ -322,9 +347,7 @@ export function RateFlow({
 
             <div className="mt-4 rounded-2xl bg-tagbg border border-orange/15 px-4 py-3">
               <p className="text-[12px] text-orange font-semibold leading-relaxed">
-                Bu bağlamda liderlik, arkadaşlık ya da özel hayat gibi
-                alanlar sorulmuyor — çünkü bunları gözlemleyecek bir ilişkiniz
-                yok.
+                {d.rateFlow.scoreGuard}
               </p>
             </div>
           </section>
@@ -333,14 +356,21 @@ export function RateFlow({
         {/* ---------------------------------------------- step 2 */}
         {step === 2 && relationship && (
           <section className="mt-6 reveal">
-            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">VIBE TAGS</p>
-            <h2 className="vt-page-title text-[28px] leading-[1.08] tracking-[-0.02em]">
-              Sende ne görüyorsun?
-            </h2>
-            <p className="text-[13px] text-muted mt-1.5">
-              En fazla {MAX_VIBE_TAGS_PER_RATING} Vibe Tag seç.{" "}
-              <b className="text-ink">{tags.length}</b> seçildi.
+            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">
+              {d.rateFlow.tagsKicker}
             </p>
+            <h2 className="vt-page-title text-[28px] leading-[1.08] tracking-[-0.02em]">
+              {d.rateFlow.tagsTitle}
+            </h2>
+            <p
+              className="text-[13px] text-muted mt-1.5 [&_b]:text-ink"
+              dangerouslySetInnerHTML={{
+                __html: fill(d.rateFlow.tagsBody, {
+                  max: MAX_VIBE_TAGS_PER_RATING,
+                  n: tags.length,
+                }),
+              }}
+            />
 
             <div className="mt-5 flex flex-wrap gap-2">
               {tagOptions.map((t) => {
@@ -371,7 +401,7 @@ export function RateFlow({
                     }
                   >
                     <TagIcon tagKey={t.key} size={15} />
-                    {t.en}
+                    {tagLabel(t.key, locale)}
                   </button>
                 );
               })}
@@ -382,19 +412,21 @@ export function RateFlow({
         {/* ---------------------------------------------- step 3 */}
         {step === 3 && relationship && (
           <section className="mt-6 reveal">
-            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">A FINAL NOTE</p>
+            <p className="text-[10px] font-extrabold tracking-[0.24em] text-coral mb-2">
+              {d.rateFlow.noteKicker}
+            </p>
             <h2 className="vt-page-title text-[28px] leading-[1.08] tracking-[-0.02em]">
-              Eklemek istediğin bir şey var mı?
+              {d.rateFlow.noteTitle}
             </h2>
             <p className="text-[13px] text-muted mt-1.5">
-              İsteğe bağlı. Yorumun her zaman anonim gösterilir.
+              {d.rateFlow.noteBody}
             </p>
 
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value.slice(0, 280))}
               rows={4}
-              placeholder="Örn. Söz verdiği işi zamanında teslim etti, iletişimi çok netti."
+              placeholder={d.rateFlow.notePlaceholder}
               className="mt-4 w-full rounded-[22px] border border-line bg-warmwhite p-4 text-[14px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition resize-none shadow-[0_10px_30px_rgba(93,58,42,0.035)]"
             />
             <div className="text-right text-[11px] text-muted mt-1">
@@ -410,21 +442,19 @@ export function RateFlow({
               />
               <span>
                 <span className="block text-[13.5px] font-bold">
-                  Kimliğimi tamamen gizle
+                  {d.rateFlow.hideIdentity}
                 </span>
                 <span className="block text-[12px] text-muted leading-relaxed mt-0.5">
-                  Gold üyeler dahil hiç kimse bu değerlendirmeyi sana
-                  bağlayamaz.
+                  {d.rateFlow.hideIdentityBody}
                 </span>
               </span>
             </label>
 
             <div className="mt-4 rounded-2xl bg-warmwhite border border-line px-4 py-3.5">
-              <p className="text-[12.5px] text-muted leading-relaxed">
-                Verdiğin puanlar hiçbir zaman tek tek kişiye
-                bağlanarak gösterilmez. Değerlendirmeni <b>ayda bir kez</b>{" "}
-                güncelleyebilirsin.
-              </p>
+              <p
+                className="text-[12.5px] text-muted leading-relaxed [&_b]:text-ink"
+                dangerouslySetInnerHTML={{ __html: d.rateFlow.privacyNote }}
+              />
             </div>
           </section>
         )}
@@ -443,7 +473,7 @@ export function RateFlow({
               onClick={() => setStep((s) => s - 1)}
               className="h-13 px-6 rounded-full bg-white border border-line font-bold text-[15px] active:scale-[0.98] transition-transform"
             >
-              Geri
+              {d.common.back}
             </button>
           )}
 
@@ -466,15 +496,11 @@ export function RateFlow({
               onClick={() => setStep((s) => s + 1)}
               className="flex-1 h-13 rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)] active:scale-[0.98] transition-transform disabled:opacity-40 disabled:shadow-none"
             >
-              {step === 0
-                ? "Devam et"
-                : step === 1
-                  ? allScored
-                    ? "Devam et"
-                    : "Tüm kriterleri puanla"
-                  : tags.length === 0
-                    ? "En az 1 tag seç"
-                    : "Devam et"}
+              {step === 1 && !allScored
+                ? d.rateFlow.scoreAll
+                : step === 2 && tags.length === 0
+                  ? d.rateFlow.pickTag
+                  : d.common.continue}
             </button>
           ) : (
             <button
@@ -484,12 +510,12 @@ export function RateFlow({
               className="flex-1 h-13 rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)] active:scale-[0.98] transition-transform disabled:opacity-40"
             >
               {pending
-                ? "Gönderiliyor…"
+                ? d.rateFlow.submitting
                 : locked
-                  ? "Güncelleme kilitli"
+                  ? d.rateFlow.lockedSubmit
                   : existing
-                    ? "Değerlendirmemi güncelle"
-                    : "Değerlendirmeyi gönder"}
+                    ? d.rateFlow.submitUpdate
+                    : d.rateFlow.submit}
             </button>
           )}
         </div>
@@ -505,31 +531,37 @@ function Success({
   target: RateTarget;
   isUpdate: boolean;
 }) {
+  const d = useD();
+  const firstName = target.name.split(" ")[0];
+
   return (
     <main className="min-h-dvh px-6 flex flex-col items-center justify-center text-center overflow-hidden">
       <div className="pop w-20 h-20 rounded-full grid place-items-center grad-score text-white text-[28px] font-display shadow-[0_18px_44px_rgba(255,92,119,0.28)]">✓</div>
-      <p className="mt-6 text-[10px] font-extrabold tracking-[0.26em] text-coral">VIBE RECEIVED</p>
-      <h1 className="vt-page-title mt-2 text-[30px] tracking-[-0.02em] leading-tight">
-        {isUpdate ? "Değerlendirmen güncellendi" : "Teşekkürler!"}
-      </h1>
-      <p className="mt-2.5 text-[14px] text-muted leading-relaxed max-w-[18rem]">
-        {target.name.split(" ")[0]} artık çevresinin onda gördüğü güzel
-        özelliklerden birini daha görebilecek. Değerlendirmen{" "}
-        <b className="text-ink">anonim</b> olarak eklendi.
+      <p className="mt-6 text-[10px] font-extrabold tracking-[0.26em] text-coral">
+        {d.rateFlow.successKicker}
       </p>
+      <h1 className="vt-page-title mt-2 text-[30px] tracking-[-0.02em] leading-tight">
+        {isUpdate ? d.rateFlow.successUpdate : d.rateFlow.successNew}
+      </h1>
+      <p
+        className="mt-2.5 text-[14px] text-muted leading-relaxed max-w-[18rem] [&_b]:text-ink"
+        dangerouslySetInnerHTML={{
+          __html: fill(d.rateFlow.successBody, { name: firstName }),
+        }}
+      />
 
       <div className="mt-8 grid gap-3 w-full max-w-[20rem]">
         <Link
           href={`/u/${target.username}`}
           className="h-13 grid place-items-center rounded-full grad-score text-white font-bold text-[15px]"
         >
-          {target.name.split(" ")[0]}’in profilini gör
+          {fill(d.rateFlow.seeProfile, { name: firstName })}
         </Link>
         <Link
           href="/people"
           className="h-13 grid place-items-center rounded-full bg-white border border-line font-bold text-[15px]"
         >
-          Başka birini değerlendir
+          {d.rateFlow.rateAnother}
         </Link>
       </div>
     </main>

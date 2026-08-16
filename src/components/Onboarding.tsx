@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { VibeMark } from "@/components/Logo";
+import { useD } from "@/components/LocaleProvider";
+import { LangToggle } from "@/components/LangToggle";
+import { useLocale } from "@/components/LocaleProvider";
+import { tagLabel } from "@/lib/labels";
 
 /**
  * Three onboarding screens. Each one carries a single idea and an abstract,
@@ -10,48 +14,35 @@ import { VibeMark } from "@/components/Logo";
  * no stock art, nothing that would look foreign next to the real screens.
  */
 
-const SLIDES = [
-  {
-    key: "identity",
-    title: "İnsanlar sende ne görüyor?",
-    body: "Vibe Tag bir puanlama uygulaması değil. Çevrendeki insanların sende gördüğü güzel özellikleri keşfettiğin yer.",
-    art: <ArtIdentity />,
-  },
-  {
-    key: "context",
-    title: "Herkes seni tanıdığı kadar değerlendirir",
-    body: "Değerlendirme öncesi “Bu kişiyi nereden tanıyorsun?” sorusu zorunlu. Sadece o ilişkide gözlemleyebileceği şeyler sorulur.",
-    art: <ArtContext />,
-  },
-  {
-    key: "share",
-    title: "Sosyal kimliğini paylaş",
-    body: "My Vibe profilin, Vibe Score’un ve paylaşılabilir Vibe Card’ın hazır. Story’de paylaş, çevreni davet et.",
-    art: <ArtShare />,
-  },
-];
+/** The copy lives in the dictionary; only the artwork is bound here. */
+const ART = [<ArtIdentity key="identity" />, <ArtContext key="context" />, <ArtShare key="share" />];
 
 export function Onboarding() {
+  const d = useD();
   const [i, setI] = useState(0);
-  const slide = SLIDES[i];
-  const last = i === SLIDES.length - 1;
+  const slides = d.onboarding.slides;
+  const slide = slides[i];
+  const last = i === slides.length - 1;
 
   return (
     <main className="min-h-dvh flex flex-col px-6 pt-11 pb-10 overflow-hidden">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <VibeMark size={30} />
-        <Link href="/register" className="text-[13px] font-bold text-muted">
-          Atla
-        </Link>
+        <div className="flex items-center gap-2.5">
+          <LangToggle />
+          <Link href="/register" className="text-[13px] font-bold text-muted">
+            {d.onboarding.skip}
+          </Link>
+        </div>
       </div>
 
-      <div key={slide.key} className="mt-8 grid place-items-center pop">
-        {slide.art}
+      <div key={i} className="mt-8 grid place-items-center pop">
+        {ART[i]}
       </div>
 
-      <div key={`${slide.key}-t`} className="mt-9 reveal">
+      <div key={`${i}-t`} className="mt-9 reveal">
         <p className="text-[10px] font-extrabold tracking-[0.28em] text-coral mb-2.5">
-          {String(i + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}
+          {String(i + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
         </p>
         <h1 className="vt-page-title text-[32px] tracking-[-0.03em] leading-[1.08]">
           {slide.title}
@@ -62,9 +53,9 @@ export function Onboarding() {
       </div>
 
       <div className="mt-7 flex gap-2">
-        {SLIDES.map((s, n) => (
+        {slides.map((s, n) => (
           <span
-            key={s.key}
+            key={s.title}
             className="h-1.5 rounded-full transition-all"
             style={{
               width: n === i ? 28 : 8,
@@ -81,13 +72,13 @@ export function Onboarding() {
               href="/register"
               className="h-13 grid place-items-center rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)]"
             >
-              My Vibe’ımı oluştur
+              {d.onboarding.finish}
             </Link>
             <Link
               href="/login"
               className="text-center text-[14px] font-bold text-muted py-2"
             >
-              Zaten hesabım var
+              {d.onboarding.haveAccount}
             </Link>
           </>
         ) : (
@@ -96,13 +87,13 @@ export function Onboarding() {
               onClick={() => setI((n) => n + 1)}
               className="h-13 rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)] active:scale-[0.98] transition-transform"
             >
-              Devam
+              {d.onboarding.next}
             </button>
             <button
-              onClick={() => setI(SLIDES.length - 1)}
+              onClick={() => setI(slides.length - 1)}
               className="text-center text-[14px] font-bold text-muted py-2"
             >
-              Nasıl paylaşılıyor?
+              {d.onboarding.jump}
             </button>
           </>
         )}
@@ -114,6 +105,7 @@ export function Onboarding() {
 // ------------------------------------------------------------ illustrations
 
 function ArtIdentity() {
+  const locale = useLocale();
   return (
     <div className="relative w-full h-56 grid place-items-center">
       <div
@@ -135,16 +127,16 @@ function ArtIdentity() {
         </div>
       </div>
       {[
-        ["POSITIVE", "-top-1 -left-1"],
-        ["KIND", "top-8 -right-2"],
-        ["RELIABLE", "bottom-2 -left-3"],
-        ["CALM", "-bottom-1 right-2"],
-      ].map(([e, pos]) => (
+        ["positiveEnergy", "-top-1 -left-1"],
+        ["kind", "top-8 -right-2"],
+        ["reliable", "bottom-2 -left-3"],
+        ["calm", "-bottom-1 right-2"],
+      ].map(([key, pos]) => (
         <span
-          key={e}
+          key={key}
           className={`absolute ${pos} card !py-2 !px-3 text-[9px] font-extrabold tracking-[0.12em] text-coral reveal`}
         >
-          {e}
+          {tagLabel(key, locale).toLocaleUpperCase(locale)}
         </span>
       ))}
     </div>
@@ -152,13 +144,14 @@ function ArtIdentity() {
 }
 
 function ArtContext() {
+  const d = useD();
   return (
     <div className="w-full h-56 grid grid-cols-2 gap-2.5 content-center px-2">
       {[
-        ["01", "İş arkadaşı", true],
-        ["02", "Yakın arkadaş", false],
-        ["03", "Hizmet aldım", false],
-        ["04", "Topluluk", false],
+        ["01", d.onboarding.art.chips[0], true],
+        ["02", d.onboarding.art.chips[1], false],
+        ["03", d.onboarding.art.chips[2], false],
+        ["04", d.onboarding.art.chips[3], false],
       ].map(([e, l, active]) => (
         <div
           key={String(l)}
@@ -173,7 +166,7 @@ function ArtContext() {
           <div className="text-[12.5px] font-bold mt-1">{l}</div>
           {active && (
             <div className="text-[10.5px] text-orange font-bold mt-1">
-              6 kriter açıldı
+              {d.onboarding.art.criteriaOpened}
             </div>
           )}
         </div>

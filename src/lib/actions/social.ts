@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { hasPlan, requireUser } from "@/lib/auth";
 import { getDict } from "@/lib/i18n/server";
-import { fill } from "@/lib/i18n";
 import { moderateComment } from "@/lib/moderation";
 import { notify } from "@/lib/notifications";
 import {
@@ -48,14 +47,10 @@ export async function requestFriendAction(formData: FormData): Promise<void> {
     await prisma.friendship.create({
       data: { requesterId: me.id, addresseeId: other.id },
     });
-    const d = await getDict();
-    await notify(
-      other.id,
-      "FRIEND_REQUEST",
-      d.notifications.friendRequest,
-      fill(d.notifications.friendRequestBody, { name: me.name }),
-      "/people",
-    );
+    await notify(other.id, "FRIEND_REQUEST", {
+      vars: { name: me.name },
+      href: "/people",
+    });
   }
 
   revalidatePath("/people");
@@ -67,13 +62,10 @@ async function acceptFriendship(id: string, meId: string, myName: string) {
     where: { id },
     data: { status: "ACCEPTED", acceptedAt: new Date() },
   });
-  const d = await getDict();
   await notify(
     row.requesterId === meId ? row.addresseeId : row.requesterId,
     "FRIEND_ACCEPTED",
-    d.notifications.friendAccepted,
-    fill(d.notifications.friendAcceptedBody, { name: myName }),
-    "/people",
+    { vars: { name: myName }, href: "/people" },
   );
 }
 
@@ -191,7 +183,7 @@ export async function sendMessageAction(
   if (body.length > 1000) return { error: d.report.errors.noteLong };
 
   const moderation = moderateComment(body);
-  if (!moderation.ok) return { error: moderation.error };
+  if (!moderation.ok) return { error: d.moderation[moderation.reason] };
 
   const convo = await prisma.conversation.findUnique({
     where: { id: conversationId },
@@ -226,13 +218,7 @@ export async function sendMessageAction(
     }),
   ]);
 
-  await notify(
-    otherId,
-    "NEW_MESSAGE",
-    d.notifications.newMessage,
-    d.notifications.newMessageBody,
-    `/messages/${convo.id}`,
-  );
+  await notify(otherId, "NEW_MESSAGE", { href: `/messages/${convo.id}` });
 
   revalidatePath(`/messages/${convo.id}`);
   revalidatePath("/messages");

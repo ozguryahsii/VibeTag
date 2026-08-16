@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useActionState } from "react";
 import { updateProfileAction, type FormState } from "@/lib/actions/auth";
 import { Avatar } from "@/components/Avatar";
+import { useD } from "@/components/LocaleProvider";
 
 const COLORS = ["#FF8A3D", "#FF5C77", "#FF7AA2", "#E8845C", "#D96C5F", "#F3A76F"];
 
@@ -36,6 +37,7 @@ export function ProfileEditor({
   avatarUrl: string | null;
   avatarColor: string;
 }) {
+  const d = useD();
   const [state, action, pending] = useActionState<FormState, FormData>(
     updateProfileAction,
     {},
@@ -50,7 +52,7 @@ export function ProfileEditor({
     const file = e.target.files?.[0];
     if (!file) return;
     if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type)) {
-      setLocalError("JPG, PNG veya WebP bir görsel seç.");
+      setLocalError(d.settings.photoBadType);
       return;
     }
     setBusy(true);
@@ -58,7 +60,7 @@ export function ProfileEditor({
     try {
       setPhoto(await toSquareDataUrl(file));
     } catch {
-      setLocalError("Görsel okunamadı, başka bir dosya dener misin?");
+      setLocalError(d.settings.photoUnreadable);
     } finally {
       setBusy(false);
     }
@@ -74,7 +76,7 @@ export function ProfileEditor({
           type="button"
           onClick={() => fileRef.current?.click()}
           className="relative rounded-full active:scale-95 transition-transform"
-          aria-label="Profil fotoğrafı seç"
+          aria-label={d.settings.photoPick}
         >
           <Avatar name={name} url={photo} color={color} size={68} ring />
           <span
@@ -86,13 +88,13 @@ export function ProfileEditor({
         </button>
 
         <div className="flex-1">
-          <p className="text-[13.5px] font-extrabold">Profil fotoğrafın</p>
+          <p className="text-[13.5px] font-extrabold">{d.settings.photo}</p>
           <p className="text-[11.5px] text-muted leading-relaxed mt-0.5">
             {busy
-              ? "Hazırlanıyor…"
+              ? d.settings.photoPreparing
               : photo
-                ? "Değiştirmek için dokun."
-                : "Fotoğraf yoksa baş harflerin gösterilir."}
+                ? d.settings.photoChange
+                : d.settings.photoNone}
           </p>
           {photo && (
             <button
@@ -100,7 +102,7 @@ export function ProfileEditor({
               onClick={() => setPhoto(null)}
               className="text-[11.5px] font-bold text-coral mt-1"
             >
-              Fotoğrafı kaldır
+              {d.settings.photoRemove}
             </button>
           )}
         </div>
@@ -116,7 +118,7 @@ export function ProfileEditor({
 
       <div>
         <span className="block text-[10.5px] font-extrabold tracking-[0.14em] uppercase text-muted mb-2.5 ml-1">
-          Vurgu rengi
+          {d.settings.accentColour}
         </span>
         <div className="flex gap-2">
           {COLORS.map((c) => (
@@ -137,7 +139,7 @@ export function ProfileEditor({
 
       <label className="block">
         <span className="block text-[10.5px] font-extrabold tracking-[0.14em] uppercase text-muted mb-2 ml-1">
-          İsim
+          {d.settings.name}
         </span>
         <input
           name="name"
@@ -148,14 +150,14 @@ export function ProfileEditor({
 
       <label className="block">
         <span className="block text-[10.5px] font-extrabold tracking-[0.14em] uppercase text-muted mb-2 ml-1">
-          Bio
+          {d.settings.bio}
         </span>
         <textarea
           name="bio"
           defaultValue={bio}
           rows={2}
           maxLength={160}
-          placeholder="Kendini bir cümleyle anlat"
+          placeholder={d.settings.bioPlaceholder}
           className="w-full rounded-[18px] border border-line bg-cream px-4 py-3 text-[14.5px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition resize-none"
         />
       </label>
@@ -167,7 +169,7 @@ export function ProfileEditor({
       )}
       {state.ok && !localError && (
         <p className="text-[12.5px] font-semibold text-orange">
-          Profilin güncellendi ✓
+          {d.settings.saved}
         </p>
       )}
 
@@ -176,7 +178,7 @@ export function ProfileEditor({
         disabled={pending || busy}
         className="h-12 rounded-full grad-score text-white font-bold text-[14.5px] active:scale-[0.98] transition-transform disabled:opacity-50"
       >
-        {pending ? "Kaydediliyor…" : "Kaydet"}
+        {pending ? d.common.saving : d.common.save}
       </button>
     </form>
   );

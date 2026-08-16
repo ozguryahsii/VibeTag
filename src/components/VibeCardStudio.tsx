@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { iconFor, type IconDef } from "@/lib/icons";
 import { initialsOf } from "@/components/Avatar";
+import { fill, useD } from "@/components/LocaleProvider";
 
 /**
  * Vibe Card studio (§12) — the viral core of the product.
@@ -33,9 +34,9 @@ export type CardData = {
 };
 
 const FORMATS = {
-  story: { w: 1080, h: 1920, label: "Story", hint: "Instagram · TikTok" },
-  square: { w: 1080, h: 1080, label: "Kare", hint: "Instagram · WhatsApp" },
-  wide: { w: 1600, h: 900, label: "Geniş", hint: "X · LinkedIn" },
+  story: { w: 1080, h: 1920, labelKey: "formatStory", hint: "Instagram · TikTok" },
+  square: { w: 1080, h: 1080, labelKey: "formatSquare", hint: "Instagram · WhatsApp" },
+  wide: { w: 1600, h: 900, labelKey: "formatWide", hint: "X · LinkedIn" },
 } as const;
 
 type FormatKey = keyof typeof FORMATS;
@@ -344,6 +345,7 @@ function shade(hex: string, pct: number): string {
 // ------------------------------------------------------------------ studio
 
 export function VibeCardStudio({ data }: { data: CardData }) {
+  const d = useD();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const photoRef = useRef<HTMLImageElement | null>(null);
   const [photoReady, setPhotoReady] = useState(0);
@@ -608,14 +610,14 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     // ----------------------------------------------------------- mood line
     y += u * 0.085;
     const moodText = !showScore
-      ? "People see me as"
+      ? d.card.seeMeAs
       : data.percentile && data.score >= 80
-        ? `Top ${data.percentile}% of users`
+        ? fill(d.card.moodTop, { n: data.percentile })
         : tone === "celebratory"
-          ? "Standout profile"
+          ? d.card.moodStandout
           : tone === "warm"
-            ? "Growing strong"
-            : "Room to grow";
+            ? d.card.moodGrowing
+            : d.card.moodRoom;
 
     ctx.font = sans(600, u * 0.0445);
     const mw = ctx.measureText(moodText).width;
@@ -768,10 +770,14 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     const textX = shown > 0 ? sx + stackR * 0.7 : cardX + u * 0.11;
     ctx.font = sans(500, u * 0.034);
     ctx.fillStyle = "#746860";
-    ctx.fillText("Rated by", textX, footY - u * 0.022);
+    ctx.fillText(d.common.ratedBy, textX, footY - u * 0.022);
     ctx.font = sans(500, u * 0.045);
     ctx.fillStyle = "#2D211C";
-    ctx.fillText(`${data.ratingCount} people`, textX, footY + u * 0.028);
+    ctx.fillText(
+      `${data.ratingCount} ${d.common.people}`,
+      textX,
+      footY + u * 0.028,
+    );
     ctx.textBaseline = "alphabetic";
 
     ctx.restore(); // end card clip
@@ -796,7 +802,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     ctx.fillText(`@${data.username}`, cx, cardY + cardH + margin * 0.95);
     ctx.textAlign = "left";
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, format, theme, showScore, photoReady]);
+  }, [data, format, theme, showScore, photoReady, d]);
 
   // Decode the profile photo once, then redraw. Data URLs are same-origin,
   // so the canvas stays untainted and toDataURL keeps working.
@@ -830,7 +836,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     a.href = canvas.toDataURL("image/png");
     a.download = `vibetag-${data.username}-${format}.png`;
     a.click();
-    setStatus("Kart indirildi 🎉");
+    setStatus(d.card.downloaded);
     setTimeout(() => setStatus(null), 2500);
   }
 
@@ -851,10 +857,10 @@ export function VibeCardStudio({ data }: { data: CardData }) {
         await navigator.share({
           files: [file],
           title: "My Vibe",
-          text: `People see me as ${data.tags
+          text: `${d.card.seeMeAs} ${data.tags
             .slice(0, 3)
             .map((t) => t.label)
-            .join(", ")} — Vibe Tag`,
+            .join(", ")} — ${d.common.appName}`,
         });
         return;
       } catch {
@@ -881,7 +887,9 @@ export function VibeCardStudio({ data }: { data: CardData }) {
       </div>
 
       <div className="mt-6">
-        <p className="text-[12px] font-extrabold text-muted mb-2 ml-1">FORMAT</p>
+        <p className="text-[12px] font-extrabold text-muted mb-2 ml-1">
+          {d.card.format}
+        </p>
         <div className="grid grid-cols-3 gap-2">
           {(Object.keys(FORMATS) as FormatKey[]).map((k) => (
             <button
@@ -892,7 +900,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
               }`}
             >
               <span className="block text-[13px] font-extrabold">
-                {FORMATS[k].label}
+                {d.card[FORMATS[k].labelKey]}
               </span>
               <span className="block text-[10.5px] text-muted mt-0.5">
                 {FORMATS[k].hint}
@@ -903,7 +911,9 @@ export function VibeCardStudio({ data }: { data: CardData }) {
       </div>
 
       <div className="mt-5">
-        <p className="text-[12px] font-extrabold text-muted mb-2 ml-1">TEMA</p>
+        <p className="text-[12px] font-extrabold text-muted mb-2 ml-1">
+          {d.card.theme}
+        </p>
         <div className="flex gap-2.5">
           {(Object.keys(THEMES) as ThemeKey[]).map((k) => (
             <button
@@ -927,8 +937,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
           ))}
         </div>
         <p className="text-[11px] text-muted mt-2 ml-1 leading-relaxed">
-          Auto, kartın tonunu skoruna göre seçer — yüksek skor ışıldar, sakin
-          skor zarif ve dingin kalır.
+          {d.card.themeHint}
         </p>
       </div>
 
@@ -940,9 +949,11 @@ export function VibeCardStudio({ data }: { data: CardData }) {
           className="w-5 h-5 accent-[#F05262]"
         />
         <span>
-          <span className="block text-[13.5px] font-bold">Skoru göster</span>
+          <span className="block text-[13.5px] font-bold">
+            {d.card.showScore}
+          </span>
           <span className="block text-[12px] text-muted">
-            Kapatırsan kartta sadece etiketlerin görünür.
+            {d.card.showScoreBody}
           </span>
         </span>
       </label>
@@ -952,13 +963,13 @@ export function VibeCardStudio({ data }: { data: CardData }) {
           onClick={share}
           className="h-13 rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)] active:scale-[0.98] transition-transform"
         >
-          Paylaş
+          {d.card.share}
         </button>
         <button
           onClick={download}
           className="h-13 rounded-full bg-warmwhite border border-line font-bold text-[15px] shadow-[0_5px_16px_rgba(83,60,40,0.06)] active:scale-[0.98] transition-transform"
         >
-          PNG indir ({f.w}×{f.h})
+          {fill(d.card.download, { w: f.w, h: f.h })}
         </button>
       </div>
 

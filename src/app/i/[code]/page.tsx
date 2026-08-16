@@ -7,6 +7,11 @@ import { getVibeProfile } from "@/lib/profile";
 import { Avatar } from "@/components/Avatar";
 import { Wordmark } from "@/components/Logo";
 import { TagPill } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
+import { fill } from "@/lib/i18n";
+import { LangToggle } from "@/components/LangToggle";
+import { getLocale } from "@/lib/i18n/server";
+import { tagLabel } from "@/lib/labels";
 
 /**
  * The front door. Someone you know sent you here, so the page leads with
@@ -17,6 +22,8 @@ export default async function InvitePage({
 }: {
   params: Promise<{ code: string }>;
 }) {
+  const d = await getDict();
+  const locale = await getLocale();
   const { code } = await params;
   const invite = await inviteByCode(code);
   if (!invite) notFound();
@@ -26,20 +33,24 @@ export default async function InvitePage({
   const inviter = invite.inviter;
   const profile = await getVibeProfile(inviter.id);
   const isSelf = me?.id === inviter.id;
+  const firstName = inviter.name.split(" ")[0];
 
   // A spent link still shows the person — it just cannot hand out permission.
   const status = inviteStatus(invite);
   const spent = status !== "ACTIVE";
   const spentReason =
     status === "EXPIRED"
-      ? "Bu davet linkinin süresi dolmuş."
+      ? d.inviteLanding.expired
       : status === "REVOKED"
-        ? "Bu davet linki iptal edilmiş."
-        : "Bu davet linki kullanım hakkını doldurmuş.";
+        ? d.inviteLanding.revoked
+        : d.inviteLanding.exhausted;
 
   return (
     <main className="min-h-dvh flex flex-col px-6 pt-12 pb-10 overflow-hidden">
-      <Wordmark size={20} />
+      <div className="flex items-start justify-between gap-3">
+        <Wordmark size={20} />
+        <LangToggle />
+      </div>
 
       <div className="mt-12 text-center pop relative">
         <div className="absolute left-1/2 top-8 -translate-x-1/2 w-48 h-48 rounded-full bg-coral/10 blur-3xl" aria-hidden />
@@ -51,35 +62,31 @@ export default async function InvitePage({
           ring
         />
         <h1 className="vt-page-title relative mt-6 text-[30px] tracking-[-0.03em] leading-[1.08]">
-          {inviter.name.split(" ")[0]} senden bir
+          {fill(d.inviteLanding.waiting, { name: firstName })}
           <br />
-          <span className="grad-text">Vibe</span> bekliyor
+          <span className="grad-text">{d.inviteLanding.waitingVibe}</span>
         </h1>
-        <p className="mt-3 text-[14.5px] text-muted leading-relaxed max-w-[20rem] mx-auto">
-          Onu nereden tanıdığını seç, sadece o ilişkide gözlemlediğin şeyleri
-          değerlendir. Cevabın <b className="text-ink">anonim</b> kalır.
-        </p>
+        <p
+          className="mt-3 text-[14.5px] text-muted leading-relaxed max-w-[20rem] mx-auto [&_b]:text-ink"
+          dangerouslySetInnerHTML={{ __html: d.inviteLanding.body }}
+        />
       </div>
 
       {profile.tags.length > 0 && (
         <div className="mt-7 reveal">
           <p className="text-[12px] font-bold text-muted text-center mb-2.5">
-            İnsanlar {inviter.name.split(" ")[0]} için diyor ki
+            {fill(d.inviteLanding.peopleSay, { name: firstName })}
           </p>
           <div className="flex flex-wrap gap-2 justify-center">
             {profile.tags.slice(0, 4).map((t) => (
-              <TagPill key={t.key} tagKey={t.key} label={t.en} />
+              <TagPill key={t.key} tagKey={t.key} label={tagLabel(t.key, locale)} />
             ))}
           </div>
         </div>
       )}
 
       <div className="mt-8 grid gap-2.5 reveal">
-        {[
-          "Tanışıklığını seçmeden değerlendiremezsin",
-          "Kimin ne yazdığı asla görünmez",
-          "Bir kişiyi yalnızca bir kez değerlendirirsin",
-        ].map((line) => (
+        {d.inviteLanding.points.map((line) => (
           <div
             key={line}
             className="card !py-3.5 flex items-center gap-3 text-[13px] font-semibold"
@@ -94,9 +101,7 @@ export default async function InvitePage({
         <div className="mt-6 rounded-[20px] border border-orange/25 bg-tagbg px-4 py-3.5">
           <p className="text-[13px] font-bold text-orange">{spentReason}</p>
           <p className="text-[12.5px] text-muted mt-0.5 leading-relaxed">
-            {inviter.name.split(" ")[0]} profilini yine görebilirsin; sadece
-            davetiyle gelenlerden değerlendirme alıyorsa yeni bir link istemen
-            gerekir.
+            {fill(d.inviteLanding.spentBody, { name: firstName })}
           </p>
         </div>
       )}
@@ -104,11 +109,11 @@ export default async function InvitePage({
       <div className="mt-auto pt-8 grid gap-3">
         {isSelf ? (
           <p className="text-center text-[13.5px] text-muted">
-            Bu senin kendi davet linkin — paylaşmak için{" "}
+            {d.inviteLanding.ownLink}{" "}
             <Link href="/invite" className="font-bold text-orange">
-              Davet ekranına
+              {d.inviteLanding.ownLinkCta}
             </Link>{" "}
-            git.
+            {d.inviteLanding.ownLinkEnd}
           </p>
         ) : me ? (
           <form action={acceptInviteAction}>
@@ -117,7 +122,7 @@ export default async function InvitePage({
               type="submit"
               className="h-13 w-full grid place-items-center rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)]"
             >
-              {inviter.name.split(" ")[0]}’i değerlendir
+              {fill(d.inviteLanding.rateCta, { name: firstName })}
             </button>
           </form>
         ) : (
@@ -126,13 +131,13 @@ export default async function InvitePage({
               href="/register"
               className="h-13 grid place-items-center rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)]"
             >
-              Başla ve değerlendir
+              {d.inviteLanding.startCta}
             </Link>
             <Link
               href="/login"
               className="text-center text-[14px] font-bold text-muted py-2"
             >
-              Zaten hesabım var
+              {d.inviteLanding.haveAccount}
             </Link>
           </>
         )}

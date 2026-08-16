@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { loginAction, registerAction, type FormState } from "@/lib/actions/auth";
 import { Wordmark } from "@/components/Logo";
+import { LangToggle } from "@/components/LangToggle";
+import { useD } from "@/components/LocaleProvider";
 
 const initial: FormState = {};
 
@@ -36,30 +38,34 @@ function Submit({ label }: { label: string }) {
 }
 
 export function LoginForm() {
+  const d = useD();
   const [state, action, pending] = useActionState(loginAction, initial);
 
   return (
     <main className="min-h-dvh px-6 pt-12 pb-10 flex flex-col overflow-hidden">
-      <Wordmark size={20} />
-      <p className="mt-11 text-[10px] font-extrabold tracking-[0.28em] text-coral">WELCOME BACK</p>
-      <h1 className="vt-page-title mt-2 text-[34px] tracking-[-0.03em] leading-tight">
-        Tekrar hoş geldin
-      </h1>
-      <p className="text-[14px] text-muted mt-1.5">
-        Vibe profilin seni bekliyor.
+      <div className="flex items-start justify-between gap-3">
+        <Wordmark size={20} />
+        <LangToggle />
+      </div>
+      <p className="mt-11 text-[10px] font-extrabold tracking-[0.28em] text-coral">
+        {d.auth.loginKicker}
       </p>
+      <h1 className="vt-page-title mt-2 text-[34px] tracking-[-0.03em] leading-tight">
+        {d.auth.loginTitle}
+      </h1>
+      <p className="text-[14px] text-muted mt-1.5">{d.auth.loginBody}</p>
 
       <form action={action} className="mt-8 grid gap-4 relative">
         <Field
-          label="E-posta"
+          label={d.auth.email}
           name="email"
           type="email"
           autoComplete="email"
-          placeholder="sen@ornek.com"
+          placeholder={d.auth.emailPlaceholder}
           required
         />
         <Field
-          label="Şifre"
+          label={d.auth.password}
           name="password"
           type="password"
           autoComplete="current-password"
@@ -72,14 +78,14 @@ export function LoginForm() {
           </p>
         )}
         <div className="mt-1">
-          <Submit label={pending ? "Giriş yapılıyor…" : "Giriş yap"} />
+          <Submit label={pending ? d.auth.signingIn : d.auth.signIn} />
         </div>
       </form>
 
       <p className="mt-auto pt-8 text-center text-[14px] text-muted">
-        Hesabın yok mu?{" "}
+        {d.auth.noAccount}{" "}
         <Link href="/register" className="font-bold text-orange">
-          Kayıt ol
+          {d.auth.signUp}
         </Link>
       </p>
     </main>
@@ -87,41 +93,50 @@ export function LoginForm() {
 }
 
 export function RegisterForm() {
+  const d = useD();
   const [state, action, pending] = useActionState(registerAction, initial);
 
   return (
     <main className="min-h-dvh px-6 pt-12 pb-10 flex flex-col overflow-hidden">
-      <Wordmark size={20} />
-      <p className="mt-11 text-[10px] font-extrabold tracking-[0.28em] text-coral">CREATE YOUR SIGNATURE</p>
-      <h1 className="vt-page-title mt-2 text-[34px] tracking-[-0.03em] leading-tight">
-        My Vibe’ını oluştur
-      </h1>
-      <p className="text-[14px] text-muted mt-1.5">
-        Birkaç saniye — sonra çevrenden gerçek geri bildirim toplamaya başla.
+      <div className="flex items-start justify-between gap-3">
+        <Wordmark size={20} />
+        <LangToggle />
+      </div>
+      <p className="mt-11 text-[10px] font-extrabold tracking-[0.28em] text-coral">
+        {d.auth.registerKicker}
       </p>
+      <h1 className="vt-page-title mt-2 text-[34px] tracking-[-0.03em] leading-tight">
+        {d.auth.registerTitle}
+      </h1>
+      <p className="text-[14px] text-muted mt-1.5">{d.auth.registerBody}</p>
 
       <form action={action} className="mt-8 grid gap-4">
-        <Field label="İsim" name="name" placeholder="Özgür Yahşi" required />
         <Field
-          label="Kullanıcı adı"
+          label={d.auth.name}
+          name="name"
+          placeholder={d.auth.namePlaceholder}
+          required
+        />
+        <Field
+          label={d.auth.username}
           name="username"
           placeholder="ozguryahsi"
           required
         />
         <Field
-          label="E-posta"
+          label={d.auth.email}
           name="email"
           type="email"
           autoComplete="email"
-          placeholder="sen@ornek.com"
+          placeholder={d.auth.emailPlaceholder}
           required
         />
         <Field
-          label="Şifre"
+          label={d.auth.password}
           name="password"
           type="password"
           autoComplete="new-password"
-          placeholder="En az 6 karakter"
+          placeholder={d.auth.passwordHint}
           required
         />
         {state.error && (
@@ -130,14 +145,14 @@ export function RegisterForm() {
           </p>
         )}
         <div className="mt-1">
-          <Submit label={pending ? "Oluşturuluyor…" : "Hesabımı oluştur"} />
+          <Submit label={pending ? d.auth.creating : d.auth.createAccount} />
         </div>
       </form>
 
       <p className="mt-auto pt-8 text-center text-[14px] text-muted">
-        Zaten hesabın var mı?{" "}
+        {d.auth.haveAccount}{" "}
         <Link href="/login" className="font-bold text-orange">
-          Giriş yap
+          {d.auth.signIn}
         </Link>
       </p>
     </main>

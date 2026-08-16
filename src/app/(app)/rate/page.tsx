@@ -3,12 +3,16 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { cooldownDaysLeft } from "@/lib/rating-rules";
 import { InviteShareBlock } from "@/components/InviteShareBlock";
+import { getDict } from "@/lib/i18n/server";
+import { fill } from "@/lib/i18n";
+import { LangToggle } from "@/components/LangToggle";
 import { Avatar, Card, EmptyState, SectionTitle } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function RatePickerPage() {
   const me = await requireUser();
+  const d = await getDict();
 
   const [users, mine] = await Promise.all([
     prisma.user.findMany({
@@ -37,15 +41,19 @@ export default async function RatePickerPage() {
   return (
     <main className="px-5 pt-10">
       {/* Half of this screen is "let people rate me", so the share card leads. */}
-      <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">
-        SHARE YOUR VIBE
-      </p>
-      <h1 className="vt-page-title text-[31px] tracking-[-0.02em] leading-[1.08]">
-        Seni değerlendirsinler
-      </h1>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">
+            {d.rate.shareKicker}
+          </p>
+          <h1 className="vt-page-title text-[31px] tracking-[-0.02em] leading-[1.08]">
+            {d.rate.shareTitle}
+          </h1>
+        </div>
+        <LangToggle className="mt-1 shrink-0" />
+      </div>
       <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
-        Linkini paylaş ya da QR'ını okut — açan kişi doğrudan senin
-        değerlendirme sayfana düşer.
+        {d.rate.shareBody}
       </p>
 
       <InviteShareBlock />
@@ -55,30 +63,30 @@ export default async function RatePickerPage() {
           href="/invite"
           className="text-[12.5px] font-bold text-orange underline underline-offset-2"
         >
-          Davet linklerini yönet →
+          {d.rate.manageLink}
         </Link>
       </div>
 
       <div className="mt-9 pt-7 border-t border-line">
         <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">
-          LEAVE A VIBE
+          {d.rate.listKicker}
         </p>
         <h2 className="vt-page-title text-[26px] tracking-[-0.02em] leading-[1.1]">
-          Sen de birini değerlendir
+          {d.rate.listTitle}
         </h2>
-        <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
-          Her kişiyi <b className="text-ink">bir kez</b> değerlendirebilirsin.
-          Değerlendirmeni ayda bir güncelleyebilirsin.
-        </p>
+        <p
+          className="text-[13px] text-muted mt-1.5 leading-relaxed [&_b]:text-ink"
+          dangerouslySetInnerHTML={{ __html: d.rate.listBody }}
+        />
       </div>
 
       <div className="mt-6">
-        <SectionTitle>Henüz değerlendirmedin</SectionTitle>
+        <SectionTitle>{d.rate.notRatedYet}</SectionTitle>
         {fresh.length === 0 ? (
           <EmptyState
             emoji="✓"
-            title="Herkesi değerlendirdin"
-            body="Çevrendeki yeni kişiler katıldığında burada görünecekler."
+            title={d.rate.allRatedTitle}
+            body={d.rate.allRatedBody}
           />
         ) : (
           <div className="grid gap-2.5">
@@ -96,7 +104,7 @@ export default async function RatePickerPage() {
                     </p>
                   </div>
                   <span className="shrink-0 text-[12px] font-bold text-white grad-score rounded-full px-4 py-2">
-                    Değerlendir
+                    {d.rate.rateCta}
                   </span>
                 </Card>
               </Link>
@@ -107,7 +115,7 @@ export default async function RatePickerPage() {
 
       {rated.length > 0 && (
         <div className="mt-7">
-          <SectionTitle>Değerlendirdiklerin</SectionTitle>
+          <SectionTitle>{d.rate.rated}</SectionTitle>
           <div className="grid gap-2.5">
             {rated.map((u) => {
               const r = mineMap.get(u.id)!;
@@ -127,9 +135,10 @@ export default async function RatePickerPage() {
                       </p>
                       <p className="text-[11.5px] text-muted">
                         {days > 0
-                          ? `${days} gün sonra güncellenebilir`
-                          : "Şimdi güncelleyebilirsin"}
-                        {r.updateCount > 0 && ` · ${r.updateCount} güncelleme`}
+                          ? fill(d.rate.updatableIn, { n: days })
+                          : d.rate.updatableNow}
+                        {r.updateCount > 0 &&
+                          ` · ${fill(d.rate.updateCount, { n: r.updateCount })}`}
                       </p>
                     </div>
                     <span
@@ -140,7 +149,7 @@ export default async function RatePickerPage() {
                         border: `1px solid ${days > 0 ? "#E9E1D9" : "#FFE3D2"}`,
                       }}
                     >
-                      {days > 0 ? "Kilitli" : "Güncelle"}
+                      {days > 0 ? d.rate.locked : d.rate.update}
                     </span>
                   </Card>
                 </Link>

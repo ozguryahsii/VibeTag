@@ -2,30 +2,40 @@ import { requireUser } from "@/lib/auth";
 import { getPercentile, getVibeProfile } from "@/lib/profile";
 import { VibeCardStudio } from "@/components/VibeCardStudio";
 import { EmptyState, Button } from "@/components/ui";
+import { getDict, getLocale } from "@/lib/i18n/server";
+import { tagLabel } from "@/lib/labels";
+import { LangToggle } from "@/components/LangToggle";
 
 export default async function CardPage() {
   const user = await requireUser();
+  const d = await getDict();
+  const locale = await getLocale();
   const profile = await getVibeProfile(user.id);
   const percentile = await getPercentile(user.id, profile.score);
 
   if (profile.ratingCount === 0) {
     return (
       <main className="px-5 pt-12">
-        <p className="text-[10.5px] font-bold uppercase tracking-[0.24em] text-coral">
-          Your social identity
-        </p>
-        <h1 className="mt-1 font-display text-[34px] font-semibold tracking-[-0.04em] text-ink">
-          Vibe Card
-        </h1>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.24em] text-coral">
+              {d.card.kicker}
+            </p>
+            <h1 className="mt-1 font-display text-[34px] font-semibold tracking-[-0.04em] text-ink">
+              {d.card.title}
+            </h1>
+          </div>
+          <LangToggle className="mt-1 shrink-0" />
+        </div>
         <p className="mt-1 text-[13px] leading-relaxed text-muted">
-          Paylaşılabilir sosyal kimlik kartın.
+          {d.card.subtitle}
         </p>
         <div className="mt-6">
           <EmptyState
             emoji="🪪"
-            title="Kartın için biraz veri lazım"
-            body="En az bir değerlendirme aldığında Vibe Card'ını oluşturup Story'de paylaşabilirsin."
-            action={<Button href="/people">Kişileri gör</Button>}
+            title={d.card.emptyTitle}
+            body={d.card.emptyBody}
+            action={<Button href="/people">{d.card.emptyCta}</Button>}
           />
         </div>
       </main>
@@ -34,14 +44,19 @@ export default async function CardPage() {
 
   return (
     <main className="px-5 pt-12">
-      <p className="text-[10.5px] font-bold uppercase tracking-[0.24em] text-coral">
-        Your social identity
-      </p>
-      <h1 className="mt-1 font-display text-[34px] font-semibold tracking-[-0.04em] text-ink">
-        Vibe Card
-      </h1>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[10.5px] font-bold uppercase tracking-[0.24em] text-coral">
+            {d.card.kicker}
+          </p>
+          <h1 className="mt-1 font-display text-[34px] font-semibold tracking-[-0.04em] text-ink">
+            {d.card.title}
+          </h1>
+        </div>
+        <LangToggle className="mt-1 shrink-0" />
+      </div>
       <p className="mt-1 text-[13px] leading-relaxed text-muted">
-        Story, kare veya geniş format — indir ve paylaş.
+        {d.card.subtitle}
       </p>
 
       <VibeCardStudio
@@ -55,7 +70,7 @@ export default async function CardPage() {
           avatarColor: user.avatarColor,
           tags: profile.tags
             .slice(0, 4)
-            .map((t) => ({ key: t.key, label: t.en })),
+            .map((t) => ({ key: t.key, label: tagLabel(t.key, locale) })),
         }}
       />
     </main>

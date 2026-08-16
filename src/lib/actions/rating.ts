@@ -8,13 +8,18 @@ import { hasInviteGrant } from "@/lib/invite";
 import { moderateComment } from "@/lib/moderation";
 import { notify } from "@/lib/notifications";
 import { cooldownDaysLeft } from "@/lib/rating-rules";
+import { getDict, getLocale } from "@/lib/i18n/server";
+import { fill } from "@/lib/i18n";
+import { traitLabel } from "@/lib/labels";
 import {
   MAX_VIBE_TAGS_PER_RATING,
   MIN_VIBE_TAGS_PER_RATING,
   RELATIONSHIPS,
+  VIBE_TAGS,
   assertAllowed,
   isRelationshipKey,
   isVibeTagKey,
+  type VibeTagKey,
 } from "@/lib/taxonomy";
 
 export type RatingState = {
@@ -33,11 +38,14 @@ export async function submitRatingAction(
   _prev: RatingState,
   formData: FormData,
 ): Promise<RatingState> {
+  const d = await getDict();
+  const locale = await getLocale();
+
   let rater;
   try {
     rater = await requireUser();
   } catch {
-    return { error: "Değerlendirme yapmak için giriş yapmalısın." };
+    return { error: d.rating.errors.signIn };
   }
 
   const username = String(formData.get("username") ?? "").toLowerCase();
@@ -46,16 +54,16 @@ export async function submitRatingAction(
   const hideIdentity = formData.get("hideIdentity") === "on";
 
   if (!isRelationshipKey(relationship)) {
-    return { error: "Önce bu kişiyi nereden tanıdığını seçmelisin." };
+    return { error: d.rating.errors.pickContext };
   }
 
   const rated = await prisma.user.findUnique({
     where: { username },
     select: { id: true, username: true, name: true, ratingPolicy: true },
   });
-  if (!rated) return { error: "Kullanıcı bulunamadı." };
+  if (!rated) return { error: d.rating.errors.noUser };
   if (rated.id === rater.id) {
-    return { error: "Kendini değerlendiremezsin." };
+    return { error: d.rating.errors.self };
   }
 
   // ---- consent checks, before anything else is read
@@ -72,8 +80,8 @@ export async function submitRatingAction(
     return {
       error:
         blocked.blockerId === rater.id
-          ? "Bu kişiyi engellemişsin. Değerlendirmek için engeli kaldırman gerek."
-          : "Bu kişiyi şu anda değerlendiremezsin.",
+          ? d.rating.errors.youBlocked
+          : d.rating.errors.theyBlocked,
     };
   }
 
@@ -82,7 +90,9 @@ export async function submitRatingAction(
     !(await hasInviteGrant(rater.id, rated.id))
   ) {
     return {
-      error: `${rated.name.split(" ")[0]} yalnızca davet ettiği kişilerden değerlendirme alıyor. Ondan geçerli bir davet linki istemen gerek.`,
+      error: fill(d.rating.errors.inviteOnly, {
+        name: rated.name.split(" ")[0],
+      }),
     };
   }
 
@@ -93,7 +103,7 @@ export async function submitRatingAction(
     const raw = formData.get(`trait:${key}`);
     const score = Number(raw);
     if (!Number.isInteger(score) || score < 1 || score > 5) {
-      return { error: "Tüm kriterleri 1-5 arasında puanlamalısın." };
+      return { error: d.rating.errors.scoreAll };
     }
     traits.push({ traitKey: key, score });
   }
@@ -105,10 +115,12 @@ export async function submitRatingAction(
     .filter((t, i, arr) => isVibeTagKey(t) && arr.indexOf(t) === i);
 
   if (tags.length < MIN_VIBE_TAGS_PER_RATING) {
-    return { error: "En az 1 Vibe Tag seçmelisin." };
+    return { error: d.rating.errors.minTags };
   }
   if (tags.length > MAX_VIBE_TAGS_PER_RATING) {
-    return { error: `En fazla ${MAX_VIBE_TAGS_PER_RATING} Vibe Tag seçebilirsin.` };
+    return {
+      error: fill(d.rating.errors.maxTags, { max: MAX_VIBE_TAGS_PER_RATING }),
+    };
   }
 
   // ---- the trust guard: context gates what may be said
@@ -117,13 +129,28 @@ export async function submitRatingAction(
     traits.map((t) => t.traitKey),
     tags,
   );
-  if (!guard.ok) return { error: guard.error };
+  if (!guard.ok) {
+    // Named in the reader's language, so the guard explains itself instead of
+    // just refusing.
+    const label =
+      guard.kind === "trait"
+        ? traitLabel(guard.key, locale)
+        : (VIBE_TAGS[guard.key as VibeTagKey]?.en ?? guard.key);
+    return {
+      error: fill(
+        guard.kind === "trait"
+          ? d.rating.errors.notAllowedTrait
+          : d.rating.errors.notAllowedTag,
+        { label },
+      ),
+    };
+  }
 
   if (comment.length > 280) {
-    return { error: "Yorum en fazla 280 karakter olabilir." };
+    return { error: d.rating.errors.commentLong };
   }
   const moderation = moderateComment(comment);
-  if (!moderation.ok) return { error: moderation.error };
+  if (!moderation.ok) return { error: d.moderation[moderation.reason] };
 
   const existing = await prisma.rating.findUnique({
     where: { ratedUserId_raterUserId: { ratedUserId: rated.id, raterUserId: rater.id } },
@@ -153,20 +180,12 @@ export async function submitRatingAction(
     });
 
     // Never says who — that would undo the anonymity the product runs on.
-    await notify(
-      rated.id,
-      "NEW_RATING",
-      "Yeni bir değerlendirme aldın ✨",
-      "Biri seni değerlendirdi. My Vibe profilin güncellendi.",
-      "/home",
-    );
+    await notify(rated.id, "NEW_RATING", { href: "/home" });
   } else {
     // §8 — one revision per 30 days, and the old version is archived.
     const daysLeft = cooldownDaysLeft(existing.lastUpdatedAt);
     if (daysLeft > 0) {
-      return {
-        error: `Değerlendirmeni ayda bir kez güncelleyebilirsin. ${daysLeft} gün sonra tekrar deneyebilirsin.`,
-      };
+      return { error: fill(d.rating.errors.cooldown, { n: daysLeft }) };
     }
 
     const snapshot = JSON.stringify({
@@ -208,13 +227,7 @@ export async function submitRatingAction(
       }),
     ]);
 
-    await notify(
-      rated.id,
-      "RATING_UPDATED",
-      "Bir değerlendirmen güncellendi",
-      "Daha önce seni değerlendiren biri görüşünü güncelledi.",
-      "/home",
-    );
+    await notify(rated.id, "RATING_UPDATED", { href: "/home" });
   }
 
   revalidatePath(`/u/${rated.username}`);

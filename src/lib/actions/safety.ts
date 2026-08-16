@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { destroySession, requireUser } from "@/lib/auth";
 import { isReportReason } from "@/lib/moderation";
+import { getDict } from "@/lib/i18n/server";
+import { fill } from "@/lib/i18n";
 
 export type SafetyState = { error?: string; ok?: string };
 
@@ -42,11 +44,13 @@ export async function reportAction(
   _prev: SafetyState,
   formData: FormData,
 ): Promise<SafetyState> {
+  const d = await getDict();
+
   let me;
   try {
     me = await requireUser();
   } catch {
-    return { error: "Bildirim için giriş yapmalısın." };
+    return { error: d.report.errors.signIn };
   }
 
   const reason = String(formData.get("reason") ?? "");
@@ -54,9 +58,11 @@ export async function reportAction(
   const ratingId = String(formData.get("ratingId") ?? "") || null;
   const username = String(formData.get("username") ?? "").toLowerCase() || null;
 
-  if (!isReportReason(reason)) return { error: "Bir sebep seçmelisin." };
-  if (note.length > 500) return { error: "Açıklama en fazla 500 karakter." };
-  if (!ratingId && !username) return { error: "Neyi bildirdiğin anlaşılmadı." };
+  if (!isReportReason(reason)) return { error: d.report.errors.pickReason };
+  if (note.length > 500) return { error: d.report.errors.noteLong };
+  if (!ratingId && !username) {
+    return { error: d.report.errors.unknownTarget };
+  }
 
   let reportedUserId: string | null = null;
 
@@ -68,14 +74,16 @@ export async function reportAction(
       select: { ratedUserId: true },
     });
     if (!rating || rating.ratedUserId !== me.id) {
-      return { error: "Bu değerlendirmeyi bildiremezsin." };
+      return { error: d.report.errors.notYours };
     }
   } else if (username) {
     const target = await prisma.user.findUnique({
       where: { username },
       select: { id: true },
     });
-    if (!target || target.id === me.id) return { error: "Kullanıcı bulunamadı." };
+    if (!target || target.id === me.id) {
+      return { error: d.report.errors.noUser };
+    }
     reportedUserId = target.id;
   }
 
@@ -87,7 +95,7 @@ export async function reportAction(
     },
   });
   if (duplicate) {
-    return { ok: "Bu bildirimi zaten aldık, inceleniyor." };
+    return { ok: d.report.duplicate };
   }
 
   await prisma.report.create({
@@ -100,9 +108,7 @@ export async function reportAction(
     },
   });
 
-  return {
-    ok: "Bildirimin alındı. Ekibimiz inceleyecek — sonucu bildirimlerinde göreceksin.",
-  };
+  return { ok: d.report.receivedBody };
 }
 
 // ------------------------------------------------------------ privacy
@@ -126,10 +132,13 @@ export async function deleteAccountAction(
   formData: FormData,
 ): Promise<SafetyState> {
   const me = await requireUser();
+  const d = await getDict();
   const confirm = String(formData.get("confirm") ?? "").trim().toLowerCase();
 
   if (confirm !== me.username) {
-    return { error: `Onaylamak için kullanıcı adını yaz: ${me.username}` };
+    return {
+      error: fill(d.settings.deleteMismatch, { username: me.username }),
+    };
   }
 
   // Everything hangs off the user row with onDelete: Cascade — ratings given,

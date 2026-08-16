@@ -8,7 +8,10 @@ import { getMyRatingOf, getPercentile, getUserByUsername, getVibeProfile } from 
 import { cooldownDaysLeft } from "@/lib/rating-rules";
 import { earnedBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
-import { CONTEXT_GROUPS, RELATIONSHIPS } from "@/lib/taxonomy";
+import { getDict, getLocale } from "@/lib/i18n/server";
+import { fill } from "@/lib/i18n";
+import { badgeLabel, groupLabel, percent, tagLabel, traitLabel } from "@/lib/labels";
+import { RELATIONSHIPS } from "@/lib/taxonomy";
 import { groupIconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ScoreDial } from "@/components/ScoreDial";
@@ -21,16 +24,19 @@ export default async function PublicProfile({
   params: Promise<{ username: string }>;
 }) {
   const me = await requireUser();
+  const d = await getDict();
+  const locale = await getLocale();
   const { username } = await params;
 
   const user = await getUserByUsername(username);
   if (!user) notFound();
 
   const isMe = user.id === me.id;
+  const firstName = user.name.split(" ")[0];
   const profile = await getVibeProfile(user.id);
   const percentile = await getPercentile(user.id, profile.score);
   const badges = earnedBadges(profile);
-  const summary = generateVibeSummary(profile, user.name.split(" ")[0]);
+  const summary = generateVibeSummary(profile, firstName, d, locale);
   const existing = isMe ? null : await getMyRatingOf(me.id, user.id);
   const daysLeft = existing ? cooldownDaysLeft(existing.lastUpdatedAt) : 0;
 
@@ -111,17 +117,21 @@ export default async function PublicProfile({
           <ScoreDial
             score={profile.score}
             size={220}
-            caption={percentile ? `Top ${percentile}% of users` : undefined}
+            caption={
+              percentile ? fill(d.home.topPercent, { n: percentile }) : undefined
+            }
           />
 
           {profile.ratingCount > 0 && (
             <div className="w-full">
               <p className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.22em] text-muted">
-                People see {isMe ? "you" : "them"} as
+                {fill(d.profile.seeThemAs, {
+                  who: isMe ? d.profile.you : d.profile.them,
+                })}
               </p>
               <div className="flex flex-wrap justify-center gap-2">
                 {profile.tags.slice(0, 4).map((t) => (
-                  <TagPill key={t.key} tagKey={t.key} label={t.en} />
+                  <TagPill key={t.key} tagKey={t.key} label={tagLabel(t.key, locale)} />
                 ))}
               </div>
             </div>
@@ -129,9 +139,9 @@ export default async function PublicProfile({
 
           <div className="mt-6 w-full border-t border-line/80 pt-4 text-left">
             <p className="text-[12px] leading-tight text-muted">
-              Rated by
+              {d.common.ratedBy}
               <span className="mt-0.5 block text-[16px] font-semibold text-ink">
-                {profile.ratingCount} people
+                {profile.ratingCount} {d.common.people}
               </span>
             </p>
           </div>
@@ -140,10 +150,9 @@ export default async function PublicProfile({
 
       {!isMe && blockedByMe && (
         <div className="mt-5 card p-4 text-center">
-          <p className="text-[13.5px] font-bold">Bu kişiyi engelledin</p>
+          <p className="text-[13.5px] font-bold">{d.profile.blocked}</p>
           <p className="text-[12.5px] text-muted mt-1 leading-relaxed">
-            Sana yeni değerlendirme yapamaz ve mevcut değerlendirmesini
-            güncelleyemez.
+            {d.profile.blockedBody}
           </p>
           <form action={toggleBlockAction} className="mt-3">
             <input type="hidden" name="username" value={user.username} />
@@ -151,7 +160,7 @@ export default async function PublicProfile({
               type="submit"
               className="h-11 px-6 rounded-full bg-white border border-line text-[13.5px] font-bold"
             >
-              Engeli kaldır
+              {d.profile.unblock}
             </button>
           </form>
         </div>
@@ -162,10 +171,10 @@ export default async function PublicProfile({
           {existing && daysLeft > 0 ? (
             <div className="card p-4 text-center">
               <p className="text-[13.5px] font-bold">
-                Bu kişiyi zaten değerlendirdin 🔒
+                {d.profile.alreadyRated}
               </p>
               <p className="text-[12.5px] text-muted mt-1">
-                {daysLeft} gün sonra güncelleyebilirsin.
+                {fill(d.profile.updateIn, { n: daysLeft })}
               </p>
             </div>
           ) : (
@@ -174,20 +183,20 @@ export default async function PublicProfile({
               className="h-13 w-full grid place-items-center rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)]"
             >
               {existing
-                ? "Değerlendirmemi güncelle"
-                : `${user.name.split(" ")[0]}’i değerlendir`}
+                ? d.profile.updateCta
+                : fill(d.profile.rateCta, { name: firstName })}
             </Link>
           )}
 
           <div className="mt-3 flex items-center justify-center gap-4">
-            <ReportDialog username={user.username} label="Bu profili bildir" compact />
+            <ReportDialog username={user.username} label={d.profile.report} compact />
             <form action={toggleBlockAction}>
               <input type="hidden" name="username" value={user.username} />
               <button
                 type="submit"
                 className="text-[11.5px] font-bold text-muted underline underline-offset-2"
               >
-                Engelle
+                {d.profile.block}
               </button>
             </form>
           </div>
@@ -198,11 +207,11 @@ export default async function PublicProfile({
         <div className="mt-6">
           <EmptyState
             emoji="🌱"
-            title="Henüz değerlendirme yok"
+            title={d.profile.emptyTitle}
             body={
               isMe
-                ? "Çevrendeki insanları davet ettiğinde Vibe profilin oluşmaya başlayacak."
-                : `${user.name.split(" ")[0]} için ilk Vibe'ı sen bırakabilirsin.`
+                ? d.profile.emptyMine
+                : fill(d.profile.emptyOther, { name: firstName })
             }
           />
         </div>
@@ -210,10 +219,12 @@ export default async function PublicProfile({
         <>
           {profile.tags.length > 4 && (
             <section className="mt-6 reveal">
-              <SectionTitle>More of {isMe ? "your" : "their"} Vibe</SectionTitle>
+              <SectionTitle>
+                {isMe ? d.home.moreVibe : d.profile.moreVibe}
+              </SectionTitle>
               <Card className="flex flex-wrap gap-2">
                 {profile.tags.slice(4, 8).map((t) => (
-                  <TagPill key={t.key} tagKey={t.key} label={t.en} count={t.count} />
+                  <TagPill key={t.key} tagKey={t.key} label={tagLabel(t.key, locale)} count={t.count} />
                 ))}
               </Card>
             </section>
@@ -221,13 +232,13 @@ export default async function PublicProfile({
 
           {badges.length > 0 && (
             <section className="mt-6 reveal">
-              <SectionTitle>Rozetler</SectionTitle>
+              <SectionTitle>{d.profile.badges}</SectionTitle>
               <div className="flex flex-wrap gap-2">
                 {badges.map((b) => (
                   <TagPill
                     key={b.key}
                     tagKey={b.icon}
-                    label={b.label}
+                    label={badgeLabel(b.key, d)}
                     tone="warm"
                   />
                 ))}
@@ -236,14 +247,14 @@ export default async function PublicProfile({
           )}
 
           <section className="mt-6 reveal">
-            <SectionTitle>Güçlü yönler</SectionTitle>
+            <SectionTitle>{d.profile.strengths}</SectionTitle>
             <Card className="grid gap-4">
               {profile.traits.slice(0, 5).map((t) => (
                 <div key={t.key}>
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-[13.5px] font-bold inline-flex items-center gap-2">
                       <TraitIcon traitKey={t.key} color="#FF8A3D" />
-                      {t.label}
+                      {traitLabel(t.key, locale)}
                     </span>
                     <span className="text-[13px] font-black tabular-nums grad-text">
                       {t.score}
@@ -256,7 +267,7 @@ export default async function PublicProfile({
           </section>
 
           <section className="mt-6 reveal">
-            <SectionTitle>Nereden tanınıyor?</SectionTitle>
+            <SectionTitle>{d.profile.circles}</SectionTitle>
             <Card className="grid gap-3">
               {profile.groups.map((g) => (
                 <div key={g.group} className="flex items-center gap-3">
@@ -265,9 +276,9 @@ export default async function PublicProfile({
                   </span>
                   <div className="flex-1">
                     <div className="flex justify-between text-[12.5px] font-bold mb-1">
-                      <span>{g.label}</span>
+                      <span>{groupLabel(g.group, d)}</span>
                       <span className="text-muted tabular-nums">
-                        %{Math.round(g.share * 100)}
+                        {percent(g.share * 100, locale)}
                       </span>
                     </div>
                     <Meter value={g.share * 100} />
@@ -278,7 +289,7 @@ export default async function PublicProfile({
           </section>
 
           <section className="mt-6 reveal">
-            <SectionTitle>AI özeti</SectionTitle>
+            <SectionTitle>{d.profile.aiSummary}</SectionTitle>
             <Card>
               <p className="text-[16px] font-extrabold leading-snug">
                 {summary.headline}
@@ -291,21 +302,21 @@ export default async function PublicProfile({
 
           {comments.length > 0 && (
             <section className="mt-6 mb-2 reveal">
-              <SectionTitle>Anonim notlar</SectionTitle>
+              <SectionTitle>{d.profile.anonNotes}</SectionTitle>
               <div className="grid gap-2.5">
                 {comments.map((c) => (
                   <Card key={c.id} className="!py-4">
                     <p className="text-[13.5px] leading-relaxed">“{c.comment}”</p>
                     <p className="text-[11.5px] text-muted mt-2 font-semibold">
-                      Anonim ·{" "}
-                      {
-                        CONTEXT_GROUPS[
+                      {d.common.anonymous} ·{" "}
+                      {fill(d.profile.fromCircle, {
+                        group: groupLabel(
                           RELATIONSHIPS[
                             c.relationship as keyof typeof RELATIONSHIPS
-                          ].group
-                        ].label
-                      }{" "}
-                      çevresinden
+                          ].group,
+                          d,
+                        ),
+                      })}
                     </p>
                   </Card>
                 ))}

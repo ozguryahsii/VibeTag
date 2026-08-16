@@ -4,29 +4,33 @@ import { prisma } from "@/lib/db";
 import { getVibeProfile } from "@/lib/profile";
 import { generateVibeSummary } from "@/lib/insights";
 import { growthAreas, strongestTraits } from "@/lib/vibe";
-import { RELATIONSHIPS, TRAITS, VIBE_TAGS } from "@/lib/taxonomy";
+import { RELATIONSHIPS } from "@/lib/taxonomy";
 import { groupIconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ReportDialog } from "@/components/ReportDialog";
 import { openRatingThreadAction } from "@/lib/actions/social";
-import { getDict } from "@/lib/i18n/server";
+import { getDict, getLocale } from "@/lib/i18n/server";
+import { fill } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n/config";
+import { groupLabel, percent, relationshipLabel, tagLabel, traitLabel } from "@/lib/labels";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
-function fmtDate(d: Date): string {
-  return new Intl.DateTimeFormat("tr-TR", {
+function fmtDate(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
-  }).format(d);
+  }).format(date);
 }
 
 export default async function InsightsPage() {
   const me = await requireUser();
   const d = await getDict();
+  const locale = await getLocale();
   const profile = await getVibeProfile(me.id);
-  const summary = generateVibeSummary(profile, me.name.split(" ")[0]);
+  const summary = generateVibeSummary(profile, me.name.split(" ")[0], d, locale);
 
   const isSilver = hasPlan(me, "SILVER");
   const isGold = hasPlan(me, "GOLD");
@@ -65,7 +69,7 @@ export default async function InsightsPage() {
       <header className="reveal">
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-extrabold tracking-[0.24em] text-coral">
-            VIBE ANALYSIS
+            {d.insights.kicker}
           </span>
           <span
             className="text-[10px] font-black rounded-full px-2 py-0.5 text-white"
@@ -82,19 +86,17 @@ export default async function InsightsPage() {
           </span>
         </div>
         <h1 className="vt-page-title text-[31px] tracking-[-0.02em] mt-1.5">
-          Vibe Insights
+          {d.insights.title}
         </h1>
-        <p className="text-[13px] text-muted mt-1">
-          Sosyal algının arkasındaki veri.
-        </p>
+        <p className="text-[13px] text-muted mt-1">{d.insights.subtitle}</p>
       </header>
 
       {profile.ratingCount === 0 ? (
         <div className="mt-6">
           <EmptyState
             emoji="✦"
-            title="Analiz için veri yok"
-            body="En az 3 değerlendirme sonrası analiz açılır. Çevrendeki kişileri davet ederek başlayabilirsin."
+            title={d.insights.emptyTitle}
+            body={d.insights.emptyBody}
           />
         </div>
       ) : (
@@ -106,7 +108,7 @@ export default async function InsightsPage() {
               style={{ boxShadow: "0 18px 44px rgba(255,92,119,0.24)" }}
             >
               <p className="text-[11px] font-extrabold tracking-[0.2em] opacity-85">
-                PEOPLE DESCRIBE YOU AS
+                {d.insights.describedAs}
               </p>
               <p className="text-[28px] font-black tracking-[-0.02em] mt-1.5 leading-tight">
                 {summary.persona}
@@ -120,24 +122,25 @@ export default async function InsightsPage() {
           {/* ---------------------------------------------- SILVER */}
           <Gate
             open={isSilver}
-            title="Seni hangi çevrelerden tanıyorlar?"
+            title={d.insights.circlesTitle}
             plan="SILVER"
-            blurb="Değerlendirmelerinin hangi çevrelerden geldiğini gör."
+            blurb={d.insights.circlesBlurb}
+            unlockLabel={fill(d.insights.unlockWith, { plan: "Silver" })}
           >
-            <SectionTitle>Seni hangi çevrelerden tanıyorlar?</SectionTitle>
+            <SectionTitle>{d.insights.circlesTitle}</SectionTitle>
             <Card className="grid gap-3.5">
               <p className="text-[12.5px] text-muted font-semibold">
-                {profile.ratingCount} değerlendirme
+                {fill(d.insights.ratingCount, { n: profile.ratingCount })}
               </p>
               {profile.groups.map((g) => (
                 <div key={g.group}>
                   <div className="flex justify-between text-[13px] font-bold mb-1.5">
                     <span className="inline-flex items-center gap-2">
                       <IconGlyph def={groupIconFor(g.group)} size={16} color="#FF8A3D" />
-                      {g.label}
+                      {groupLabel(g.group, d)}
                     </span>
                     <span className="tabular-nums text-muted">
-                      %{Math.round(g.share * 100)}
+                      {percent(g.share * 100, locale)}
                     </span>
                   </div>
                   <Meter value={g.share * 100} />
@@ -150,7 +153,9 @@ export default async function InsightsPage() {
                     key={r.key}
                     className="flex justify-between text-[12.5px]"
                   >
-                    <span className="text-muted">{r.label}</span>
+                    <span className="text-muted">
+                      {relationshipLabel(r.key, d)}
+                    </span>
                     <span className="font-bold tabular-nums">{r.count}</span>
                   </div>
                 ))}
@@ -158,11 +163,11 @@ export default async function InsightsPage() {
             </Card>
 
             <div className="mt-6">
-              <SectionTitle>Detaylı analiz</SectionTitle>
+              <SectionTitle>{d.insights.detailed}</SectionTitle>
               <Card className="grid gap-4">
                 <div>
                   <p className="text-[11px] font-extrabold tracking-[0.16em] text-orange mb-2.5">
-                    STRONGEST VIBES
+                    {d.insights.strongest}
                   </p>
                   <div className="grid gap-3">
                     {strong.map((t) => (
@@ -170,7 +175,7 @@ export default async function InsightsPage() {
                         <div className="flex justify-between text-[13px] font-bold mb-1">
                           <span className="inline-flex items-center gap-2">
                             <TraitIcon traitKey={t.key} color="#FF8A3D" />
-                            {t.en}
+                            {traitLabel(t.key, locale)}
                           </span>
                           <span className="tabular-nums grad-text font-black">
                             {t.score}
@@ -178,7 +183,7 @@ export default async function InsightsPage() {
                         </div>
                         <Meter value={t.score} />
                         <p className="text-[11.5px] text-muted mt-1">
-                          {summary.strengths.find((s) => s.label === t.label)?.note}
+                          {summary.strengths.find((s) => s.key === t.key)?.note}
                         </p>
                       </div>
                     ))}
@@ -188,7 +193,7 @@ export default async function InsightsPage() {
                 {growth.length > 0 && (
                   <div className="pt-3 border-t border-line">
                     <p className="text-[11px] font-extrabold tracking-[0.16em] text-coral mb-2.5">
-                      GROWTH AREAS
+                      {d.insights.growth}
                     </p>
                     <div className="grid gap-3">
                       {growth.map((t) => (
@@ -196,7 +201,7 @@ export default async function InsightsPage() {
                           <div className="flex justify-between text-[13px] font-bold mb-1">
                             <span className="inline-flex items-center gap-2">
                               <TraitIcon traitKey={t.key} color="#FF5C77" />
-                              {t.en}
+                              {traitLabel(t.key, locale)}
                             </span>
                             <span className="tabular-nums text-coral font-black">
                               {t.score}
@@ -204,7 +209,7 @@ export default async function InsightsPage() {
                           </div>
                           <Meter value={t.score} />
                           <p className="text-[11.5px] text-muted mt-1">
-                            {summary.growth.find((s) => s.label === t.label)?.note}
+                            {summary.growth.find((s) => s.key === t.key)?.note}
                           </p>
                         </div>
                       ))}
@@ -216,13 +221,11 @@ export default async function InsightsPage() {
 
             <div className="mt-6">
               <SectionTitle>
-                {isGold ? "Değerlendirmeler" : "Anonim oy detayları"}
+                {isGold ? d.insights.ratings : d.insights.anonDetails}
               </SectionTitle>
               <div className="grid gap-2.5">
                 {details.map((row) => {
-                  const rel = RELATIONSHIPS[
-                    row.relationship as keyof typeof RELATIONSHIPS
-                  ];
+                  const relName = relationshipLabel(row.relationship, d);
                   // §15 — identity is revealed only for Gold, and never for
                   // protected or explicitly anonymised ratings.
                   const showIdentity =
@@ -247,7 +250,7 @@ export default async function InsightsPage() {
                                 {row.raterUser.name}
                               </Link>
                               <p className="text-[11.5px] text-muted">
-                                {rel.label}
+                                {relName}
                               </p>
                             </div>
                           </>
@@ -261,13 +264,13 @@ export default async function InsightsPage() {
                                 Anonim
                               </p>
                               <p className="text-[11.5px] text-muted">
-                                {rel.label}
+                                {relName}
                               </p>
                             </div>
                           </>
                         )}
                         <span className="ml-auto text-[11px] text-muted">
-                          {fmtDate(row.createdAt)}
+                          {fmtDate(row.createdAt, locale)}
                         </span>
                       </div>
 
@@ -278,8 +281,7 @@ export default async function InsightsPage() {
                             className="flex justify-between text-[12.5px]"
                           >
                             <span className="text-muted">
-                              {TRAITS[t.traitKey as keyof typeof TRAITS]?.en ??
-                                t.traitKey}
+                              {traitLabel(t.traitKey, locale)}
                             </span>
                             <span className="font-bold tabular-nums">
                               {t.score}/5
@@ -290,18 +292,14 @@ export default async function InsightsPage() {
 
                       {row.vibeTags.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1.5">
-                          {row.vibeTags.map((t) => {
-                            const tag =
-                              VIBE_TAGS[t.tagKey as keyof typeof VIBE_TAGS];
-                            return tag ? (
-                              <TagPill
-                                key={t.tagKey}
-                                tagKey={t.tagKey}
-                                label={tag.en}
-                                size="sm"
-                              />
-                            ) : null;
-                          })}
+                          {row.vibeTags.map((t) => (
+                            <TagPill
+                              key={t.tagKey}
+                              tagKey={t.tagKey}
+                              label={tagLabel(t.tagKey, locale)}
+                              size="sm"
+                            />
+                          ))}
                         </div>
                       )}
 
@@ -327,8 +325,7 @@ export default async function InsightsPage() {
 
                       {isGold && (row.isProtected || row.hideIdentity) && (
                         <p className="mt-3 text-[11.5px] text-muted bg-cream rounded-xl px-3 py-2">
-                          Bu değerlendirmenin kimliği sistem tarafından
-                          korunuyor — Gold üyelikte de görünmez.
+                          {d.insights.protectedNote}
                         </p>
                       )}
                     </Card>
@@ -349,20 +346,19 @@ export default async function InsightsPage() {
                 }}
               >
                 <p className="text-[11px] font-extrabold tracking-[0.2em] opacity-85">
-                  GOLD · VIBE IDENTITY
+                  {d.insights.goldKicker}
                 </p>
                 <p className="text-[19px] font-black mt-1.5 leading-snug">
-                  Kimlerin değerlendirdiğini gör
+                  {d.insights.goldTitle}
                 </p>
                 <p className="text-[13px] opacity-90 mt-1.5 leading-relaxed">
-                  Kim, nereden tanıyor ve hangi alanlarda değerlendirdi. Sistem
-                  tarafından korunan ve gizlenen oylar her zaman anonim kalır.
+                  {d.insights.goldBody}
                 </p>
                 <Link
                   href="/settings"
                   className="inline-flex mt-4 rounded-full bg-white text-coral font-bold text-[14px] px-5 py-3"
                 >
-                  Gold’a geç
+                  {d.insights.goldCta}
                 </Link>
               </div>
             </section>
@@ -385,13 +381,14 @@ function Gate({
   children,
   title,
   blurb,
-  plan,
+  unlockLabel,
 }: {
   open: boolean;
   children: React.ReactNode;
   title: string;
   blurb: string;
   plan: string;
+  unlockLabel: string;
 }) {
   if (open) return <div className="mt-6">{children}</div>;
 
@@ -438,7 +435,7 @@ function Gate({
             href="/settings"
             className="inline-flex mt-4 rounded-full grad-score text-white font-bold text-[14px] px-5 py-3"
           >
-            {plan} ile aç
+            {unlockLabel}
           </Link>
         </div>
       </div>

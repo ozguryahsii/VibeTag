@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { reportAction, type SafetyState } from "@/lib/actions/safety";
 import { REPORT_REASONS } from "@/lib/moderation";
+import { useD } from "@/components/LocaleProvider";
 
 /**
  * Reporting a rating never tells the reporter who wrote it, and never tells
@@ -12,7 +13,7 @@ import { REPORT_REASONS } from "@/lib/moderation";
 export function ReportDialog({
   ratingId,
   username,
-  label = "Bildir",
+  label,
   compact = false,
 }: {
   ratingId?: string;
@@ -20,6 +21,7 @@ export function ReportDialog({
   label?: string;
   compact?: boolean;
 }) {
+  const d = useD();
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState<SafetyState, FormData>(
     reportAction,
@@ -37,7 +39,7 @@ export function ReportDialog({
             : "h-11 w-full rounded-full bg-white border border-line text-[13.5px] font-bold text-muted active:scale-[0.98] transition-transform"
         }
       >
-        {label}
+        {label ?? d.report.submit}
       </button>
 
       {open && (
@@ -55,7 +57,9 @@ export function ReportDialog({
             {state.ok ? (
               <div className="text-center py-4">
                 <div className="w-14 h-14 mx-auto rounded-full grid place-items-center grad-score text-white text-xl font-black">✓</div>
-                <p className="vt-page-title text-[22px] mt-4">Bildirimin alındı</p>
+                <p className="vt-page-title text-[22px] mt-4">
+                  {d.report.received}
+                </p>
                 <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
                   {state.ok}
                 </p>
@@ -63,7 +67,7 @@ export function ReportDialog({
                   onClick={() => setOpen(false)}
                   className="mt-5 h-12 w-full rounded-full grad-score text-white font-bold text-[14.5px]"
                 >
-                  Kapat
+                  {d.common.close}
                 </button>
               </div>
             ) : (
@@ -75,31 +79,31 @@ export function ReportDialog({
                   <input type="hidden" name="username" value={username} />
                 )}
 
-                <p className="text-[10px] font-extrabold tracking-[0.22em] text-coral mb-2">SAFETY</p>
+                <p className="text-[10px] font-extrabold tracking-[0.22em] text-coral mb-2">
+                  {d.report.kicker}
+                </p>
                 <h2 className="vt-page-title text-[24px] tracking-[-0.02em]">
-                  Neyi bildirmek istiyorsun?
+                  {d.report.title}
                 </h2>
                 <p className="text-[12.5px] text-muted mt-1.5 leading-relaxed">
-                  {ratingId
-                    ? "Bu değerlendirmeyi kimin yazdığını biz de sana söylemeyiz — bildirimin de kimliğini ona açmaz."
-                    : "Bildirimin gizlidir, karşı tarafa iletilmez."}
+                  {ratingId ? d.report.bodyRating : d.report.bodyUser}
                 </p>
 
                 <div className="mt-4 grid gap-2">
-                  {REPORT_REASONS.map((r, i) => (
+                  {REPORT_REASONS.map((key, i) => (
                     <label
-                      key={r.key}
+                      key={key}
                       className="flex items-center gap-3 rounded-[18px] border border-line bg-cream px-4 py-3 cursor-pointer has-[:checked]:border-coral/40 has-[:checked]:bg-tagbg"
                     >
                       <input
                         type="radio"
                         name="reason"
-                        value={r.key}
+                        value={key}
                         defaultChecked={i === 0}
                         className="w-4 h-4 accent-[#FF5C77]"
                       />
                       <span className="text-[13.5px] font-semibold">
-                        {r.label}
+                        {d.report.reasons[key]}
                       </span>
                     </label>
                   ))}
@@ -109,7 +113,7 @@ export function ReportDialog({
                   name="note"
                   rows={3}
                   maxLength={500}
-                  placeholder="Kısaca ne olduğunu anlatabilirsin (isteğe bağlı)"
+                  placeholder={d.report.notePlaceholder}
                   className="mt-3 w-full rounded-[18px] border border-line bg-cream p-4 text-[14px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 resize-none"
                 />
 
@@ -125,14 +129,14 @@ export function ReportDialog({
                     onClick={() => setOpen(false)}
                     className="h-12 px-6 rounded-full bg-white border border-line font-bold text-[14px]"
                   >
-                    Vazgeç
+                    {d.common.cancel}
                   </button>
                   <button
                     type="submit"
                     disabled={pending}
                     className="flex-1 h-12 rounded-full grad-score text-white font-bold text-[14.5px] disabled:opacity-50"
                   >
-                    {pending ? "Gönderiliyor…" : "Bildir"}
+                    {pending ? d.common.sending : d.report.submit}
                   </button>
                 </div>
               </form>

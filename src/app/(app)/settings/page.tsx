@@ -7,43 +7,21 @@ import { ProfileEditor } from "@/components/ProfileEditor";
 import { DeleteAccount } from "@/components/DeleteAccount";
 import { Avatar } from "@/components/Avatar";
 import { Card, SectionTitle } from "@/components/ui";
+import { getDict } from "@/lib/i18n/server";
+import { fill } from "@/lib/i18n";
+import { LangToggle } from "@/components/LangToggle";
 
-const PLANS = [
-  {
-    key: "FREE",
-    name: "Free",
-    price: "₺0",
-    tagline: "My Vibe",
-    perks: ["My Vibe profili", "Vibe Score ve Vibe Tags", "Vibe Card oluşturma"],
-  },
-  {
-    key: "SILVER",
-    name: "Silver",
-    price: "₺79/ay",
-    tagline: "Vibe Insights",
-    perks: [
-      "Seni hangi çevrelerden tanıyorlar",
-      "Güçlü yönler ve gelişim alanları",
-      "Anonim oy detayları",
-    ],
-  },
-  {
-    key: "GOLD",
-    name: "Gold",
-    price: "₺149/ay",
-    tagline: "Vibe Identity",
-    perks: [
-      "Silver'daki her şey",
-      "Kim değerlendirdi, nereden tanıyor",
-      "Korunan oylar yine anonim kalır",
-    ],
-  },
+const PLAN_KEYS = [
+  { key: "FREE", dict: "free" },
+  { key: "SILVER", dict: "silver" },
+  { key: "GOLD", dict: "gold" },
 ] as const;
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const user = await requireUser();
+  const d = await getDict();
 
   const blocks = await prisma.block.findMany({
     where: { blockerId: user.id },
@@ -58,8 +36,17 @@ export default async function SettingsPage() {
 
   return (
     <main className="px-5 pt-10">
-      <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">YOUR VIBE IDENTITY</p>
-      <h1 className="vt-page-title text-[31px] tracking-[-0.02em]">Profil</h1>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">
+            {d.settings.kicker}
+          </p>
+          <h1 className="vt-page-title text-[31px] tracking-[-0.02em]">
+            {d.settings.title}
+          </h1>
+        </div>
+        <LangToggle className="mt-1 shrink-0" />
+      </div>
       <p className="text-[13px] text-muted mt-1">
         @{user.username} · {user.email}
       </p>
@@ -69,24 +56,24 @@ export default async function SettingsPage() {
           href={`/u/${user.username}`}
           className="card !py-4 text-center text-[12.5px] font-bold"
         >
-          Profilim
+          {d.settings.myProfile}
         </Link>
         <Link
           href="/card"
           className="card !py-4 text-center text-[12.5px] font-bold"
         >
-          Vibe Card
+          {d.settings.vibeCard}
         </Link>
         <Link
           href="/invite"
           className="card !py-4 text-center text-[12.5px] font-bold"
         >
-          Davet et
+          {d.settings.invite}
         </Link>
       </div>
 
       <div className="mt-6">
-        <SectionTitle>Profilini düzenle</SectionTitle>
+        <SectionTitle>{d.settings.editProfile}</SectionTitle>
         <ProfileEditor
           name={user.name}
           bio={user.bio ?? ""}
@@ -96,9 +83,10 @@ export default async function SettingsPage() {
       </div>
 
       <div className="mt-7">
-        <SectionTitle>Üyelik</SectionTitle>
+        <SectionTitle>{d.settings.membership}</SectionTitle>
         <div className="grid gap-2.5">
-          {PLANS.map((p) => {
+          {PLAN_KEYS.map((p) => {
+            const plan = d.settings.plans[p.dict];
             const active = user.plan === p.key;
             return (
               <div
@@ -114,16 +102,16 @@ export default async function SettingsPage() {
               >
                 <div className="flex items-baseline justify-between">
                   <div>
-                    <span className="text-[16px] font-black">{p.name}</span>
+                    <span className="text-[16px] font-black">{plan.name}</span>
                     <span className="text-[12px] font-bold text-coral ml-2">
-                      {p.tagline}
+                      {plan.tagline}
                     </span>
                   </div>
-                  <span className="text-[14px] font-extrabold">{p.price}</span>
+                  <span className="text-[14px] font-extrabold">{plan.price}</span>
                 </div>
 
                 <ul className="mt-3 grid gap-1.5">
-                  {p.perks.map((perk) => (
+                  {plan.perks.map((perk) => (
                     <li
                       key={perk}
                       className="text-[12.5px] text-muted flex gap-2"
@@ -136,7 +124,7 @@ export default async function SettingsPage() {
 
                 {active ? (
                   <p className="mt-4 text-[12.5px] font-bold text-orange">
-                    Aktif planın
+                    {d.settings.activePlan}
                   </p>
                 ) : (
                   <form action={setPlanAction} className="mt-4">
@@ -145,7 +133,9 @@ export default async function SettingsPage() {
                       type="submit"
                       className="h-11 w-full rounded-full font-bold text-[14px] text-white active:scale-[0.98] transition-transform grad-score"
                     >
-                      {p.key === "FREE" ? "Free'ye dön" : `${p.name}'a geç`}
+                      {p.key === "FREE"
+                        ? d.settings.backToFree
+                        : fill(d.settings.switchTo, { plan: plan.name })}
                     </button>
                   </form>
                 )}
@@ -154,29 +144,35 @@ export default async function SettingsPage() {
           })}
         </div>
         <p className="text-[11.5px] text-muted mt-3 px-1 leading-relaxed">
-          Demo sürümünde plan değişimi anında ve ücretsizdir — gerçek uygulamada
-          bu akış ödeme sağlayıcısına bağlanır.
+          {d.settings.planNote}
         </p>
       </div>
 
       <div className="mt-7">
-        <SectionTitle>Gizlilik ve güvenlik</SectionTitle>
+        <SectionTitle>{d.settings.privacy}</SectionTitle>
 
         <Card className="grid gap-3">
           <div>
             <p className="text-[13.5px] font-extrabold">
-              Seni kimler değerlendirebilir?
+              {d.settings.whoCanRate}
             </p>
             <p className="text-[12px] text-muted leading-relaxed mt-0.5">
-              Kapalı moda geçersen yalnızca senin davet linkinle katılmış
-              kişiler değerlendirme yapabilir.
+              {d.settings.whoCanRateBody}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
             {[
-              { key: "EVERYONE", label: "Herkes", hint: "Açık profil" },
-              { key: "INVITED", label: "Davet ettiklerim", hint: "Kapalı çevre" },
+              {
+                key: "EVERYONE",
+                label: d.settings.everyone,
+                hint: d.settings.everyoneHint,
+              },
+              {
+                key: "INVITED",
+                label: d.settings.invitedOnly,
+                hint: d.settings.invitedOnlyHint,
+              },
             ].map((opt) => {
               const active = user.ratingPolicy === opt.key;
               return (
@@ -202,17 +198,11 @@ export default async function SettingsPage() {
         </Card>
 
         <Card className="grid gap-3 mt-2.5">
-          {[
-            ["Tüm oylar anonimdir", "Kimin ne yazdığı profilinde asla görünmez."],
-            ["Korunan değerlendirmeler", "Şüpheli görülen oyların kimliği Gold üyelikte de gizli kalır."],
-            ["Güncelleme geçmişi", "Bir değerlendirme güncellendiğinde eski sürümü kayıt altına alınır."],
-            ["Bağlam kilidi", "Kimse seni tanımadığı bir alanda değerlendiremez."],
-            ["Engelleme", "Engellediğin kişi yeni değerlendirme yapamaz. Mevcut değerlendirmesi silinmez — aksi hâlde engelleme, düşük puanları temizleme aracına dönerdi. Haksız bulduğun değerlendirmeyi bildirebilirsin."],
-          ].map(([t, d]) => (
-            <div key={t}>
-              <span className="block text-[13px] font-bold">{t}</span>
+          {d.settings.privacyPoints.map((point) => (
+            <div key={point.title}>
+              <span className="block text-[13px] font-bold">{point.title}</span>
               <span className="block text-[12px] text-muted leading-relaxed mt-0.5">
-                {d}
+                {point.body}
               </span>
             </div>
           ))}
@@ -220,12 +210,10 @@ export default async function SettingsPage() {
       </div>
 
       <div className="mt-7">
-        <SectionTitle>Engellediklerin</SectionTitle>
+        <SectionTitle>{d.settings.blocked}</SectionTitle>
         {blocks.length === 0 ? (
           <Card className="!py-5 text-center">
-            <p className="text-[13px] text-muted">
-              Kimseyi engellemedin.
-            </p>
+            <p className="text-[13px] text-muted">{d.settings.blockedEmpty}</p>
           </Card>
         ) : (
           <div className="grid gap-2.5">
@@ -249,7 +237,7 @@ export default async function SettingsPage() {
                     type="submit"
                     className="text-[12px] font-bold text-orange rounded-full px-3.5 py-2 bg-tagbg border border-orange/20"
                   >
-                    Kaldır
+                    {d.common.remove}
                   </button>
                 </form>
               </Card>
@@ -259,7 +247,7 @@ export default async function SettingsPage() {
       </div>
 
       <div className="mt-7">
-        <SectionTitle>Hesap</SectionTitle>
+        <SectionTitle>{d.settings.account}</SectionTitle>
         <div className="grid gap-2.5">
           <DeleteAccount username={user.username} />
         </div>
@@ -270,7 +258,7 @@ export default async function SettingsPage() {
           type="submit"
           className="w-full h-12 rounded-full bg-white border border-line text-[14px] font-bold text-muted active:scale-[0.98] transition-transform"
         >
-          Çıkış yap
+          {d.common.signOut}
         </button>
       </form>
     </main>

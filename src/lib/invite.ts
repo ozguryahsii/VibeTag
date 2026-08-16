@@ -4,6 +4,7 @@ import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { INVITE_COOKIE } from "@/lib/invite-cookie";
+import { notify } from "@/lib/notifications";
 
 /**
  * Invites are the product's only door. Nobody discovers Vibe Tag by browsing
@@ -161,17 +162,11 @@ export async function redeemInviteFor(
     }
   }
 
-  await prisma.notification.create({
-    data: {
-      userId: invite.inviterId,
-      type: "INVITE_JOINED",
-      title: "Davetin kabul edildi 🎉",
-      body: opts.isNewAccount
-        ? "Davet ettiğin biri Vibe Tag'e katıldı."
-        : "Davet ettiğin biri linkini açtı.",
-      href: "/invite",
-    },
-  });
+  await notify(
+    invite.inviterId,
+    opts.isNewAccount ? "INVITE_JOINED" : "INVITE_JOINED_EXISTING",
+    { href: "/invite" },
+  );
 
   await clearInviteCookie();
   return invite.inviter.username;

@@ -10,6 +10,9 @@ import {
   respondFriendAction,
 } from "@/lib/actions/social";
 import { buildVibeProfile } from "@/lib/vibe";
+import { distanceKm, FAR_KM } from "@/lib/geo";
+import { disableLocationAction } from "@/lib/actions/location";
+import { NearbyToggle } from "@/components/NearbyToggle";
 import { Avatar } from "@/components/Avatar";
 import { LangToggle } from "@/components/LangToggle";
 import { Card, SectionTitle } from "@/components/ui";
@@ -27,7 +30,11 @@ export default async function PeoplePage({
   const { q } = await searchParams;
   const query = (q ?? "").trim();
 
-  const [users, friends, requests, mine, pendingOut] = await Promise.all([
+  const [me2, users, friends, requests, mine, pendingOut] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: me.id },
+      select: { shareLocation: true, lat: true, lng: true },
+    }),
     prisma.user.findMany({
       where: {
         id: { not: me.id },
@@ -48,6 +55,9 @@ export default async function PeoplePage({
         avatarUrl: true,
         avatarColor: true,
         isVerified: true,
+        shareLocation: true,
+        lat: true,
+        lng: true,
         ratingsReceived: {
           select: {
             relationship: true,
@@ -76,9 +86,17 @@ export default async function PeoplePage({
   const friendIds = new Set(friends.map((f) => f.id));
   const requestedIds = new Set(pendingOut.map((f) => f.addresseeId));
 
+  const nearbyOn = !!me2?.shareLocation && me2.lat !== null && me2.lng !== null;
+
   const rows = users
     .map((u) => ({
       ...u,
+      // Only people who also opted in get a distance; everyone else simply
+      // has none and falls to the bottom of the list.
+      distance:
+        nearbyOn && u.shareLocation && u.lat !== null && u.lng !== null
+          ? distanceKm(me2!.lat!, me2!.lng!, u.lat, u.lng)
+          : null,
       profile: buildVibeProfile(
         u.ratingsReceived.map((r) => ({
           id: "",
@@ -95,14 +113,26 @@ export default async function PeoplePage({
     }))
     // Friends already have their own section above; do not list them twice.
     .filter((u) => !friendIds.has(u.id))
-    .sort((a, b) => b.profile.ratingCount - a.profile.ratingCount);
+    .sort((a, b) => {
+      // Nearby first when we can measure it, then the busiest profiles.
+      if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
+      if (a.distance !== null) return -1;
+      if (b.distance !== null) return 1;
+      return b.profile.ratingCount - a.profile.ratingCount;
+    });
+
+  function distanceLabel(km: number): string {
+    if (km >= FAR_KM) return d.people.distanceFar;
+    if (km < 1) return d.people.distanceClose;
+    return fill(d.people.distanceKm, { n: Math.round(km) });
+  }
 
   return (
     <main className="px-5 pt-10">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">
-            YOUR CIRCLE
+            {d.people.kicker}
           </p>
           <h1 className="vt-page-title text-[31px] tracking-[-0.02em]">
             {d.people.title}
@@ -215,7 +245,30 @@ export default async function PeoplePage({
       </div>
 
       <div className="mt-7">
-        <SectionTitle>{query ? d.people.results : d.people.community}</SectionTitle>
+        {nearbyOn ? (
+          <div className="mb-3 flex items-center justify-between gap-3 px-1">
+            <p className="text-[11.5px] text-muted leading-relaxed">
+              {d.people.nearbyBody}
+            </p>
+            <form action={disableLocationAction} className="shrink-0">
+              <button className="text-[11.5px] font-bold text-muted underline underline-offset-2">
+                {d.people.nearbyDisable}
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="mb-4">
+            <NearbyToggle />
+          </div>
+        )}
+
+        <SectionTitle>
+          {query
+            ? d.people.results
+            : nearbyOn
+              ? d.people.nearby
+              : d.people.community}
+        </SectionTitle>
 
         {rows.length === 0 ? (
           <Card className="text-center py-8">
@@ -256,6 +309,11 @@ export default async function PeoplePage({
                     {u.profile.ratingCount > 0 &&
                       ` · ${fill(d.people.ratingsCount, { n: u.profile.ratingCount })}`}
                   </p>
+                  {u.distance !== null && (
+                    <p className="text-[11px] font-bold text-orange mt-0.5">
+                      📍 {distanceLabel(u.distance)}
+                    </p>
+                  )}
                 </Link>
 
                 {requestedIds.has(u.id) ? (

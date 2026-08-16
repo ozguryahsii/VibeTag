@@ -56,9 +56,16 @@ function normalize(text: string): string {
     .replace(/\s+/g, " ");
 }
 
+/**
+ * The failure carries a reason key, not a sentence: the note is written by
+ * one person and the warning is read by them in whatever language they have
+ * the app set to, so the copy has to be resolved at render time.
+ */
+export type ModerationReason = "abusive" | "contact" | "link";
+
 export type ModerationResult =
   | { ok: true }
-  | { ok: false; error: string };
+  | { ok: false; reason: ModerationReason };
 
 export function moderateComment(raw: string): ModerationResult {
   const text = raw.trim();
@@ -70,40 +77,34 @@ export function moderateComment(raw: string): ModerationResult {
   for (const word of BLOCKED) {
     const w = normalize(word).replace(/\s/g, "");
     if (spaceless.includes(w)) {
-      return {
-        ok: false,
-        error:
-          "Bu not hakaret içeriyor gibi görünüyor. Vibe Tag olumlu geri bildirim için — eleştirini kırıcı olmayan bir dille yazabilir misin?",
-      };
+      return { ok: false, reason: "abusive" };
     }
   }
 
   for (const re of CONTACT) {
     if (re.test(text)) {
-      return {
-        ok: false,
-        error: "Notlarda telefon veya e-posta paylaşılamaz.",
-      };
+      return { ok: false, reason: "contact" };
     }
   }
 
   if (/(https?:\/\/|www\.)/i.test(text)) {
-    return { ok: false, error: "Notlarda bağlantı paylaşılamaz." };
+    return { ok: false, reason: "link" };
   }
 
   return { ok: true };
 }
 
+/** Reason keys; the labels live in `d.report.reasons`. */
 export const REPORT_REASONS = [
-  { key: "UNFAIR", label: "Haksız / gerçeği yansıtmıyor" },
-  { key: "ABUSIVE", label: "Hakaret veya taciz içeriyor" },
-  { key: "FAKE", label: "Sahte hesap ya da sahte değerlendirme" },
-  { key: "SPAM", label: "Spam veya reklam" },
-  { key: "OTHER", label: "Diğer" },
+  "UNFAIR",
+  "ABUSIVE",
+  "FAKE",
+  "SPAM",
+  "OTHER",
 ] as const;
 
-export type ReportReason = (typeof REPORT_REASONS)[number]["key"];
+export type ReportReason = (typeof REPORT_REASONS)[number];
 
 export function isReportReason(v: unknown): v is ReportReason {
-  return REPORT_REASONS.some((r) => r.key === v);
+  return (REPORT_REASONS as readonly string[]).includes(v as string);
 }

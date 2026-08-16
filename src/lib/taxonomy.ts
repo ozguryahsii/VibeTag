@@ -639,24 +639,16 @@ export function assertAllowed(
   relationship: RelationshipKey,
   traitKeys: string[],
   tagKeys: string[],
-): { ok: true } | { ok: false; error: string } {
+):
+  | { ok: true }
+  | { ok: false; kind: "trait" | "tag"; key: string } {
   const traits = new Set(RELATIONSHIPS[relationship].traits as string[]);
   for (const t of traitKeys) {
-    if (!traits.has(t)) {
-      return {
-        ok: false,
-        error: `"${TRAITS[t as TraitKey]?.label ?? t}" bu tanışıklık türünde değerlendirilemez.`,
-      };
-    }
+    if (!traits.has(t)) return { ok: false, kind: "trait", key: t };
   }
   const tags = new Set(allowedVibeTags(relationship).map((t) => t.key as string));
   for (const t of tagKeys) {
-    if (!tags.has(t)) {
-      return {
-        ok: false,
-        error: `"${VIBE_TAGS[t as VibeTagKey]?.en ?? t}" etiketi bu tanışıklık türünde verilemez.`,
-      };
-    }
+    if (!tags.has(t)) return { ok: false, kind: "tag", key: t };
   }
   return { ok: true };
 }

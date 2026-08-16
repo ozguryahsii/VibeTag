@@ -30,6 +30,12 @@ export const en = {
     language: "Language",
   },
 
+  meta: {
+    title: "Vibe Tag — Discover how people see you",
+    description:
+      "Vibe Tag turns the good things the people around you see in you into a digital social identity.",
+  },
+
   nav: {
     myVibe: "My Vibe",
     people: "People",
@@ -84,10 +90,17 @@ export const en = {
         body: "Your My Vibe profile, your Vibe Score and a shareable Vibe Card are ready. Post it, invite your circle.",
       },
     ],
-    art: { criteriaOpened: "6 criteria unlocked" },
+    art: {
+      criteriaOpened: "6 criteria unlocked",
+      chips: ["Coworker", "Close friend", "Service", "Community"],
+    },
   },
 
   auth: {
+    loginKicker: "WELCOME BACK",
+    registerKicker: "CREATE YOUR SIGNATURE",
+    emailPlaceholder: "you@example.com",
+    namePlaceholder: "Alex Morgan",
     loginTitle: "Welcome back 👋",
     loginBody: "Your Vibe profile is waiting.",
     registerTitle: "Create your My Vibe",
@@ -150,6 +163,7 @@ export const en = {
   },
 
   people: {
+    kicker: "YOUR CIRCLE",
     title: "People",
     subtitle: "Find someone you know and leave them a Vibe.",
     search: "Search by name or username…",
@@ -170,6 +184,20 @@ export const en = {
       "No friends yet. Add the people you know — they show up here first so rating them is one tap.",
     incoming: "wants to be friends",
     message: "Message",
+    nearby: "Nearby",
+    nearbyOn: "Show me people near me",
+    nearbyBody:
+      "We store your location roughly, never precisely, and only use it to sort this list. You can turn it off any time.",
+    nearbyEnable: "Turn on nearby",
+    nearbyDisable: "Turn off nearby",
+    nearbyAsking: "Getting your location…",
+    nearbyDenied:
+      "Location permission was refused. You can allow it from your browser settings.",
+    nearbyUnsupported: "This device cannot share a location.",
+    nearbyNone: "Nobody nearby has shared a location yet.",
+    distanceClose: "under 1 km",
+    distanceKm: "{n} km away",
+    distanceFar: "far away",
   },
 
   rate: {
@@ -247,6 +275,7 @@ export const en = {
     you: "you",
     them: "them",
     badges: "Badges",
+    moreVibe: "More of their Vibe",
     strengths: "Strong sides",
     circles: "Which circles know them?",
     aiSummary: "AI summary",
@@ -270,6 +299,7 @@ export const en = {
 
   insights: {
     premium: "✦ PREMIUM",
+    kicker: "VIBE ANALYSIS",
     title: "Vibe Insights",
     subtitle: "The data behind your social perception.",
     describedAs: "PEOPLE DESCRIBE YOU AS",
@@ -296,9 +326,13 @@ export const en = {
   },
 
   card: {
+    kicker: "YOUR SOCIAL IDENTITY",
     title: "Vibe Card",
     subtitle: "Story, square or wide — download and share.",
     format: "FORMAT",
+    formatStory: "Story",
+    formatSquare: "Square",
+    formatWide: "Wide",
     theme: "THEME",
     themeHint:
       "Auto picks the tone from your score — a high score glows, a calm score stays elegant.",
@@ -375,6 +409,7 @@ export const en = {
     justNow: "just now",
     minutesAgo: "{n} min ago",
     hoursAgo: "{n} h ago",
+    dayAgo: "1 day ago",
     daysAgo: "{n} days ago",
     newRating: "You received a new rating ✨",
     newRatingBody: "Someone rated you. Your My Vibe profile was updated.",
@@ -389,6 +424,10 @@ export const en = {
     friendAcceptedBody: "{name} accepted your friend request.",
     newMessage: "New message",
     newMessageBody: "You have a new message in your inbox.",
+    badgeEarned: "You earned a new badge 🏅",
+    badgeEarnedBody: "“{badge}” is now on your My Vibe profile.",
+    generic: "Something happened on your profile",
+    kicker: "RECENT ACTIVITY",
   },
 
   messages: {
@@ -419,6 +458,7 @@ export const en = {
   },
 
   settings: {
+    kicker: "YOUR VIBE IDENTITY",
     title: "Profile",
     myProfile: "My profile",
     vibeCard: "Vibe Card",
@@ -429,6 +469,9 @@ export const en = {
     photoChange: "Tap to change.",
     photoNone: "Without a photo your initials are shown.",
     photoRemove: "Remove photo",
+    photoPick: "Choose a profile photo",
+    photoBadType: "Pick a JPG, PNG or WebP image.",
+    photoUnreadable: "That image could not be read — try another file?",
     accentColour: "Accent colour",
     name: "Name",
     bio: "Bio",
@@ -649,6 +692,29 @@ export const en = {
   },
 
   ai: {
+    personaFallback: "The Original",
+    personas: {
+      reliability: "The Dependable One",
+      leadership: "A Natural Leader",
+      kindness: "The Kind Soul",
+      empathy: "The Empath",
+      problemSolving: "The Problem Solver",
+      creativity: "The Creative Mind",
+      positivity: "The Energy Giver",
+      teamwork: "The Team Anchor",
+      communication: "The Communicator",
+      honesty: "The Straight Shooter",
+      supportiveness: "The Supporter",
+      professionalism: "The Professional",
+      workQuality: "The Craftsman",
+      helpfulness: "The Helper",
+      punctuality: "The Reliable Clock",
+      diligence: "The Hard Worker",
+      responsibility: "The Owner",
+      fairness: "The Fair Dealer",
+      respect: "The Respectful One",
+      funToBeAround: "The Good Time",
+    },
     emptyPersona: "Fresh Start",
     emptyHeadline: "Not enough ratings yet.",
     emptyParagraph:

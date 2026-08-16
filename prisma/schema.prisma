@@ -36,6 +36,15 @@ model User {
   /// through one of their invite links).
   ratingPolicy String @default("EVERYONE")
 
+  /// Opt-in, coarse location for the "people near me" list.
+  ///
+  /// Rounded to ~100 m before it is stored: enough to sort a list by
+  /// distance, not enough to find someone's front door. Off by default.
+  shareLocation Boolean   @default(false)
+  lat           Float?
+  lng           Float?
+  locationAt    DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -223,11 +232,17 @@ model Notification {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  /// NEW_RATING | RATING_UPDATED | INVITE_JOINED | BADGE_EARNED
-  type  String
-  title String
-  body  String?
-  href  String?
+  /// NEW_RATING | RATING_UPDATED | INVITE_JOINED | BADGE_EARNED |
+  /// FRIEND_REQUEST | FRIEND_ACCEPTED | NEW_MESSAGE
+  ///
+  /// The copy is *not* stored. Writing a rendered sentence would freeze the
+  /// notification in whatever language the person who triggered it happened
+  /// to be reading — so only the type and its variables are kept, and the
+  /// text is built in the reader's language when the list is drawn.
+  type String
+  /// JSON object of substitutions, e.g. {"name":"Deniz"}.
+  vars String  @default("{}")
+  href String?
 
   readAt    DateTime?
   createdAt DateTime  @default(now())

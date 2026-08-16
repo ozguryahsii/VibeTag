@@ -2,8 +2,10 @@
 
 import { useActionState, useState } from "react";
 import { deleteAccountAction, type SafetyState } from "@/lib/actions/safety";
+import { fill, useD } from "@/components/LocaleProvider";
 
 export function DeleteAccount({ username }: { username: string }) {
+  const d = useD();
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState<SafetyState, FormData>(
     deleteAccountAction,
@@ -16,27 +18,32 @@ export function DeleteAccount({ username }: { username: string }) {
         onClick={() => setOpen(true)}
         className="w-full h-12 rounded-full bg-white border border-coral/30 text-[14px] font-bold text-coral active:scale-[0.98] transition-transform"
       >
-        Hesabımı sil
+        {d.settings.deleteAccount}
       </button>
     );
   }
 
   return (
     <form action={action} className="card p-5 border-coral/30">
-      <p className="text-[10px] font-extrabold tracking-[0.2em] text-coral mb-2">DANGER ZONE</p>
+      <p className="text-[10px] font-extrabold tracking-[0.2em] text-coral mb-2">
+        {d.settings.dangerZone}
+      </p>
       <p className="vt-page-title text-[21px] leading-tight text-ink">
-        Hesabını kalıcı olarak silmek üzeresin
+        {d.settings.deleteTitle}
       </p>
       <p className="text-[12.5px] text-muted mt-2 leading-relaxed">
-        Profilin, aldığın ve verdiğin tüm değerlendirmeler, davetlerin ve
-        bildirimlerin silinir. Bu işlem geri alınamaz — sana verilen
-        değerlendirmeler de dahil hiçbir veri saklanmaz.
+        {d.settings.deleteBody}
       </p>
 
       <label className="block mt-4">
-        <span className="block text-[11px] font-extrabold tracking-[0.08em] text-muted mb-2 ml-1">
-          Onaylamak için <b className="text-ink">{username}</b> yaz
-        </span>
+        <span
+          className="block text-[11px] font-extrabold tracking-[0.08em] text-muted mb-2 ml-1 [&_b]:text-ink"
+          dangerouslySetInnerHTML={{
+            __html: fill(d.settings.deleteConfirm, {
+              username: `<b>${username}</b>`,
+            }),
+          }}
+        />
         <input
           name="confirm"
           autoComplete="off"
@@ -56,14 +63,14 @@ export function DeleteAccount({ username }: { username: string }) {
           onClick={() => setOpen(false)}
           className="h-12 px-6 rounded-full bg-white border border-line font-bold text-[14px]"
         >
-          Vazgeç
+          {d.common.cancel}
         </button>
         <button
           type="submit"
           disabled={pending}
           className="flex-1 h-12 rounded-full bg-coral text-white font-bold text-[14.5px] disabled:opacity-50"
         >
-          {pending ? "Siliniyor…" : "Kalıcı olarak sil"}
+          {pending ? d.settings.deleting : d.settings.deleteCta}
         </button>
       </div>
     </form>

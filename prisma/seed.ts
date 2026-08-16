@@ -43,6 +43,40 @@ function daysAgo(n: number): Date {
 
 const COLORS = ["#FF8A3D", "#FF5C77", "#FF7AA2", "#8B5CF6", "#E8845C", "#5AA9E6"];
 
+/**
+ * Seeded coordinates so the "nearby" list has something to sort. Most people
+ * sit around İstanbul at varying distances, a handful are in other cities, and
+ * some share nothing at all — which is the realistic mix the list has to cope
+ * with. Stored at ~100 m precision, the same as the app itself does.
+ */
+const CITIES: [number, number][] = [
+  [41.0082, 28.9784], // İstanbul
+  [39.9334, 32.8597], // Ankara
+  [38.4237, 27.1428], // İzmir
+];
+
+function seededLocation(i: number): {
+  shareLocation: boolean;
+  lat: number | null;
+  lng: number | null;
+  locationAt: Date | null;
+} {
+  // Roughly a third keep location off, which is the honest default.
+  if (rnd() < 0.3) {
+    return { shareLocation: false, lat: null, lng: null, locationAt: null };
+  }
+  const [baseLat, baseLng] = i % 9 === 4 ? pick(CITIES.slice(1)) : CITIES[0];
+  const spread = 0.45; // ≈ 50 km
+  const lat = baseLat + (rnd() - 0.5) * spread;
+  const lng = baseLng + (rnd() - 0.5) * spread;
+  return {
+    shareLocation: true,
+    lat: Math.round(lat * 1000) / 1000,
+    lng: Math.round(lng * 1000) / 1000,
+    locationAt: daysAgo(Math.floor(rnd() * 10)),
+  };
+}
+
 const PEOPLE: [string, string][] = [
   ["Elif Demir", "elifdemir"],
   ["Mert Kaya", "mertkaya"],
@@ -171,6 +205,10 @@ async function main() {
       avatarColor: "#FF8A3D",
       plan: "GOLD",
       isVerified: true,
+      shareLocation: true,
+      lat: 41.043,
+      lng: 29.008,
+      locationAt: daysAgo(1),
       createdAt: daysAgo(240),
     },
   });
@@ -203,6 +241,7 @@ async function main() {
                   ? "SILVER"
                   : "FREE",
           isVerified: rnd() > 0.7,
+          ...seededLocation(i),
           createdAt: daysAgo(30 + Math.floor(rnd() * 200)),
         },
       }),
@@ -377,24 +416,19 @@ async function main() {
       {
         userId: ozgur.id,
         type: "NEW_RATING",
-        title: "Yeni bir değerlendirme aldın ✨",
-        body: "Biri seni değerlendirdi. My Vibe profilin güncellendi.",
         href: "/home",
         createdAt: daysAgo(1),
       },
       {
         userId: ozgur.id,
         type: "INVITE_JOINED",
-        title: "Davetin kabul edildi 🎉",
-        body: "Davet ettiğin biri Vibe Tag'e katıldı.",
         href: "/invite",
         createdAt: daysAgo(3),
       },
       {
         userId: ozgur.id,
         type: "BADGE_EARNED",
-        title: "Yeni rozet: Community Favorite",
-        body: "25+ kişi seni değerlendirdi ve skorun 88'in üzerinde.",
+        vars: JSON.stringify({ badge: "Community Favorite" }),
         href: "/home",
         createdAt: daysAgo(9),
         readAt: daysAgo(8),

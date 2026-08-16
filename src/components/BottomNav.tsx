@@ -4,25 +4,32 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ICONS } from "@/lib/icons";
 import { IconGlyph } from "@/components/Icon";
+import { useD } from "@/components/LocaleProvider";
 import { VibeMark } from "@/components/Logo";
 
 type Tab = {
   href: string;
-  label: string;
+  /** Key into dict.nav — "My Vibe" and "Insights" stay as-is in both languages. */
+  label: "myVibe" | "people" | "rate" | "insights" | "profile";
   icon: keyof typeof ICONS;
   center?: boolean;
 };
 
 const TABS: Tab[] = [
-  { href: "/home", label: "My Vibe", icon: "fingerprint" },
-  { href: "/people", label: "Kişiler", icon: "users" },
-  { href: "/rate", label: "Değerlendir", icon: "plus", center: true },
-  { href: "/insights", label: "Insights", icon: "chart" },
-  { href: "/settings", label: "Profil", icon: "userCircle" },
+  { href: "/home", label: "myVibe", icon: "fingerprint" },
+  { href: "/people", label: "people", icon: "users" },
+  { href: "/rate", label: "rate", icon: "plus", center: true },
+  { href: "/insights", label: "insights", icon: "chart" },
+  { href: "/settings", label: "profile", icon: "userCircle" },
 ];
 
 export function BottomNav() {
   const path = usePathname();
+  const d = useD();
+
+  // A chat thread owns the whole screen, composer pinned to the bottom —
+  // the tab bar would sit on top of the input.
+  if (/^\/messages\/[^/]+$/.test(path)) return null;
 
   return (
     <>
@@ -48,7 +55,7 @@ export function BottomNav() {
                   <Link
                     key={t.href}
                     href={t.href}
-                    aria-label={t.label}
+                    aria-label={d.nav[t.label]}
                     className="grid place-items-center w-13 h-13 rounded-full grad-score text-white shadow-[0_10px_26px_rgba(255,92,119,0.45)] active:scale-95 transition-transform -mt-6"
                   >
                     <IconGlyph def={ICONS[t.icon]} size={24} color="#fff" strokeWidth={2.4} />
@@ -79,7 +86,7 @@ export function BottomNav() {
                     />
                   )}
                   <span className="text-[10px] font-bold leading-none">
-                    {t.label}
+                    {d.nav[t.label]}
                   </span>
                 </Link>
               );

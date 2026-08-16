@@ -45,6 +45,8 @@ export const en = {
     messages: "Messages",
     notifications: "Notifications",
     moderation: "Moderation",
+    dm: "DM",
+    badges: "Badges",
   },
 
   welcome: {
@@ -324,6 +326,22 @@ export const en = {
     emptyTitle: "No data to analyse",
     emptyBody:
       "The analysis unlocks after at least 3 ratings. Start by inviting people you know.",
+  },
+
+  badgesPage: {
+    kicker: "WHAT YOU HAVE EARNED",
+    title: "Badges",
+    subtitle:
+      "Badges are earned once and kept. They come from what people saw in you, not from anything you can buy.",
+    earned: "Earned",
+    locked: "Still to earn",
+    earnedOn: "Earned {date}",
+    progress: "{n}% there",
+    noneEarnedTitle: "No badges yet",
+    noneEarnedBody:
+      "Every badge below is still open. The first ratings you collect start moving them.",
+    allEarned: "You have earned every badge. That is rare.",
+    countEarned: "{n} of {total} earned",
   },
 
   card: {

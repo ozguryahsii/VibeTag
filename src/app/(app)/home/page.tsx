@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { unreadCount } from "@/lib/notifications";
-import { unreadMessageCount } from "@/lib/social";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 import { badgeDescription, badgeLabel, tagLabel, traitLabel } from "@/lib/labels";
@@ -27,14 +27,24 @@ export default async function HomePage() {
   const user = await requireUser();
   const profile = await getVibeProfile(user.id);
   const percentile = await getPercentile(user.id, profile.score);
-  const badges = computeBadges(profile);
-  const earned = badges.filter((b) => b.earned);
-  const [unread, unreadDm, d, locale] = await Promise.all([
+  const [unread, d, locale, held] = await Promise.all([
     unreadCount(user.id),
-    unreadMessageCount(user.id),
     getDict(),
     getLocale(),
+    prisma.earnedBadge.findMany({
+      where: { userId: user.id },
+      select: { key: true },
+    }),
   ]);
+
+  // Owned badges beat the live calculation — a badge is kept once earned, and
+  // the shelf here has to agree with the Badges tab.
+  const heldKeys = new Set(held.map((b) => b.key));
+  const badges = computeBadges(profile).map((b) => ({
+    ...b,
+    earned: b.earned || heldKeys.has(b.key),
+  }));
+  const earned = badges.filter((b) => b.earned);
   const summary = generateVibeSummary(profile, user.name.split(" ")[0], d, locale);
 
   return (
@@ -51,21 +61,6 @@ export default async function HomePage() {
         </div>
         <div className="flex items-center gap-2.5">
           <LangToggle />
-          <Link
-            href="/messages"
-            aria-label={d.nav.messages}
-            className="relative w-11 h-11 grid place-items-center rounded-full bg-warmwhite border border-line"
-          >
-            <IconGlyph def={ICONS.envelope} size={19} color="#6B6B6B" />
-            {unreadDm > 0 && (
-              <span
-                className="absolute -top-1 -right-1 min-w-5 h-5 px-1.5 grid place-items-center rounded-full grad-score text-white text-[10px] font-black"
-                style={{ boxShadow: "0 0 0 2.5px #FAF7F2" }}
-              >
-                {unreadDm > 9 ? "9+" : unreadDm}
-              </span>
-            )}
-          </Link>
           <Link
             href="/notifications"
             aria-label={d.nav.notifications}
@@ -258,7 +253,15 @@ export default async function HomePage() {
 
       {/* badges */}
       <section className="mt-6 reveal" style={{ animationDelay: "320ms" }}>
-        <SectionTitle>{d.home.badges}</SectionTitle>
+        <SectionTitle
+          action={
+            <Link href="/badges" className="text-[12px] font-bold text-coral">
+              {d.home.seeAll}
+            </Link>
+          }
+        >
+          {d.home.badges}
+        </SectionTitle>
         <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
           {(earned.length ? earned : badges).slice(0, 6).map((b) => (
             <div

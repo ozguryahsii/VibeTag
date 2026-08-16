@@ -42,6 +42,8 @@ export const tr: Dictionary = {
     messages: "Mesajlar",
     notifications: "Bildirimler",
     moderation: "Moderasyon",
+    dm: "DM",
+    badges: "Rozetler",
   },
 
   welcome: {
@@ -144,7 +146,7 @@ export const tr: Dictionary = {
     seeAll: "Tümü →",
     strongest: "En güçlü yönlerin",
     badges: "Rozetlerin",
-    topPercent: "En iyi %{n} içindesin",
+    topPercent: "En iyi %{n} içinde",
     ratedCount: "{n} kişi değerlendirdi",
     awaitingFirst: "İlk değerlendirmeni bekliyor",
     emptyTitle: "Vibe profilin henüz boş",
@@ -321,6 +323,22 @@ export const tr: Dictionary = {
     emptyTitle: "Analiz için veri yok",
     emptyBody:
       "En az 3 değerlendirme sonrası analiz açılır. Çevrendeki kişileri davet ederek başlayabilirsin.",
+  },
+
+  badgesPage: {
+    kicker: "KAZANDIKLARIN",
+    title: "Rozetler",
+    subtitle:
+      "Rozetler bir kez kazanılır ve kalır. İnsanların sende gördüklerinden gelir; satın alınabilecek bir şey değildir.",
+    earned: "Kazanılanlar",
+    locked: "Henüz kazanılmayanlar",
+    earnedOn: "Kazanıldı · {date}",
+    progress: "%{n} tamamlandı",
+    noneEarnedTitle: "Henüz rozet yok",
+    noneEarnedBody:
+      "Aşağıdaki rozetlerin hepsi açık. İlk değerlendirmeler geldikçe ilerlemeye başlarlar.",
+    allEarned: "Bütün rozetleri kazandın. Bu nadir bir şey.",
+    countEarned: "{total} rozetin {n} tanesi",
   },
 
   card: {

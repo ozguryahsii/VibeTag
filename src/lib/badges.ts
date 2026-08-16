@@ -13,6 +13,17 @@ function clamp01(n: number) {
   return Math.max(0, Math.min(1, n));
 }
 
+/**
+ * Progress towards a badge with two conditions.
+ *
+ * The binding one wins. Averaging them lets a badge sit at "100%" while it is
+ * still locked — you have twenty work ratings but the teamwork score has not
+ * arrived — which reads as a bug, not a goal.
+ */
+function both(a: number, b: number) {
+  return clamp01(Math.min(a, b));
+}
+
 function traitScore(profile: VibeProfile, key: string): number {
   return profile.traits.find((t) => t.key === key)?.score ?? 0;
 }
@@ -58,9 +69,7 @@ export function computeBadges(profile: VibeProfile): Badge[] {
   const state: Record<string, { earned: boolean; progress: number }> = {
     trustedPerson: {
       earned: traitScore(profile, "reliability") >= 90 && n >= 8,
-      progress: clamp01(
-        (traitScore(profile, "reliability") / 90) * 0.5 + (n / 8) * 0.5,
-      ),
+      progress: both(traitScore(profile, "reliability") / 90, n / 8),
     },
     goodEnergy: {
       earned:
@@ -75,13 +84,11 @@ export function computeBadges(profile: VibeProfile): Badge[] {
     },
     teamPlayer: {
       earned: traitScore(profile, "teamwork") >= 88 && workRatings >= 5,
-      progress: clamp01(
-        (traitScore(profile, "teamwork") / 88) * 0.5 + (workRatings / 5) * 0.5,
-      ),
+      progress: both(traitScore(profile, "teamwork") / 88, workRatings / 5),
     },
     communityFavorite: {
       earned: n >= 25 && profile.score >= 88,
-      progress: clamp01((n / 25) * 0.6 + (profile.score / 88) * 0.4),
+      progress: both(n / 25, profile.score / 88),
     },
     kindHeart: {
       earned: traitScore(profile, "kindness") >= 92,
@@ -96,7 +103,11 @@ export function computeBadges(profile: VibeProfile): Badge[] {
   return defs.map((d) => ({
     ...d,
     earned: state[d.key].earned,
-    progress: state[d.key].earned ? 1 : state[d.key].progress,
+    // Never round an unearned badge up to a full bar: "100%" next to "locked"
+    // reads as something broken rather than something close.
+    progress: state[d.key].earned
+      ? 1
+      : Math.min(state[d.key].progress, 0.99),
   }));
 }
 

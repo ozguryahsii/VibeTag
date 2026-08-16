@@ -232,12 +232,37 @@ bağımsız saf TypeScript — mobil istemci aynı kuralları paylaşabilir.
 
 ### Production'a geçerken
 
+**PostgreSQL.** Şema Postgres uyumlu yazıldı; tek değişiklik:
+
 ```prisma
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 ```
+
+Sonra `npx prisma migrate dev --name init`. Dikkat edilecek tek davranış farkı
+arama: SQLite'ta `contains` büyük/küçük harf duyarsız, Postgres'te değil.
+`src/lib/search.ts` bunu sağlayıcıya göre çözüyor — yeni bir metin araması
+eklerken oradan geç.
+
+**Ortam değişkenleri.** `.env.example` hepsini açıklıyor. Üçü isteğe bağlı ve
+tanımlanmazsa ilgili özellik sessizce kapalı kalır:
+
+| Değişken | Ne olur? |
+| --- | --- |
+| `SUPPORT_EMAIL` | Askıya alınan kişiye ve yasal metinlere yazılan adres |
+| `CRON_SECRET` | Tanımsızsa `/api/cron/fraud-sweep` 503 döner |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` | Tanımsızsa push kapalı, ayarlarda seçenek de görünmez |
+
+**Sahtecilik taraması.** Canlı kontrol yalnızca oy verildiği anı görür.
+Sonradan kapanan karşılıklı oy halkaları için gecelik bir tarama gerekir:
+
+```bash
+curl -X POST -H "Authorization: Bearer $CRON_SECRET" https://…/api/cron/fraud-sweep
+```
+
+Aynı işi moderasyon panelindeki düğme elle yapar.
 
 ---
 
@@ -248,6 +273,8 @@ npm run dev        # geliştirme sunucusu
 npm run build      # production build
 npm run start      # production sunucusu
 npm run typecheck  # tip kontrolü
+npm run test       # testler (vitest)
+npm run test:watch # testleri izleyerek çalıştır
 npm run db:push    # şemayı veritabanına uygula
 npm run db:seed    # demo verisi
 npm run db:reset   # sıfırla + şema + demo verisi
@@ -255,15 +282,29 @@ npm run db:reset   # sıfırla + şema + demo verisi
 
 ---
 
+## Testler
+
+`npm run test`. Kapsam bilinçli olarak dar: bozulduğunda ekranda hiçbir şeyin
+yanlış görünmediği, yani kimsenin fark etmeyeceği kurallar.
+
+| Dosya | Neyi koruyor |
+| --- | --- |
+| `context-lock.test.ts` | Bağlam kilidi — kasiyer liderlikten puanlanamaz |
+| `rating-rules.test.ts` | 30 günlük güncelleme sınırı ve §15 kimlik görünürlüğü |
+| `scoring.test.ts` | Skorun cömert ama temkinli davranışı, çevre dağılımı |
+| `badges.test.ts` | Rozet eşikleri; kilitli bir rozet asla %100 göstermez |
+| `moderation.test.ts` | Küfür filtresi ve kaçamakları, bildirim sebepleri |
+| `geo.test.ts` | "~100 metreye yuvarlanır" sözünün tutulduğu |
+| `i18n.test.ts` | İki sözlüğün aynı şekli ve aynı `{placeholder}`'ları |
+
+---
+
 ## Yol haritası
 
-Konseptte tanımlı olup bu MVP'de yer almayanlar:
+Konseptte tanımlı olup bu sürümde yer almayanlar:
 
 - Fotoğrafların object storage'a (R2/S3) taşınması — şu an data URL
-- Push bildirimleri (şu an yalnızca uygulama içi bildirim var)
-- Rapor kuyruğu için moderasyon paneli — `Report` kayıtları yazılıyor ama
-  inceleyecek bir arayüz henüz yok
-- Otomatik testler
-- Gerçek ödeme entegrasyonu
-- Sahte oy tespitinin periyodik toplu yeniden hesaplaması
+- E-posta doğrulama ve şifre sıfırlama
+- Gerçek ödeme entegrasyonu — plan değişimi şu an anlık ve ücretsiz
+- Yasal metinlerin hukukçu onayı (`src/lib/legal.ts` taslak olarak işaretli)
 - Freelancer / işe alım güven profili görünümleri

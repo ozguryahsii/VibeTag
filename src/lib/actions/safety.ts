@@ -56,11 +56,12 @@ export async function reportAction(
   const reason = String(formData.get("reason") ?? "");
   const note = String(formData.get("note") ?? "").trim();
   const ratingId = String(formData.get("ratingId") ?? "") || null;
+  const conversationId = String(formData.get("conversationId") ?? "") || null;
   const username = String(formData.get("username") ?? "").toLowerCase() || null;
 
   if (!isReportReason(reason)) return { error: d.report.errors.pickReason };
   if (note.length > 500) return { error: d.report.errors.noteLong };
-  if (!ratingId && !username) {
+  if (!ratingId && !conversationId && !username) {
     return { error: d.report.errors.unknownTarget };
   }
 
@@ -74,6 +75,17 @@ export async function reportAction(
       select: { ratedUserId: true },
     });
     if (!rating || rating.ratedUserId !== me.id) {
+      return { error: d.report.errors.notYours };
+    }
+  } else if (conversationId) {
+    // Only a participant may report a thread — and we deliberately do not
+    // record who the other side is. In a rating thread they may be anonymous
+    // to the reporter, and a report must never be what names them.
+    const convo = await prisma.conversation.findUnique({
+      where: { id: conversationId },
+      select: { userAId: true, userBId: true },
+    });
+    if (!convo || (convo.userAId !== me.id && convo.userBId !== me.id)) {
       return { error: d.report.errors.notYours };
     }
   } else if (username) {
@@ -91,7 +103,11 @@ export async function reportAction(
     where: {
       reporterId: me.id,
       status: "OPEN",
-      ...(ratingId ? { ratingId } : { reportedUserId }),
+      ...(ratingId
+        ? { ratingId }
+        : conversationId
+          ? { conversationId }
+          : { reportedUserId }),
     },
   });
   if (duplicate) {
@@ -102,6 +118,7 @@ export async function reportAction(
     data: {
       reporterId: me.id,
       ratingId,
+      conversationId,
       reportedUserId,
       reason,
       note: note || null,

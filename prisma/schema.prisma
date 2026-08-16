@@ -44,6 +44,11 @@ model User {
   /// through one of their invite links).
   ratingPolicy String @default("EVERYONE")
 
+  /// Last language this person chose. The UI reads a cookie; a push
+  /// notification has no request to read one from, so the choice is mirrored
+  /// here the moment they make it.
+  locale String @default("en")
+
   /// Opt-in, coarse location for the "people near me" list.
   ///
   /// Rounded to ~100 m before it is stored: enough to sort a list by
@@ -63,19 +68,20 @@ model User {
   invites         Invite[]
   inviteClaim     InviteClaim?
   badges          EarnedBadge[]
-  friendsSent     Friendship[]   @relation("FriendRequester")
-  friendsReceived Friendship[]   @relation("FriendAddressee")
-  conversationsA  Conversation[] @relation("ConvA")
-  conversationsB  Conversation[] @relation("ConvB")
+  friendsSent     Friendship[]       @relation("FriendRequester")
+  friendsReceived Friendship[]       @relation("FriendAddressee")
+  conversationsA  Conversation[]     @relation("ConvA")
+  conversationsB  Conversation[]     @relation("ConvB")
   messagesSent    Message[]
-  grantsGiven     InviteGrant[]  @relation("GrantsGiven")
-  grantsHeld      InviteGrant[]  @relation("GrantsHeld")
+  grantsGiven     InviteGrant[]      @relation("GrantsGiven")
+  grantsHeld      InviteGrant[]      @relation("GrantsHeld")
   notifications   Notification[]
-  blocksMade      Block[]        @relation("BlocksMade")
-  blocksAgainst   Block[]        @relation("BlocksAgainst")
-  reportsFiled    Report[]       @relation("ReportsFiled")
-  reportsAbout    Report[]       @relation("ReportsAbout")
-  reportsJudged   Report[]       @relation("ReportsReviewed")
+  pushSubs        PushSubscription[]
+  blocksMade      Block[]            @relation("BlocksMade")
+  blocksAgainst   Block[]            @relation("BlocksAgainst")
+  reportsFiled    Report[]           @relation("ReportsFiled")
+  reportsAbout    Report[]           @relation("ReportsAbout")
+  reportsJudged   Report[]           @relation("ReportsReviewed")
 
   @@index([createdAt])
 }
@@ -261,6 +267,25 @@ model EarnedBadge {
   @@index([userId])
 }
 
+/// A browser push endpoint.
+///
+/// One row per device, not per user: the same person signs in on a phone and a
+/// laptop and expects both to buzz. A dead endpoint is deleted the first time
+/// the push service rejects it — keeping it would mean retrying forever.
+model PushSubscription {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  endpoint String @unique
+  p256dh   String
+  auth     String
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
 model Notification {
   id     String @id @default(cuid())
   userId String
@@ -311,6 +336,13 @@ model Report {
   /// The rating being disputed, when the report is about one.
   ratingId String?
 
+  /// The thread being disputed, when the report is about a conversation.
+  ///
+  /// Reported separately from the person: in a rating thread the other side
+  /// may be anonymous to the reporter, and a report must never be the thing
+  /// that names them.
+  conversationId String?
+
   /// The person being reported, when the report is about an account.
   reportedUserId String?
   reportedUser   User?   @relation("ReportsAbout", fields: [reportedUserId], references: [id], onDelete: SetNull)
@@ -331,6 +363,7 @@ model Report {
 
   @@index([status, createdAt])
   @@index([ratingId])
+  @@index([conversationId])
 }
 
 // -------------------------------------------------------------- friends

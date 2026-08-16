@@ -5,6 +5,7 @@ import { logoutAction, setPlanAction } from "@/lib/actions/auth";
 import { setRatingPolicyAction, toggleBlockAction } from "@/lib/actions/safety";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { DeleteAccount } from "@/components/DeleteAccount";
+import { PushToggle } from "@/components/PushToggle";
 import { Avatar } from "@/components/Avatar";
 import { Card, SectionTitle } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
@@ -22,6 +23,7 @@ export const dynamic = "force-dynamic";
 export default async function SettingsPage() {
   const user = await requireUser();
   const d = await getDict();
+  const pushKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || null;
 
   const blocks = await prisma.block.findMany({
     where: { blockerId: user.id },
@@ -148,6 +150,14 @@ export default async function SettingsPage() {
         </p>
       </div>
 
+      {/* Only offered when push is actually configured for this deployment. */}
+      {pushKey && (
+        <div className="mt-7">
+          <SectionTitle>{d.nav.notifications}</SectionTitle>
+          <PushToggle publicKey={pushKey} />
+        </div>
+      )}
+
       <div className="mt-7">
         <SectionTitle>{d.settings.privacy}</SectionTitle>
 
@@ -266,6 +276,22 @@ export default async function SettingsPage() {
         <div className="grid gap-2.5">
           <DeleteAccount username={user.username} />
         </div>
+      </div>
+
+      <div className="mt-7">
+        <SectionTitle>{d.legal.title}</SectionTitle>
+        <Card className="grid gap-0.5 !py-2">
+          {(["privacy", "kvkk", "terms"] as const).map((slug) => (
+            <Link
+              key={slug}
+              href={`/legal/${slug}`}
+              className="flex items-center justify-between py-2.5"
+            >
+              <span className="text-[13px] font-semibold">{d.legal[slug]}</span>
+              <span className="text-orange font-bold text-[16px]">→</span>
+            </Link>
+          ))}
+        </Card>
       </div>
 
       <form action={logoutAction} className="mt-6 mb-2">

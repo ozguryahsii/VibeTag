@@ -184,6 +184,7 @@ async function main() {
   await prisma.report.deleteMany();
   await prisma.block.deleteMany();
   await prisma.notification.deleteMany();
+  await prisma.pushSubscription.deleteMany();
   await prisma.earnedBadge.deleteMany();
   await prisma.inviteGrant.deleteMany();
   await prisma.inviteClaim.deleteMany();
@@ -209,6 +210,7 @@ async function main() {
       plan: "GOLD",
       isVerified: true,
       isAdmin: true,
+      locale: "tr",
       shareLocation: true,
       lat: 41.043,
       lng: 29.008,

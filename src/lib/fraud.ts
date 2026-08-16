@@ -1,6 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/lib/db";
+import { FRAUD_FLAGS, type FraudFlagKey } from "@/lib/fraud-flags";
 
 /**
  * Fake-rating detection (§11).
@@ -10,35 +11,7 @@ import { prisma } from "@/lib/db";
  * protected, which also removes them from Gold's identity view (§15).
  */
 
-export const FRAUD_FLAGS = {
-  NEW_ACCOUNT: {
-    key: "NEW_ACCOUNT",
-    label: "Hesap çok yeni",
-    penalty: 0.6,
-  },
-  NO_REPUTATION: {
-    key: "NO_REPUTATION",
-    label: "Değerlendiren kişinin kendi itibar geçmişi yok",
-    penalty: 0.85,
-  },
-  BURST: {
-    key: "BURST",
-    label: "Kısa sürede çok sayıda değerlendirme",
-    penalty: 0.5,
-  },
-  MUTUAL_MAX: {
-    key: "MUTUAL_MAX",
-    label: "Karşılıklı tam puan alışverişi",
-    penalty: 0.55,
-  },
-  FLAT_PATTERN: {
-    key: "FLAT_PATTERN",
-    label: "Her değerlendirmede aynı tekdüze puan",
-    penalty: 0.7,
-  },
-} as const;
-
-export type FraudFlagKey = keyof typeof FRAUD_FLAGS;
+export { FRAUD_FLAGS, parseFlags, type FraudFlagKey } from "@/lib/fraud-flags";
 
 const MIN_WEIGHT = 0.15;
 const PROTECT_BELOW = 0.55;
@@ -128,11 +101,67 @@ export async function evaluateRating({
   return { flags, weight, isProtected: weight < PROTECT_BELOW };
 }
 
-export function describeFlags(json: string): string[] {
-  try {
-    const keys = JSON.parse(json) as FraudFlagKey[];
-    return keys.filter((k) => k in FRAUD_FLAGS).map((k) => FRAUD_FLAGS[k].label);
-  } catch {
-    return [];
+/**
+ * Re-score one rating against today's evidence.
+ *
+ * The live check only sees the moment a rating is written, which misses every
+ * pattern that only becomes visible later — the reciprocal ring that closes a
+ * week after the first vote, the account that turns out to rate nobody but its
+ * own circle. Returns whether anything actually changed, so a sweep can report
+ * real work rather than a row count.
+ */
+export async function recomputeRating(ratingId: string): Promise<boolean> {
+  const rating = await prisma.rating.findUnique({
+    where: { id: ratingId },
+    select: {
+      id: true,
+      raterUserId: true,
+      ratedUserId: true,
+      weight: true,
+      isProtected: true,
+      traits: { select: { score: true } },
+    },
+  });
+  if (!rating) return false;
+
+  const verdict = await evaluateRating({
+    raterUserId: rating.raterUserId,
+    ratedUserId: rating.ratedUserId,
+    scores: rating.traits.map((t) => t.score),
+  });
+
+  const changed =
+    verdict.weight !== rating.weight ||
+    verdict.isProtected !== rating.isProtected;
+  if (!changed) return false;
+
+  await prisma.rating.update({
+    where: { id: rating.id },
+    data: {
+      weight: verdict.weight,
+      isProtected: verdict.isProtected,
+      fraudFlags: JSON.stringify(verdict.flags),
+    },
+  });
+  return true;
+}
+
+export type SweepResult = { scanned: number; changed: number };
+
+/**
+ * Re-score every rating. Cheap enough to run whole at this size; when it stops
+ * being cheap, the `where` clause is the seam — scan by `updatedAt` window.
+ */
+export async function recomputeAllRatings(limit = 5000): Promise<SweepResult> {
+  const ids = await prisma.rating.findMany({
+    select: { id: true },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+
+  let changed = 0;
+  for (const { id } of ids) {
+    if (await recomputeRating(id)) changed += 1;
   }
+  return { scanned: ids.length, changed };
 }

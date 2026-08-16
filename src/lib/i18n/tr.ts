@@ -195,6 +195,9 @@ export const tr: Dictionary = {
       "Konum izni reddedildi. Tarayıcı ayarlarından izin verebilirsin.",
     nearbyUnsupported: "Bu cihaz konum paylaşamıyor.",
     nearbyNone: "Yakınında konum paylaşan kimse yok.",
+    nearbyConsent:
+      "Bunu açman, yaklaşık konum verinin işlenmesine verdiğin açık rızadır. Rızanı istediğin an buradan geri çekebilirsin.",
+    nearbyConsentLink: "Nasıl işliyoruz?",
     distanceClose: "1 km'den yakın",
     distanceKm: "{n} km uzakta",
     distanceFar: "uzakta",
@@ -480,6 +483,9 @@ export const tr: Dictionary = {
     unreadMany: "{n} okunmamış mesaj",
     startedFromRating: "Bir değerlendirmeden başladı",
     threadWith: "{name} ile sohbet",
+    reportThread: "Bildir",
+    reportAnonymousNote:
+      "Karşı tarafın kim olduğunu öğrenmeden bu sohbeti bildirebilirsin.",
   },
 
   settings: {
@@ -585,12 +591,35 @@ export const tr: Dictionary = {
     },
   },
 
+  push: {
+    title: "Bu cihazda bildirimler",
+    body: "Biri seni değerlendirdiğinde, eklediğinde ya da yazdığında bildirim al. İstediğin an buradan kapatabilirsin.",
+    enable: "Bildirimleri aç",
+    disable: "Bildirimleri kapat",
+    denied:
+      "Bu site için bildirimler engellenmiş. Tarayıcı ayarlarından yeniden izin verebilirsin.",
+    unsupported: "Bu tarayıcı bildirim gösteremiyor.",
+  },
+
+  legal: {
+    kicker: "KÜÇÜK YAZILAR",
+    updated: "Son güncelleme: {date}",
+    draftNotice:
+      "Taslak. Bu metinler uygulamanın gerçekte ne yaptığını anlatıyor, ancak henüz bir hukukçu tarafından incelenmedi — nihai sözleşme değil, çalışma metni olarak değerlendir.",
+    title: "Yasal",
+    privacy: "Gizlilik Politikası",
+    kvkk: "KVKK Aydınlatma Metni",
+    terms: "Kullanım Şartları",
+  },
+
   report: {
     kicker: "GÜVENLİK",
     title: "Neyi bildirmek istiyorsun?",
     bodyRating:
       "Bu değerlendirmeyi kimin yazdığını biz de sana söylemeyiz — bildirimin de kimliğini ona açmaz.",
     bodyUser: "Bildirimin gizlidir, karşı tarafa iletilmez.",
+    bodyThread:
+      "Bildirimin gizlidir. Karşı taraf sana anonimse öyle kalır — bildirmek kimseyi açığa çıkarmaz.",
     notePlaceholder: "Kısaca ne olduğunu anlatabilirsin (isteğe bağlı)",
     submit: "Bildir",
     received: "Bildirimin alındı",
@@ -602,6 +631,7 @@ export const tr: Dictionary = {
       ABUSIVE: "Hakaret veya taciz içeriyor",
       FAKE: "Sahte hesap ya da sahte değerlendirme",
       SPAM: "Spam veya reklam",
+      HARASSMENT: "İstenmeyen mesaj / taciz",
       OTHER: "Diğer",
     },
     errors: {
@@ -647,6 +677,9 @@ export const tr: Dictionary = {
     reviewing: "İnceleniyor",
     aboutRating: "Bir değerlendirme hakkında",
     aboutUser: "Bir hesap hakkında",
+    aboutThread: "Bir sohbet hakkında",
+    threadNote:
+      "Sohbetin içinden bildirildi. Okumak için konuşmayı veritabanından aç — bildiren kişi karşı tarafın kim olduğunu bilmiyor olabilir, bu yüzden bu ekran ismi göstermiyor.",
     reportedBy: "Bildiren: {name}",
     reasonLabel: "Sebep",
     noteLabel: "Açıklaması",
@@ -668,11 +701,27 @@ export const tr: Dictionary = {
     suspended: "Askıdaki hesaplar",
     suspendedEmpty: "Askıya alınmış hesap yok.",
     signedOut:
-      "Hesabın askıya alınmış. Bunun bir hata olduğunu düşünüyorsan bize yaz.",
+      "Hesabın askıya alınmış. Hata olduğunu düşünüyorsan {email} adresine yaz — kullanıcı adını ilet, tekrar bakalım.",
+    sweep: "Sahtecilik taramasını çalıştır",
+    sweepRunning: "Taranıyor…",
+    sweepDone: "{scanned} değerlendirmenin {changed} tanesi yeniden puanlandı.",
+    sweepNone: "{scanned} değerlendirme tarandı — değişen olmadı.",
     abusive:
       "Bu not hakaret içeriyor gibi görünüyor. Vibe Tag olumlu geri bildirim için — eleştirini kırıcı olmayan bir dille yazabilir misin?",
     contact: "Notlarda telefon veya e-posta paylaşılamaz.",
     link: "Notlarda bağlantı paylaşılamaz.",
+  },
+
+  fraudFlags: {
+    title: "Otomatik işaretler",
+    none: "Tespit sistemi bu değerlendirmede bir şey bulmadı.",
+    weight: "%{n} ağırlıkla sayılıyor",
+    protectedNote: "Kimliği tespit sistemi tarafından korunuyor",
+    NEW_ACCOUNT: "Hesap çok yeniydi",
+    NO_REPUTATION: "Değerlendirenin kendi itibar geçmişi yok",
+    BURST: "Kısa sürede çok sayıda değerlendirme",
+    MUTUAL_MAX: "Karşılıklı tam puan alışverişi",
+    FLAT_PATTERN: "Her seferinde aynı tekdüze tam puan",
   },
 
   groups: {

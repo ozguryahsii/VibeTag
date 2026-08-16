@@ -6,6 +6,7 @@ import { getDict } from "@/lib/i18n/server";
 import { canSendInConversation } from "@/lib/social";
 import { Avatar } from "@/components/Avatar";
 import { MessageComposer } from "@/components/MessageComposer";
+import { ReportDialog } from "@/components/ReportDialog";
 
 export const dynamic = "force-dynamic";
 
@@ -108,6 +109,14 @@ export default async function ThreadPage({
             </span>
           </Link>
         )}
+
+        <div className="ml-auto shrink-0">
+          <ReportDialog
+            conversationId={convo.id}
+            label={d.messages.reportThread}
+            compact
+          />
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto px-5 py-5">

@@ -17,6 +17,7 @@ import { NearbyToggle } from "@/components/NearbyToggle";
 import { Avatar } from "@/components/Avatar";
 import { LangToggle } from "@/components/LangToggle";
 import { Card, SectionTitle } from "@/components/ui";
+import { nameSearch } from "@/lib/search";
 import type { RelationshipKey, TraitKey, VibeTagKey } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
@@ -39,14 +40,7 @@ export default async function PeoplePage({
     prisma.user.findMany({
       where: {
         id: { not: me.id },
-        ...(query
-          ? {
-              OR: [
-                { name: { contains: query } },
-                { username: { contains: query.toLowerCase() } },
-              ],
-            }
-          : {}),
+        ...(query ? { OR: nameSearch(query) } : {}),
       },
       select: {
         id: true,

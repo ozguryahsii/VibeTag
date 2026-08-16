@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { saveLocationAction, type LocationState } from "@/lib/actions/location";
 import { useD } from "@/components/LocaleProvider";
@@ -38,6 +39,17 @@ export function NearbyToggle() {
       <p className="text-[13.5px] font-extrabold">{d.people.nearbyOn}</p>
       <p className="text-[12px] text-muted leading-relaxed mt-1">
         {d.people.nearbyBody}
+      </p>
+      {/*
+       * Location is the one thing here that rests on explicit consent rather
+       * than on the contract, so the ask says so in as many words and links to
+       * the text that explains it. KVKK m.5/1.
+       */}
+      <p className="text-[11.5px] text-muted/90 leading-relaxed mt-2">
+        {d.people.nearbyConsent}{" "}
+        <Link href="/legal/kvkk" className="font-bold text-orange">
+          {d.people.nearbyConsentLink}
+        </Link>
       </p>
 
       {coords ? (

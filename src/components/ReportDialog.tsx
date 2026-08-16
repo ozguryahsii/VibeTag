@@ -2,7 +2,11 @@
 
 import { useActionState, useState } from "react";
 import { reportAction, type SafetyState } from "@/lib/actions/safety";
-import { REPORT_REASONS } from "@/lib/moderation";
+import {
+  RATING_REPORT_REASONS,
+  REPORT_REASONS,
+  THREAD_REPORT_REASONS,
+} from "@/lib/moderation";
 import { useD } from "@/components/LocaleProvider";
 
 /**
@@ -12,17 +16,26 @@ import { useD } from "@/components/LocaleProvider";
  */
 export function ReportDialog({
   ratingId,
+  conversationId,
   username,
   label,
   compact = false,
 }: {
   ratingId?: string;
+  conversationId?: string;
   username?: string;
   label?: string;
   compact?: boolean;
 }) {
   const d = useD();
   const [open, setOpen] = useState(false);
+  // Each surface offers only the complaints that can be true there: "unfair"
+  // means nothing about a DM, "harassment" means nothing about a score.
+  const reasons: readonly (typeof REPORT_REASONS)[number][] = ratingId
+    ? RATING_REPORT_REASONS
+    : conversationId
+      ? THREAD_REPORT_REASONS
+      : REPORT_REASONS;
   const [state, action, pending] = useActionState<SafetyState, FormData>(
     reportAction,
     {},
@@ -75,6 +88,13 @@ export function ReportDialog({
                 {ratingId && (
                   <input type="hidden" name="ratingId" value={ratingId} />
                 )}
+                {conversationId && (
+                  <input
+                    type="hidden"
+                    name="conversationId"
+                    value={conversationId}
+                  />
+                )}
                 {username && (
                   <input type="hidden" name="username" value={username} />
                 )}
@@ -86,11 +106,15 @@ export function ReportDialog({
                   {d.report.title}
                 </h2>
                 <p className="text-[12.5px] text-muted mt-1.5 leading-relaxed">
-                  {ratingId ? d.report.bodyRating : d.report.bodyUser}
+                  {ratingId
+                    ? d.report.bodyRating
+                    : conversationId
+                      ? d.report.bodyThread
+                      : d.report.bodyUser}
                 </p>
 
                 <div className="mt-4 grid gap-2">
-                  {REPORT_REASONS.map((key, i) => (
+                  {reasons.map((key, i) => (
                     <label
                       key={key}
                       className="flex items-center gap-3 rounded-[18px] border border-line bg-cream px-4 py-3 cursor-pointer has-[:checked]:border-coral/40 has-[:checked]:bg-tagbg"

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { notify } from "@/lib/notifications";
+import { recomputeAllRatings } from "@/lib/fraud";
 
 /**
  * The moderation queue's write side.
@@ -127,4 +128,26 @@ export async function unsuspendUserAction(formData: FormData): Promise<void> {
     data: { suspendedAt: null },
   });
   revalidatePath("/moderation");
+}
+
+export type SweepState = { scanned?: number; changed?: number };
+
+/**
+ * Re-run fake-rating detection over every rating.
+ *
+ * Manual for now, behind the moderation queue. The same function is what a
+ * nightly cron should call — see `/api/cron/fraud-sweep`, which is this with
+ * a shared secret instead of a session.
+ */
+export async function fraudSweepAction(
+  _prev: SweepState,
+  _formData: FormData,
+): Promise<SweepState> {
+  await requireAdmin();
+  const result = await recomputeAllRatings();
+
+  revalidatePath("/moderation");
+  revalidatePath("/insights");
+  revalidatePath("/home");
+  return result;
 }

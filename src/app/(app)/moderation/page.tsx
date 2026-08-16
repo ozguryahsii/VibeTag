@@ -15,7 +15,9 @@ import {
   takeReportAction,
   unsuspendUserAction,
 } from "@/lib/actions/moderation";
+import { parseFlags } from "@/lib/fraud-flags";
 import { Avatar } from "@/components/Avatar";
+import { FraudSweep } from "@/components/FraudSweep";
 import { LangToggle } from "@/components/LangToggle";
 import { Card, EmptyState, SectionTitle } from "@/components/ui";
 
@@ -82,6 +84,9 @@ export default async function ModerationPage() {
           comment: true,
           relationship: true,
           hiddenAt: true,
+          weight: true,
+          isProtected: true,
+          fraudFlags: true,
           ratedUser: { select: { name: true, username: true } },
         },
       })
@@ -107,6 +112,10 @@ export default async function ModerationPage() {
       <p className="text-[13px] text-muted mt-1 leading-relaxed">
         {d.moderation.subtitle}
       </p>
+
+      <div className="mt-4">
+        <FraudSweep />
+      </div>
 
       <div className="mt-6">
         <SectionTitle>
@@ -171,7 +180,11 @@ export default async function ModerationPage() {
               <Card key={r.id} className="!py-3.5">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[12.5px] font-bold">
-                    {r.ratingId ? d.moderation.aboutRating : d.moderation.aboutUser}
+                    {r.ratingId
+                      ? d.moderation.aboutRating
+                      : r.conversationId
+                        ? d.moderation.aboutThread
+                        : d.moderation.aboutUser}
                     {" · "}
                     <span className="text-muted font-semibold">
                       {d.report.reasons[r.reason as keyof Dictionary["report"]["reasons"]] ??
@@ -213,6 +226,7 @@ type ReportRow = {
   status: string;
   createdAt: Date;
   ratingId: string | null;
+  conversationId: string | null;
   reporter: { name: string; username: string };
   reportedUser: {
     name: string;
@@ -228,6 +242,9 @@ type RatingRow = {
   comment: string | null;
   relationship: string;
   hiddenAt: Date | null;
+  weight: number;
+  isProtected: boolean;
+  fraudFlags: string;
   ratedUser: { name: string; username: string };
 };
 
@@ -243,7 +260,9 @@ function ReportCard({
   locale: Locale;
 }) {
   const isRating = !!report.ratingId;
+  const isThread = !isRating && !!report.conversationId;
   const reviewing = report.status === "REVIEWING";
+  const flags = rating ? parseFlags(rating.fraudFlags) : [];
   const done = isRating
     ? !!rating?.hiddenAt
     : !!report.reportedUser?.suspendedAt;
@@ -253,7 +272,11 @@ function ReportCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[13px] font-extrabold">
-            {isRating ? d.moderation.aboutRating : d.moderation.aboutUser}
+            {isRating
+              ? d.moderation.aboutRating
+              : isThread
+                ? d.moderation.aboutThread
+                : d.moderation.aboutUser}
           </p>
           <p className="text-[11.5px] text-muted mt-0.5">
             {fill(d.moderation.reportedBy, { name: report.reporter.name })} ·{" "}
@@ -304,10 +327,49 @@ function ReportCard({
                   ? `“${rating.comment}”`
                   : d.moderation.ratingNoComment}
               </p>
+
+              {/*
+               * What the detector already knows. Judging a "fake rating"
+               * report without this means re-deriving by hand something the
+               * system worked out when the rating was written.
+               */}
+              <div className="mt-3 border-t border-line pt-2.5">
+                <p className="text-[10.5px] font-extrabold tracking-[0.1em] uppercase text-muted">
+                  {d.fraudFlags.title}
+                </p>
+                {flags.length === 0 ? (
+                  <p className="text-[11.5px] text-muted mt-1">
+                    {d.fraudFlags.none}
+                  </p>
+                ) : (
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {flags.map((f) => (
+                      <span
+                        key={f}
+                        className="text-[10.5px] font-bold text-coral bg-coral/8 border border-coral/25 rounded-full px-2.5 py-1"
+                      >
+                        {d.fraudFlags[f]}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="text-[11px] text-muted mt-1.5">
+                  {fill(d.fraudFlags.weight, {
+                    n: Math.round(rating.weight * 100),
+                  })}
+                  {rating.isProtected ? ` · ${d.fraudFlags.protectedNote}` : ""}
+                </p>
+              </div>
             </>
           ) : (
             <p className="text-[12.5px] text-muted">{d.moderation.ratingGone}</p>
           )}
+        </div>
+      ) : isThread ? (
+        <div className="mt-2.5 rounded-[16px] border-l-2 border-coral/40 bg-warmwhite px-3.5 py-3">
+          <p className="text-[12.5px] text-muted leading-relaxed">
+            {d.moderation.threadNote}
+          </p>
         </div>
       ) : (
         report.reportedUser && (
@@ -343,7 +405,7 @@ function ReportCard({
           </form>
         )}
 
-        {done ? (
+        {isThread ? null : done ? (
           <span className="text-[12px] font-bold text-muted self-center">
             {isRating ? d.moderation.alreadyHidden : d.moderation.alreadySuspended}
           </span>

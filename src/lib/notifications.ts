@@ -34,7 +34,7 @@ export async function notify(
   type: NotificationType,
   opts: { vars?: NotificationVars; href?: string } = {},
 ): Promise<void> {
-  await prisma.notification.create({
+  const row = await prisma.notification.create({
     data: {
       userId,
       type,
@@ -42,6 +42,32 @@ export async function notify(
       href: opts.href ?? null,
     },
   });
+
+  // Push is best-effort and never blocks the thing that caused it: a rating
+  // must still be saved when someone's phone is unreachable. Imported lazily
+  // so the web-push dependency is only loaded when a notification actually
+  // fires.
+  try {
+    const { pushNotification } = await import("@/lib/push");
+    await pushNotification(userId, row, await readerLocale(userId));
+  } catch {
+    // Delivery is not the caller's problem.
+  }
+}
+
+/**
+ * Which language to write a push in.
+ *
+ * There is no request here to read the language cookie from, so we use the
+ * locale stored on the person's own subscription-time preference. Falling back
+ * to the default is fine; being silent because we could not decide is not.
+ */
+async function readerLocale(userId: string): Promise<string> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { locale: true },
+  });
+  return user?.locale ?? "en";
 }
 
 /** Copy for one notification, in the reader's language. */

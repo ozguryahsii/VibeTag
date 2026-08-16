@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { redeemInviteFor } from "@/lib/invite";
 import { getDict } from "@/lib/i18n/server";
+import { fill } from "@/lib/i18n";
+import { SUPPORT_EMAIL } from "@/lib/support";
 import {
   createSession,
   destroySession,
@@ -93,7 +95,11 @@ export async function loginAction(
   }
   // Told plainly rather than hidden behind "wrong password" — someone who has
   // been suspended deserves to know that is what happened.
-  if (user.suspendedAt) return { error: d.moderation.signedOut };
+  if (user.suspendedAt) {
+    return {
+      error: fill(d.moderation.signedOut, { email: SUPPORT_EMAIL }),
+    };
+  }
 
   await createSession(user.id);
 

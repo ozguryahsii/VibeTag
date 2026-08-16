@@ -198,6 +198,9 @@ export const en = {
       "Location permission was refused. You can allow it from your browser settings.",
     nearbyUnsupported: "This device cannot share a location.",
     nearbyNone: "Nobody nearby has shared a location yet.",
+    nearbyConsent:
+      "Turning this on is your explicit consent to process approximate location data. You can withdraw it here at any time.",
+    nearbyConsentLink: "How we handle it",
     distanceClose: "under 1 km",
     distanceKm: "{n} km away",
     distanceFar: "far away",
@@ -483,6 +486,9 @@ export const en = {
     unreadMany: "{n} unread messages",
     startedFromRating: "Started from a rating",
     threadWith: "Conversation with {name}",
+    reportThread: "Report",
+    reportAnonymousNote:
+      "You can report this conversation without learning who is on the other side.",
   },
 
   settings: {
@@ -588,12 +594,35 @@ export const en = {
     },
   },
 
+  push: {
+    title: "Notifications on this device",
+    body: "Get a notification when someone rates you, adds you or writes to you. You can turn it off here at any time.",
+    enable: "Turn on notifications",
+    disable: "Turn off notifications",
+    denied:
+      "Notifications are blocked for this site. You can allow them again from your browser settings.",
+    unsupported: "This browser cannot show notifications.",
+  },
+
+  legal: {
+    kicker: "THE FINE PRINT",
+    updated: "Last updated {date}",
+    draftNotice:
+      "Draft. These texts describe what the app actually does, but they have not been reviewed by a lawyer yet — treat them as a working document, not final terms.",
+    title: "Legal",
+    privacy: "Privacy Policy",
+    kvkk: "Data Protection Notice (KVKK)",
+    terms: "Terms of Use",
+  },
+
   report: {
     kicker: "SAFETY",
     title: "What do you want to report?",
     bodyRating:
       "We will not tell you who wrote this rating — and your report does not reveal your identity to them either.",
     bodyUser: "Your report is confidential and is not passed to the other side.",
+    bodyThread:
+      "Your report is confidential. If the other side is anonymous to you, it stays that way — reporting never reveals them.",
     notePlaceholder: "Briefly describe what happened (optional)",
     submit: "Report",
     received: "Your report was received",
@@ -605,6 +634,7 @@ export const en = {
       ABUSIVE: "Contains insults or harassment",
       FAKE: "Fake account or fake rating",
       SPAM: "Spam or advertising",
+      HARASSMENT: "Unwanted messages / harassment",
       OTHER: "Other",
     },
     errors: {
@@ -650,6 +680,9 @@ export const en = {
     reviewing: "In review",
     aboutRating: "About a rating",
     aboutUser: "About an account",
+    aboutThread: "About a conversation",
+    threadNote:
+      "Reported from inside a thread. Open the conversation from the database to read it — the reporter may not know who the other side is, so this screen does not name them.",
     reportedBy: "Reported by {name}",
     reasonLabel: "Reason",
     noteLabel: "Their note",
@@ -671,11 +704,27 @@ export const en = {
     suspended: "Suspended accounts",
     suspendedEmpty: "No suspended accounts.",
     signedOut:
-      "Your account is suspended. Get in touch if you think that is a mistake.",
+      "Your account is suspended. Write to {email} if you think that is a mistake — tell us your username and we will look again.",
+    sweep: "Re-run fraud detection",
+    sweepRunning: "Scanning…",
+    sweepDone: "{changed} of {scanned} ratings re-scored.",
+    sweepNone: "Scanned {scanned} ratings — nothing changed.",
     abusive:
       "This note looks like it contains an insult. Vibe Tag is for positive feedback — could you phrase your criticism without hurting?",
     contact: "Phone numbers and emails cannot be shared in notes.",
     link: "Links cannot be shared in notes.",
+  },
+
+  fraudFlags: {
+    title: "Automatic flags",
+    none: "The detector found nothing on this rating.",
+    weight: "Counts at {n}% weight",
+    protectedNote: "Identity protected by the detector",
+    NEW_ACCOUNT: "Account was brand new",
+    NO_REPUTATION: "Rater has no reputation of their own",
+    BURST: "Many ratings in a short window",
+    MUTUAL_MAX: "Reciprocal top marks",
+    FLAT_PATTERN: "Same flat top score every time",
   },
 
   groups: {

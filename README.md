@@ -107,9 +107,21 @@ Uygulamanın tek kapısı davet linki. Kimse yabancıları gezinerek bulmuyor;
 sizi tanıyan biri link veriyor, o da zaten değerlendirme akışının sorduğu
 ilişkinin ta kendisi.
 
-Link açıldığında kod bir çereze yazılır; kayıt tamamlanınca `InviteClaim`
-oluşur ve kullanıcı doğrudan davet edenin değerlendirme akışına düşer. Bir
-hesabın tek bir kökeni olur — bu aynı zamanda sahte hesap tespiti için sinyal.
+**Her link ayrı üretilir ve sınırlıdır.** Tek kalıcı bir kod, "sadece davet
+ettiklerim değerlendirebilir" ayarını ilk elden ele geçişte işlevsiz bırakırdı.
+Üç hazır seçenek var: tek kişilik (1 kullanım · 7 gün), küçük grup
+(10 · 14 gün), açık link (sınırsız). Sahibi istediği linki iptal edebilir.
+
+İki kavram bilinçli olarak ayrı:
+
+- **`InviteClaim`** — hesabın kökeni. Kişi başına bir tane, yalnızca kayıt
+  anında. Sahte hesap tespitine sinyal verir.
+- **`InviteGrant`** — "bu kişi linkimle geldi, beni değerlendirebilir."
+  İki kişi arasındaki izin. Davet-only politikası bunu kontrol eder.
+
+Ayrım şart, çünkü **zaten hesabı olan** birine link gönderdiğinizde ona claim
+oluşmaz — sadece claim'e bakan bir kontrol, davet ettiğiniz mevcut kullanıcıyı
+kapıda bırakırdı.
 
 ### 7. Engelleme ve bildirme — `src/lib/actions/safety.ts`
 

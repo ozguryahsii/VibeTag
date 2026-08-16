@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { cooldownDaysLeft } from "@/lib/rating-rules";
+import { InviteShareBlock } from "@/components/InviteShareBlock";
 import { Avatar, Card, EmptyState, SectionTitle } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -35,14 +36,41 @@ export default async function RatePickerPage() {
 
   return (
     <main className="px-5 pt-10">
-      <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">LEAVE A VIBE</p>
+      {/* Half of this screen is "let people rate me", so the share card leads. */}
+      <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">
+        SHARE YOUR VIBE
+      </p>
       <h1 className="vt-page-title text-[31px] tracking-[-0.02em] leading-[1.08]">
-        Kimi değerlendireceksin?
+        Seni değerlendirsinler
       </h1>
       <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
-        Her kişiyi <b className="text-ink">bir kez</b> değerlendirebilirsin.
-        Değerlendirmeni ayda bir güncelleyebilirsin.
+        Linkini paylaş ya da QR'ını okut — açan kişi doğrudan senin
+        değerlendirme sayfana düşer.
       </p>
+
+      <InviteShareBlock />
+
+      <div className="mt-4 text-center">
+        <Link
+          href="/invite"
+          className="text-[12.5px] font-bold text-orange underline underline-offset-2"
+        >
+          Davet linklerini yönet →
+        </Link>
+      </div>
+
+      <div className="mt-9 pt-7 border-t border-line">
+        <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">
+          LEAVE A VIBE
+        </p>
+        <h2 className="vt-page-title text-[26px] tracking-[-0.02em] leading-[1.1]">
+          Sen de birini değerlendir
+        </h2>
+        <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
+          Her kişiyi <b className="text-ink">bir kez</b> değerlendirebilirsin.
+          Değerlendirmeni ayda bir güncelleyebilirsin.
+        </p>
+      </div>
 
       <div className="mt-6">
         <SectionTitle>Henüz değerlendirmedin</SectionTitle>

@@ -6,10 +6,16 @@ export function InviteShare({
   url,
   qr,
   name,
+  expiresAt,
+  remaining,
 }: {
   url: string;
   qr: string;
   name: string;
+  /** Formatted expiry date, or null for a link that never expires. */
+  expiresAt?: string | null;
+  /** Uses left, or null for an unlimited link. */
+  remaining?: number | null;
 }) {
   const [status, setStatus] = useState<string | null>(null);
 
@@ -58,6 +64,13 @@ export function InviteShare({
         />
         <p className="text-[12px] text-muted mt-3">
           Karşındakine okut — telefonu doğrudan senin sayfana gider.
+        </p>
+
+        <p className="relative text-[11.5px] font-semibold text-orange mt-2">
+          {remaining === null || remaining === undefined
+            ? "Sınırsız kullanım"
+            : `${remaining} kullanım hakkı kaldı`}
+          {expiresAt ? ` · ${expiresAt} tarihine kadar` : " · süresiz"}
         </p>
 
         <button

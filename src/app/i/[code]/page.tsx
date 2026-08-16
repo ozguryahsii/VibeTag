@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import { inviteByCode } from "@/lib/invite";
+import { inviteByCode, inviteStatus } from "@/lib/invite";
+import { acceptInviteAction } from "@/lib/actions/invite";
 import { getVibeProfile } from "@/lib/profile";
 import { Avatar } from "@/components/Avatar";
 import { Wordmark } from "@/components/Logo";
@@ -25,6 +26,16 @@ export default async function InvitePage({
   const inviter = invite.inviter;
   const profile = await getVibeProfile(inviter.id);
   const isSelf = me?.id === inviter.id;
+
+  // A spent link still shows the person — it just cannot hand out permission.
+  const status = inviteStatus(invite);
+  const spent = status !== "ACTIVE";
+  const spentReason =
+    status === "EXPIRED"
+      ? "Bu davet linkinin süresi dolmuş."
+      : status === "REVOKED"
+        ? "Bu davet linki iptal edilmiş."
+        : "Bu davet linki kullanım hakkını doldurmuş.";
 
   return (
     <main className="min-h-dvh flex flex-col px-6 pt-12 pb-10 overflow-hidden">
@@ -79,6 +90,17 @@ export default async function InvitePage({
         ))}
       </div>
 
+      {spent && (
+        <div className="mt-6 rounded-[20px] border border-orange/25 bg-tagbg px-4 py-3.5">
+          <p className="text-[13px] font-bold text-orange">{spentReason}</p>
+          <p className="text-[12.5px] text-muted mt-0.5 leading-relaxed">
+            {inviter.name.split(" ")[0]} profilini yine görebilirsin; sadece
+            davetiyle gelenlerden değerlendirme alıyorsa yeni bir link istemen
+            gerekir.
+          </p>
+        </div>
+      )}
+
       <div className="mt-auto pt-8 grid gap-3">
         {isSelf ? (
           <p className="text-center text-[13.5px] text-muted">
@@ -89,12 +111,15 @@ export default async function InvitePage({
             git.
           </p>
         ) : me ? (
-          <Link
-            href={`/rate/${inviter.username}`}
-            className="h-13 grid place-items-center rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)]"
-          >
-            {inviter.name.split(" ")[0]}’i değerlendir
-          </Link>
+          <form action={acceptInviteAction}>
+            <input type="hidden" name="username" value={inviter.username} />
+            <button
+              type="submit"
+              className="h-13 w-full grid place-items-center rounded-full grad-score text-white font-bold text-[15px] shadow-[0_10px_30px_rgba(255,92,119,0.35)]"
+            >
+              {inviter.name.split(" ")[0]}’i değerlendir
+            </button>
+          </form>
         ) : (
           <>
             <Link

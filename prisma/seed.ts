@@ -145,6 +145,7 @@ async function main() {
   await prisma.report.deleteMany();
   await prisma.block.deleteMany();
   await prisma.notification.deleteMany();
+  await prisma.inviteGrant.deleteMany();
   await prisma.inviteClaim.deleteMany();
   await prisma.invite.deleteMany();
   await prisma.ratingRevision.deleteMany();
@@ -346,10 +347,26 @@ async function main() {
     data: {
       code: "ozgurvibe",
       inviterId: ozgur.id,
-      label: "Kişisel davet linkim",
+      label: "Küçük grup",
+      maxUses: 10,
+      expiresAt: new Date(Date.now() + 14 * 86_400_000),
     },
   });
+  // An expired link, so the "spent link" state is visible in the demo.
+  await prisma.invite.create({
+    data: {
+      code: "ozgureski",
+      inviterId: ozgur.id,
+      label: "Tek kişilik",
+      maxUses: 1,
+      expiresAt: new Date(Date.now() - 2 * 86_400_000),
+    },
+  });
+
   for (const u of others.slice(0, 6)) {
+    await prisma.inviteGrant.create({
+      data: { inviteId: invite.id, ownerId: ozgur.id, userId: u.id },
+    });
     await prisma.inviteClaim.create({
       data: { inviteId: invite.id, userId: u.id },
     });

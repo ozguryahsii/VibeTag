@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { evaluateRating } from "@/lib/fraud";
-import { cameThroughInviteOf } from "@/lib/invite";
+import { hasInviteGrant } from "@/lib/invite";
 import { moderateComment } from "@/lib/moderation";
 import { notify } from "@/lib/notifications";
 import { cooldownDaysLeft } from "@/lib/rating-rules";
@@ -17,7 +17,17 @@ import {
   isVibeTagKey,
 } from "@/lib/taxonomy";
 
-export type RatingState = { error?: string; ok?: boolean; username?: string };
+export type RatingState = {
+  error?: string;
+  ok?: boolean;
+  username?: string;
+  /**
+   * Whether this call revised an existing rating. The success screen cannot
+   * infer it from props: finishing the action refreshes the route, so by the
+   * time it renders, the rating it just created is already "existing".
+   */
+  updated?: boolean;
+};
 
 export async function submitRatingAction(
   _prev: RatingState,
@@ -69,10 +79,10 @@ export async function submitRatingAction(
 
   if (
     rated.ratingPolicy === "INVITED" &&
-    !(await cameThroughInviteOf(rater.id, rated.id))
+    !(await hasInviteGrant(rater.id, rated.id))
   ) {
     return {
-      error: `${rated.name.split(" ")[0]} yalnızca davet ettiği kişilerden değerlendirme alıyor.`,
+      error: `${rated.name.split(" ")[0]} yalnızca davet ettiği kişilerden değerlendirme alıyor. Ondan geçerli bir davet linki istemen gerek.`,
     };
   }
 
@@ -210,5 +220,5 @@ export async function submitRatingAction(
   revalidatePath(`/u/${rated.username}`);
   revalidatePath("/home");
   revalidatePath("/insights");
-  return { ok: true, username: rated.username };
+  return { ok: true, username: rated.username, updated: !!existing };
 }

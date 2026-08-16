@@ -45,6 +45,8 @@ model User {
 
   invites       Invite[]
   inviteClaim   InviteClaim?
+  grantsGiven   InviteGrant[]  @relation("GrantsGiven")
+  grantsHeld    InviteGrant[]  @relation("GrantsHeld")
   notifications Notification[]
   blocksMade    Block[]        @relation("BlocksMade")
   blocksAgainst Block[]        @relation("BlocksAgainst")
@@ -147,19 +149,55 @@ model RatingRevision {
 
 // --------------------------------------------------------------- growth
 
-/// An invite link. A person can hold several (one per circle, say), which is
-/// what makes "only people I invited may rate me" a usable privacy setting.
+/// An invite link.
+///
+/// Every link is minted fresh and carries its own limits, because a single
+/// permanent code defeats the "only people I invited may rate me" setting the
+/// moment someone forwards it. A link is spent when enough distinct people
+/// have used it, or when it expires, or when its owner revokes it.
 model Invite {
   id        String   @id @default(cuid())
   code      String   @unique
   label     String?
   inviterId String
   inviter   User     @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  /// How many distinct people may use it. null = unlimited (an open link).
+  maxUses   Int?
+  expiresAt DateTime?
+  revokedAt DateTime?
+
   createdAt DateTime @default(now())
 
   claims InviteClaim[]
+  grants InviteGrant[]
 
   @@index([inviterId])
+}
+
+/// "This person came in through one of my links, so they may rate me."
+///
+/// Separate from InviteClaim on purpose: a claim records where an *account*
+/// came from and can only ever happen once, while a grant is permission
+/// between two people and must also work for someone who already had an
+/// account before you sent them a link.
+model InviteGrant {
+  id       String @id @default(cuid())
+  inviteId String
+  invite   Invite @relation(fields: [inviteId], references: [id], onDelete: Cascade)
+
+  /// Denormalised from invite.inviterId so the rating check is a single read.
+  ownerId String
+  owner   User   @relation("GrantsGiven", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation("GrantsHeld", fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([ownerId, userId])
+  @@index([inviteId])
+  @@index([userId])
 }
 
 /// Who came in through which link. One claim per user — an account has

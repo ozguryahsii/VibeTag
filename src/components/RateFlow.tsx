@@ -84,7 +84,7 @@ export function RateFlow({
 
   if (state.ok) {
     return (
-      <Success target={target} isUpdate={!!existing} />
+      <Success target={target} isUpdate={!!state.updated} />
     );
   }
 

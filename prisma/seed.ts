@@ -17,6 +17,8 @@ import {
   allowedVibeTags,
   type RelationshipKey,
 } from "../src/lib/taxonomy";
+import { buildVibeProfile } from "../src/lib/vibe";
+import { earnedBadges } from "../src/lib/badges";
 
 const prisma = new PrismaClient();
 
@@ -182,6 +184,7 @@ async function main() {
   await prisma.report.deleteMany();
   await prisma.block.deleteMany();
   await prisma.notification.deleteMany();
+  await prisma.earnedBadge.deleteMany();
   await prisma.inviteGrant.deleteMany();
   await prisma.inviteClaim.deleteMany();
   await prisma.invite.deleteMany();
@@ -205,6 +208,7 @@ async function main() {
       avatarColor: "#FF8A3D",
       plan: "GOLD",
       isVerified: true,
+      isAdmin: true,
       shareLocation: true,
       lat: 41.043,
       lng: 29.008,
@@ -428,12 +432,87 @@ async function main() {
       {
         userId: ozgur.id,
         type: "BADGE_EARNED",
-        vars: JSON.stringify({ badge: "Community Favorite" }),
+        vars: JSON.stringify({ badgeKey: "communityFavorite" }),
         href: "/home",
         createdAt: daysAgo(9),
         readAt: daysAgo(8),
       },
     ],
+  });
+
+  console.log("→ rozetler");
+  // Backfill what the seeded profiles have already earned, so the badge shelf
+  // and the "you earned it" event agree from the first render.
+  for (const u of [ozgur, ...others]) {
+    const rows = await prisma.rating.findMany({
+      where: { ratedUserId: u.id, hiddenAt: null },
+      select: {
+        id: true,
+        relationship: true,
+        weight: true,
+        createdAt: true,
+        traits: { select: { traitKey: true, score: true } },
+        vibeTags: { select: { tagKey: true } },
+      },
+    });
+    const profile = buildVibeProfile(
+      rows.map((r) => ({
+        id: r.id,
+        relationship: r.relationship as RelationshipKey,
+        weight: r.weight,
+        createdAt: r.createdAt,
+        traits: r.traits.map((t) => ({
+          traitKey: t.traitKey as never,
+          score: t.score,
+        })),
+        vibeTags: r.vibeTags.map((t) => ({ tagKey: t.tagKey as never })),
+      })),
+    );
+    const keys = earnedBadges(profile).map((b) => b.key);
+    if (keys.length) {
+      await prisma.earnedBadge.createMany({
+        data: keys.map((key) => ({ userId: u.id, key })),
+      });
+    }
+  }
+
+  console.log("→ moderasyon kuyruğu");
+  // A queue with nothing in it cannot be judged, so seed a few real-looking
+  // cases: one about a rating, one about an account, one already closed.
+  const disputed = await prisma.rating.findFirst({
+    where: { ratedUserId: ozgur.id, comment: { not: null } },
+    select: { id: true },
+  });
+  if (disputed) {
+    await prisma.report.create({
+      data: {
+        reporterId: ozgur.id,
+        ratingId: disputed.id,
+        reason: "UNFAIR",
+        note: "Bu kişiyle hiç birlikte çalışmadım, yorum gerçeği yansıtmıyor.",
+        createdAt: daysAgo(2),
+      },
+    });
+  }
+  await prisma.report.create({
+    data: {
+      reporterId: others[3].id,
+      reportedUserId: others[11].id,
+      reason: "FAKE",
+      note: "Aynı gün on kişiyi birden değerlendirmiş, hesap sahte görünüyor.",
+      createdAt: daysAgo(1),
+    },
+  });
+  await prisma.report.create({
+    data: {
+      reporterId: others[5].id,
+      reportedUserId: others[9].id,
+      reason: "SPAM",
+      status: "DISMISSED",
+      reviewerId: ozgur.id,
+      reviewedAt: daysAgo(4),
+      createdAt: daysAgo(6),
+    },
   });
 
   console.log("→ arkadaşlıklar ve mesajlar");

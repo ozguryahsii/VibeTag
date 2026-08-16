@@ -62,6 +62,7 @@ export type SessionUser = {
   avatarColor: string;
   plan: Plan;
   isVerified: boolean;
+  isAdmin: boolean;
   ratingPolicy: string;
 };
 
@@ -80,6 +81,10 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   if (!session || session.expiresAt < new Date()) return null;
 
   const u = session.user;
+  // A suspended account reads as signed out everywhere, so no screen has to
+  // remember to check. The session row stays put in case the suspension is
+  // lifted — we are not punishing them by making them re-register.
+  if (u.suspendedAt) return null;
   return {
     id: u.id,
     email: u.email,
@@ -90,6 +95,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     avatarColor: u.avatarColor,
     plan: u.plan as Plan,
     isVerified: u.isVerified,
+    isAdmin: u.isAdmin,
     ratingPolicy: u.ratingPolicy,
   };
 });
@@ -97,6 +103,13 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
 export async function requireUser(): Promise<SessionUser> {
   const user = await getCurrentUser();
   if (!user) throw new Error("UNAUTHORIZED");
+  return user;
+}
+
+/** For the moderation queue. Throws like `requireUser`, so routes can rely on it. */
+export async function requireAdmin(): Promise<SessionUser> {
+  const user = await requireUser();
+  if (!user.isAdmin) throw new Error("FORBIDDEN");
   return user;
 }
 

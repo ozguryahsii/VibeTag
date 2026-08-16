@@ -25,6 +25,9 @@ const ICON_FOR: Record<string, keyof typeof ICONS> = {
   FRIEND_REQUEST: "users",
   FRIEND_ACCEPTED: "users",
   NEW_MESSAGE: "envelope",
+  REPORT_ACTIONED: "shieldCheck",
+  REPORT_DISMISSED: "shieldCheck",
+  RATING_HIDDEN: "shieldCheck",
 };
 
 function ago(date: Date, d: Dictionary, locale: Locale): string {

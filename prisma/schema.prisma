@@ -32,6 +32,14 @@ model User {
   // Trust signals used by fake-rating detection.
   isVerified Boolean @default(false)
 
+  /// Can open the moderation queue. Not a role system — one boolean is
+  /// honest about what this actually is until there is a second kind of staff.
+  isAdmin Boolean @default(false)
+
+  /// Set when moderation actions an account report. A suspended account
+  /// cannot sign in or rate; the row and its history stay intact.
+  suspendedAt DateTime?
+
   /// Who may rate this person: EVERYONE | INVITED (only people who came in
   /// through one of their invite links).
   ratingPolicy String @default("EVERYONE")
@@ -52,20 +60,22 @@ model User {
   ratingsReceived Rating[]  @relation("RatingsReceived")
   ratingsGiven    Rating[]  @relation("RatingsGiven")
 
-  invites       Invite[]
-  inviteClaim   InviteClaim?
-  friendsSent      Friendship[]  @relation("FriendRequester")
-  friendsReceived  Friendship[]  @relation("FriendAddressee")
-  conversationsA   Conversation[] @relation("ConvA")
-  conversationsB   Conversation[] @relation("ConvB")
-  messagesSent     Message[]
-  grantsGiven   InviteGrant[]  @relation("GrantsGiven")
-  grantsHeld    InviteGrant[]  @relation("GrantsHeld")
-  notifications Notification[]
-  blocksMade    Block[]        @relation("BlocksMade")
-  blocksAgainst Block[]        @relation("BlocksAgainst")
-  reportsFiled  Report[]       @relation("ReportsFiled")
-  reportsAbout  Report[]       @relation("ReportsAbout")
+  invites         Invite[]
+  inviteClaim     InviteClaim?
+  badges          EarnedBadge[]
+  friendsSent     Friendship[]   @relation("FriendRequester")
+  friendsReceived Friendship[]   @relation("FriendAddressee")
+  conversationsA  Conversation[] @relation("ConvA")
+  conversationsB  Conversation[] @relation("ConvB")
+  messagesSent    Message[]
+  grantsGiven     InviteGrant[]  @relation("GrantsGiven")
+  grantsHeld      InviteGrant[]  @relation("GrantsHeld")
+  notifications   Notification[]
+  blocksMade      Block[]        @relation("BlocksMade")
+  blocksAgainst   Block[]        @relation("BlocksAgainst")
+  reportsFiled    Report[]       @relation("ReportsFiled")
+  reportsAbout    Report[]       @relation("ReportsAbout")
+  reportsJudged   Report[]       @relation("ReportsReviewed")
 
   @@index([createdAt])
 }
@@ -108,7 +118,12 @@ model Rating {
   /// attributed to a person in the UI, on any plan.
   isProtected Boolean @default(false)
   fraudFlags  String  @default("[]") // JSON array of flag keys
-  weight      Float   @default(1.0)  // 0..1, dampens suspicious ratings
+  weight      Float   @default(1.0) // 0..1, dampens suspicious ratings
+
+  /// Set when moderation upholds a report about this rating. Hidden ratings
+  /// stop counting and their note disappears, but the row survives — the
+  /// audit trail is the point, and a deleted row cannot be appealed.
+  hiddenAt DateTime?
 
   updateCount   Int       @default(0)
   lastUpdatedAt DateTime?
@@ -170,11 +185,11 @@ model RatingRevision {
 /// moment someone forwards it. A link is spent when enough distinct people
 /// have used it, or when it expires, or when its owner revokes it.
 model Invite {
-  id        String   @id @default(cuid())
-  code      String   @unique
+  id        String  @id @default(cuid())
+  code      String  @unique
   label     String?
   inviterId String
-  inviter   User     @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+  inviter   User    @relation(fields: [inviterId], references: [id], onDelete: Cascade)
 
   /// How many distinct people may use it. null = unlimited (an open link).
   maxUses   Int?
@@ -225,6 +240,25 @@ model InviteClaim {
   createdAt DateTime @default(now())
 
   @@index([inviteId])
+}
+
+/// A badge the user has actually been awarded.
+///
+/// Badges are computed from the profile on every render, but "earned" is an
+/// event, not a calculation: without a row saying when it first happened,
+/// there is nothing to congratulate someone for, and a score that dips would
+/// silently take the badge back.
+model EarnedBadge {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// Key from lib/badges.ts.
+  key      String
+  earnedAt DateTime @default(now())
+
+  @@unique([userId, key])
+  @@index([userId])
 }
 
 model Notification {
@@ -286,13 +320,18 @@ model Report {
   note   String?
 
   /// OPEN | REVIEWING | ACTIONED | DISMISSED
-  status    String   @default("OPEN")
+  status String @default("OPEN")
+
+  /// Who closed it and when — a queue without a trail is not a queue.
+  reviewerId String?
+  reviewer   User?     @relation("ReportsReviewed", fields: [reviewerId], references: [id], onDelete: SetNull)
+  reviewedAt DateTime?
+
   createdAt DateTime @default(now())
 
   @@index([status, createdAt])
   @@index([ratingId])
 }
-
 
 // -------------------------------------------------------------- friends
 
@@ -342,9 +381,17 @@ model Conversation {
   userBId String
   userB   User   @relation("ConvB", fields: [userBId], references: [id], onDelete: Cascade)
 
-  /// For RATING threads: the rating it grew out of, and who is hidden.
-  ratingId       String?
-  anonymousSide  String? // "A" | "B" — that participant is shown as Anonymous
+  /// For RATING threads: the rating it grew out of.
+  ratingId String?
+
+  /// Which side wrote the rating, and which side is shown as Anonymous.
+  ///
+  /// These are two different questions and were once one field, which was a
+  /// bug: a Gold member can already see who rated them, so that thread has a
+  /// rater but nobody hidden. Permission ("the rater may only reply once
+  /// written to") keys off `raterSide`; the UI keys off `anonymousSide`.
+  raterSide     String? // "A" | "B"
+  anonymousSide String? // "A" | "B" — that participant is shown as Anonymous
 
   createdAt     DateTime @default(now())
   lastMessageAt DateTime @default(now())

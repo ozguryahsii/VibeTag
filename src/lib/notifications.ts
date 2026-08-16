@@ -2,6 +2,7 @@ import "server-only";
 
 import { prisma } from "@/lib/db";
 import { fill, type Dictionary } from "@/lib/i18n";
+import { badgeLabel } from "@/lib/labels";
 
 /**
  * In-app notifications. Deliberately vague by design: "you got a new rating"
@@ -21,7 +22,10 @@ export type NotificationType =
   | "BADGE_EARNED"
   | "FRIEND_REQUEST"
   | "FRIEND_ACCEPTED"
-  | "NEW_MESSAGE";
+  | "NEW_MESSAGE"
+  | "REPORT_ACTIONED"
+  | "REPORT_DISMISSED"
+  | "RATING_HIDDEN";
 
 export type NotificationVars = Record<string, string | number>;
 
@@ -52,6 +56,12 @@ export function renderNotification(
     // A malformed row should render a plain notification, not crash the page.
   }
 
+  // A badge travels as its key so the congratulation is written in the
+  // reader's language, not the language the award happened to fire in.
+  if (typeof vars.badgeKey === "string") {
+    vars = { ...vars, badge: badgeLabel(vars.badgeKey, d) };
+  }
+
   const t = d.notifications;
   const map: Record<string, { title: string; body: string }> = {
     NEW_RATING: { title: t.newRating, body: t.newRatingBody },
@@ -65,6 +75,9 @@ export function renderNotification(
     FRIEND_REQUEST: { title: t.friendRequest, body: t.friendRequestBody },
     FRIEND_ACCEPTED: { title: t.friendAccepted, body: t.friendAcceptedBody },
     NEW_MESSAGE: { title: t.newMessage, body: t.newMessageBody },
+    REPORT_ACTIONED: { title: t.reportActioned, body: t.reportActionedBody },
+    REPORT_DISMISSED: { title: t.reportDismissed, body: t.reportDismissedBody },
+    RATING_HIDDEN: { title: t.ratingHidden, body: t.ratingHiddenBody },
   };
 
   const copy = map[n.type] ?? { title: t.generic, body: "" };

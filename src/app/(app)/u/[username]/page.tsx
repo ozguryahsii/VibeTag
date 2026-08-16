@@ -52,7 +52,7 @@ export default async function PublicProfile({
   // Anonymous wall — comments are never attributed to a person here,
   // no matter who is looking (§9).
   const comments = await prisma.rating.findMany({
-    where: { ratedUserId: user.id, comment: { not: null } },
+    where: { ratedUserId: user.id, comment: { not: null }, hiddenAt: null },
     select: { id: true, comment: true, relationship: true, createdAt: true },
     orderBy: { createdAt: "desc" },
     take: 6,

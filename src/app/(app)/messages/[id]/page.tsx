@@ -66,29 +66,48 @@ export default async function ThreadPage({
           ←
         </Link>
 
+        {/*
+         * Tapping the avatar or the name opens their profile — the obvious
+         * gesture in any chat app. It is a plain <span> only when the other
+         * side is anonymous, because there the link would be the leak.
+         */}
         {otherIsAnonymous ? (
-          <span className="w-11 h-11 shrink-0 grid place-items-center rounded-full bg-line text-[16px]">
-            🕶️
-          </span>
+          <>
+            <span className="w-11 h-11 shrink-0 grid place-items-center rounded-full bg-line text-[16px]">
+              🕶️
+            </span>
+            <div className="min-w-0">
+              <p className="text-[15px] font-extrabold truncate">
+                {d.messages.anonymousPartner}
+              </p>
+              <p className="text-[11.5px] text-muted truncate">
+                {d.messages.aboutRating}
+              </p>
+            </div>
+          </>
         ) : (
-          <Avatar
-            name={other.name}
-            url={other.avatarUrl}
-            color={other.avatarColor}
-            size={44}
-          />
+          <Link
+            href={`/u/${other.username}`}
+            className="flex min-w-0 items-center gap-3.5"
+          >
+            <Avatar
+              name={other.name}
+              url={other.avatarUrl}
+              color={other.avatarColor}
+              size={44}
+            />
+            <span className="min-w-0">
+              <span className="block text-[15px] font-extrabold truncate">
+                {other.name}
+              </span>
+              <span className="block text-[11.5px] text-muted truncate">
+                {convo.kind === "RATING"
+                  ? d.messages.aboutRating
+                  : `@${other.username}`}
+              </span>
+            </span>
+          </Link>
         )}
-
-        <div className="min-w-0">
-          <p className="text-[15px] font-extrabold truncate">
-            {otherIsAnonymous ? d.messages.anonymousPartner : other.name}
-          </p>
-          <p className="text-[11.5px] text-muted truncate">
-            {convo.kind === "RATING"
-              ? d.messages.aboutRating
-              : `@${other.username}`}
-          </p>
-        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto px-5 py-5">

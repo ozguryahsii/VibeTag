@@ -113,7 +113,7 @@ export async function canSendInConversation(
     kind: string;
     userAId: string;
     userBId: string;
-    anonymousSide: string | null;
+    raterSide: string | null;
   },
 ): Promise<SendVerdict> {
   const otherId =
@@ -129,9 +129,10 @@ export async function canSendInConversation(
       : { ok: false, reason: "FRIENDS_ONLY" };
   }
 
-  // RATING thread
+  // RATING thread. Whether the rater is *shown* anonymously is a separate
+  // question from whether they are the rater — only the latter gates writing.
   const mySide = conversation.userAId === meId ? "A" : "B";
-  const iAmTheRater = conversation.anonymousSide === mySide;
+  const iAmTheRater = conversation.raterSide === mySide;
 
   if (!iAmTheRater) return { ok: true };
 

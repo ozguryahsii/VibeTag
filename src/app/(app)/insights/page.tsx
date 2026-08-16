@@ -9,6 +9,7 @@ import { groupIconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ReportDialog } from "@/components/ReportDialog";
 import { openRatingThreadAction } from "@/lib/actions/social";
+import { canSeeRaterIdentity } from "@/lib/rating-rules";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/config";
@@ -37,7 +38,7 @@ export default async function InsightsPage() {
 
   const details = isSilver
     ? await prisma.rating.findMany({
-        where: { ratedUserId: me.id },
+        where: { ratedUserId: me.id, hiddenAt: null },
         select: {
           id: true,
           relationship: true,
@@ -226,10 +227,7 @@ export default async function InsightsPage() {
               <div className="grid gap-2.5">
                 {details.map((row) => {
                   const relName = relationshipLabel(row.relationship, d);
-                  // §15 — identity is revealed only for Gold, and never for
-                  // protected or explicitly anonymised ratings.
-                  const showIdentity =
-                    isGold && !row.isProtected && !row.hideIdentity;
+                  const showIdentity = canSeeRaterIdentity(me.plan, row);
 
                   return (
                     <Card key={row.id} className="!py-4">

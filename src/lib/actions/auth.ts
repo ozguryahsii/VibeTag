@@ -91,6 +91,9 @@ export async function loginAction(
   if (!user || !verifyPassword(password, user.passwordHash)) {
     return { error: d.auth.errors.badCredentials };
   }
+  // Told plainly rather than hidden behind "wrong password" — someone who has
+  // been suspended deserves to know that is what happened.
+  if (user.suspendedAt) return { error: d.moderation.signedOut };
 
   await createSession(user.id);
 

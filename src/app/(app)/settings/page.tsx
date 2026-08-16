@@ -246,6 +246,21 @@ export default async function SettingsPage() {
         )}
       </div>
 
+      {user.isAdmin && (
+        <div className="mt-7">
+          <SectionTitle>{d.nav.moderation}</SectionTitle>
+          <Link
+            href="/moderation"
+            className="card flex items-center justify-between !py-4"
+          >
+            <span className="text-[13.5px] font-bold">
+              {d.moderation.title}
+            </span>
+            <span className="text-orange font-bold text-[18px]">→</span>
+          </Link>
+        </div>
+      )}
+
       <div className="mt-7">
         <SectionTitle>{d.settings.account}</SectionTitle>
         <div className="grid gap-2.5">

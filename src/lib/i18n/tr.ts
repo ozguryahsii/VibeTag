@@ -41,6 +41,7 @@ export const tr: Dictionary = {
     profile: "Profil",
     messages: "Mesajlar",
     notifications: "Bildirimler",
+    moderation: "Moderasyon",
   },
 
   welcome: {
@@ -421,6 +422,15 @@ export const tr: Dictionary = {
     friendAcceptedBody: "{name} arkadaşlık isteğini kabul etti.",
     newMessage: "Yeni mesaj",
     newMessageBody: "Kutunda yeni bir mesajın var.",
+    reportActioned: "Bildirimin haklı bulundu",
+    reportActionedBody:
+      "İnceledik ve gereğini yaptık. Bildirdiğin için teşekkürler.",
+    reportDismissed: "Bildirimin incelendi",
+    reportDismissedBody:
+      "Baktık, bu sefer kurallara aykırı bir durum bulamadık.",
+    ratingHidden: "Profilinden bir değerlendirme kaldırıldı",
+    ratingHiddenBody:
+      "Aldığın bir değerlendirme kuralları ihlal ediyordu; artık Vibe Score'una sayılmıyor.",
     badgeEarned: "Yeni bir rozet kazandın 🏅",
     badgeEarnedBody: "“{badge}” artık My Vibe profilinde.",
     generic: "Profilinde bir gelişme var",
@@ -609,6 +619,38 @@ export const tr: Dictionary = {
   },
 
   moderation: {
+    kicker: "MODERASYON",
+    title: "Bildirim kuyruğu",
+    subtitle: "Açık bildirimler, en eski üstte. Her karar kayıt altına alınır.",
+    emptyTitle: "Kuyruk boş",
+    emptyBody: "Şu an karar bekleyen bir şey yok.",
+    openTab: "Açık",
+    resolvedTab: "Sonuçlanan",
+    reviewing: "İnceleniyor",
+    aboutRating: "Bir değerlendirme hakkında",
+    aboutUser: "Bir hesap hakkında",
+    reportedBy: "Bildiren: {name}",
+    reasonLabel: "Sebep",
+    noteLabel: "Açıklaması",
+    noNote: "Açıklama bırakılmamış.",
+    ratingGone: "Bu değerlendirme artık mevcut değil.",
+    ratingFrom: "{group} çevresinden bir değerlendirme",
+    ratingNoComment: "Bu değerlendirmede not yok.",
+    receivedBy: "Alan: {name}",
+    take: "İncelemeye al",
+    hideRating: "Değerlendirmeyi kaldır",
+    suspendUser: "Hesabı askıya al",
+    dismiss: "Reddet",
+    decidedBy: "Kapatan: {name}",
+    actioned: "Haklı bulundu",
+    dismissed: "Reddedildi",
+    alreadyHidden: "Bu değerlendirme zaten kaldırılmış.",
+    alreadySuspended: "Bu hesap zaten askıda.",
+    unsuspend: "Askıyı kaldır",
+    suspended: "Askıdaki hesaplar",
+    suspendedEmpty: "Askıya alınmış hesap yok.",
+    signedOut:
+      "Hesabın askıya alınmış. Bunun bir hata olduğunu düşünüyorsan bize yaz.",
     abusive:
       "Bu not hakaret içeriyor gibi görünüyor. Vibe Tag olumlu geri bildirim için — eleştirini kırıcı olmayan bir dille yazabilir misin?",
     contact: "Notlarda telefon veya e-posta paylaşılamaz.",

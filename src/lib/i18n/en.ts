@@ -44,6 +44,7 @@ export const en = {
     profile: "Profile",
     messages: "Messages",
     notifications: "Notifications",
+    moderation: "Moderation",
   },
 
   welcome: {
@@ -424,6 +425,15 @@ export const en = {
     friendAcceptedBody: "{name} accepted your friend request.",
     newMessage: "New message",
     newMessageBody: "You have a new message in your inbox.",
+    reportActioned: "Your report was upheld",
+    reportActionedBody:
+      "We reviewed it and took action. Thank you for flagging it.",
+    reportDismissed: "Your report was reviewed",
+    reportDismissedBody:
+      "We looked at it and did not find a breach of the rules this time.",
+    ratingHidden: "A rating was removed from your profile",
+    ratingHiddenBody:
+      "A rating you received broke the rules and no longer counts towards your Vibe Score.",
     badgeEarned: "You earned a new badge 🏅",
     badgeEarnedBody: "“{badge}” is now on your My Vibe profile.",
     generic: "Something happened on your profile",
@@ -612,6 +622,38 @@ export const en = {
   },
 
   moderation: {
+    kicker: "MODERATION",
+    title: "Report queue",
+    subtitle: "Open reports, oldest first. Every decision is recorded.",
+    emptyTitle: "The queue is empty",
+    emptyBody: "Nothing is waiting for a decision right now.",
+    openTab: "Open",
+    resolvedTab: "Resolved",
+    reviewing: "In review",
+    aboutRating: "About a rating",
+    aboutUser: "About an account",
+    reportedBy: "Reported by {name}",
+    reasonLabel: "Reason",
+    noteLabel: "Their note",
+    noNote: "No note left.",
+    ratingGone: "This rating no longer exists.",
+    ratingFrom: "A rating from the {group} circle",
+    ratingNoComment: "This rating has no note.",
+    receivedBy: "Received by {name}",
+    take: "Start reviewing",
+    hideRating: "Remove the rating",
+    suspendUser: "Suspend the account",
+    dismiss: "Dismiss",
+    decidedBy: "Closed by {name}",
+    actioned: "Upheld",
+    dismissed: "Dismissed",
+    alreadyHidden: "This rating is already removed.",
+    alreadySuspended: "This account is already suspended.",
+    unsuspend: "Lift the suspension",
+    suspended: "Suspended accounts",
+    suspendedEmpty: "No suspended accounts.",
+    signedOut:
+      "Your account is suspended. Get in touch if you think that is a mistake.",
     abusive:
       "This note looks like it contains an insult. Vibe Tag is for positive feedback — could you phrase your criticism without hurting?",
     contact: "Phone numbers and emails cannot be shared in notes.",

@@ -7,6 +7,7 @@ import { evaluateRating } from "@/lib/fraud";
 import { hasInviteGrant } from "@/lib/invite";
 import { moderateComment } from "@/lib/moderation";
 import { notify } from "@/lib/notifications";
+import { awardAndNotify } from "@/lib/awards";
 import { cooldownDaysLeft } from "@/lib/rating-rules";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
@@ -229,6 +230,10 @@ export async function submitRatingAction(
 
     await notify(rated.id, "RATING_UPDATED", { href: "/home" });
   }
+
+  // A rating can push someone over a badge threshold. Checked after both
+  // paths because an update moves the numbers just as much as a new rating.
+  await awardAndNotify(rated.id);
 
   revalidatePath(`/u/${rated.username}`);
   revalidatePath("/home");

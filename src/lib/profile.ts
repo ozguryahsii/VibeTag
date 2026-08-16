@@ -37,7 +37,9 @@ export async function getUserByUsername(
 
 export async function getRatingsFor(userId: string): Promise<RatingInput[]> {
   const rows = await prisma.rating.findMany({
-    where: { ratedUserId: userId },
+    // Ratings hidden by moderation stop counting the moment a report is
+    // upheld. The row survives for the appeal trail; the score must not.
+    where: { ratedUserId: userId, hiddenAt: null },
     select: {
       id: true,
       relationship: true,
@@ -85,7 +87,7 @@ export async function getPercentile(
   // One query for the whole cohort — scoring every profile with its own
   // round-trip turns a leaderboard into an N+1 stampede.
   const rows = await prisma.rating.findMany({
-    where: { ratedUserId: { in: [...eligible] } },
+    where: { ratedUserId: { in: [...eligible] }, hiddenAt: null },
     select: {
       ratedUserId: true,
       relationship: true,

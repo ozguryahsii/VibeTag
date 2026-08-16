@@ -7,6 +7,7 @@ import { hasPlan, requireUser } from "@/lib/auth";
 import { getDict } from "@/lib/i18n/server";
 import { moderateComment } from "@/lib/moderation";
 import { notify } from "@/lib/notifications";
+import { canSeeRaterIdentity } from "@/lib/rating-rules";
 import {
   areFriends,
   canSendInConversation,
@@ -147,13 +148,24 @@ export async function openRatingThreadAction(
   const ratingId = String(formData.get("ratingId") ?? "");
   const rating = await prisma.rating.findUnique({
     where: { id: ratingId },
-    select: { id: true, ratedUserId: true, raterUserId: true },
+    select: {
+      id: true,
+      ratedUserId: true,
+      raterUserId: true,
+      isProtected: true,
+      hideIdentity: true,
+    },
   });
   if (!rating || rating.ratedUserId !== me.id) redirect("/messages");
   if (await isBlockedEitherWay(me.id, rating.raterUserId)) redirect("/messages");
 
   const [userAId, userBId] = pairKey(me.id, rating.raterUserId);
-  const anonymousSide = userAId === rating.raterUserId ? "A" : "B";
+  const raterSide = userAId === rating.raterUserId ? "A" : "B";
+
+  // Hide the rater only from someone who could not already see them. A Gold
+  // member reading this person's name on the insights screen must not be told
+  // "anonymous rater" one tap later.
+  const anonymousSide = canSeeRaterIdentity(me.plan, rating) ? null : raterSide;
 
   const convo = await prisma.conversation.upsert({
     where: { userAId_userBId: { userAId, userBId } },
@@ -163,6 +175,7 @@ export async function openRatingThreadAction(
       userBId,
       kind: "RATING",
       ratingId: rating.id,
+      raterSide,
       anonymousSide,
     },
   });

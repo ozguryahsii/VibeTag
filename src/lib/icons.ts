@@ -39,6 +39,10 @@ export const ICONS: Record<string, IconDef> = {
       "M10.6 20.9h2.8",
     ],
   },
+  search: {
+    circles: [[10.8, 10.8, 6.6]],
+    paths: ["M15.6 15.6 20.8 20.8"],
+  },
   medal: {
     circles: [[12, 9, 5.2]],
     paths: ["M8.6 13.4 6.6 21l5.4-2.8L17.4 21l-2-7.6"],

@@ -222,8 +222,8 @@ export function tierRank(tier: BadgeTier): number {
  * For the profile shelf and the Vibe Card, where showing bronze, silver and
  * gold Kind Heart side by side would say the same thing three times.
  */
-export function bestPerFamily(badges: Badge[]): Badge[] {
-  const best = new Map<string, Badge>();
+export function bestPerFamily<T extends Badge>(badges: T[]): T[] {
+  const best = new Map<string, T>();
   for (const b of badges) {
     if (!b.earned) continue;
     const current = best.get(b.key);

@@ -44,10 +44,6 @@ export function badgeLabel(key: string, d: Dictionary): string {
   return d.badges[key as keyof Dictionary["badges"]]?.label ?? key;
 }
 
-export function badgeDescription(key: string, d: Dictionary): string {
-  return d.badges[key as keyof Dictionary["badges"]]?.description ?? "";
-}
-
 export function tierLabel(tier: BadgeTier, d: Dictionary): string {
   return d.badgeTiers[tier];
 }

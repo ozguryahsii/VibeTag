@@ -4,13 +4,15 @@ import { getVibeProfile } from "@/lib/profile";
 import {
   BADGE_COUNT,
   BADGE_TIERS,
+  bestPerFamily,
   computeBadges,
+  type Badge,
   type BadgeTier,
 } from "@/lib/badges";
 import { getDict, getLocale } from "@/lib/i18n/server";
-import { fill } from "@/lib/i18n";
+import { fill, type Dictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/config";
-import { badgeDescription, badgeLabel, badgeRequirement, tierLabel } from "@/lib/labels";
+import { badgeLabel, badgeRequirement, percent, tierLabel } from "@/lib/labels";
 import { TIER_STYLE } from "@/lib/tier-style";
 import { iconFor } from "@/lib/icons";
 import { IconGlyph } from "@/components/Icon";
@@ -19,12 +21,92 @@ import { Card, Meter, SectionTitle } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
+type Held = Badge & { earnedAt: Date | null };
+
 function fmtDate(date: Date, locale: Locale): string {
   return new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
   }).format(date);
+}
+
+/**
+ * One badge, as a square.
+ *
+ * Four facts and nothing else: which badge, which tier, what it cost, and —
+ * if it is yours — when. The blurb that used to sit in the middle turned a
+ * shelf into an essay; a wall of tiles you can scan beats ten paragraphs you
+ * will not read twice.
+ */
+function BadgeTile({
+  badge,
+  d,
+  locale,
+}: {
+  badge: Held;
+  d: Dictionary;
+  locale: Locale;
+}) {
+  const style = TIER_STYLE[badge.tier];
+  const earned = badge.earned;
+
+  return (
+    <Card
+      padded={false}
+      className="flex flex-col items-center p-2.5 text-center"
+      style={
+        earned
+          ? { borderColor: style.ring, background: "#FFFDF9" }
+          : { opacity: 0.62 }
+      }
+    >
+      {/* Same glyph at every tier — only the metal climbs. */}
+      <span
+        className={`grid h-10 w-10 place-items-center rounded-full ${
+          earned ? style.grad : "bg-cream border border-line"
+        }`}
+      >
+        <IconGlyph
+          def={iconFor(badge.icon)}
+          size={19}
+          color={earned ? "#fff" : "#B5A99F"}
+          strokeWidth={earned ? 2 : 1.8}
+        />
+      </span>
+
+      <p
+        className={`mt-1.5 text-[11.5px] font-extrabold leading-[1.15] ${
+          earned ? "" : "text-muted"
+        }`}
+      >
+        {badgeLabel(badge.key, d)}
+      </p>
+      <p
+        className="text-[9.5px] font-bold leading-tight mt-0.5"
+        style={{ color: style.ink }}
+      >
+        {tierLabel(badge.tier, d)}
+      </p>
+
+      <p className="mt-1 text-[9.5px] text-muted leading-tight">
+        {badgeRequirement(badge, d, locale)}
+      </p>
+
+      {earned ? (
+        <p className="mt-1 text-[9.5px] font-bold text-muted tabular-nums">
+          {badge.earnedAt ? fmtDate(badge.earnedAt, locale) : "—"}
+        </p>
+      ) : (
+        <div className="mt-1.5 w-full">
+          <Meter value={badge.progress * 100} />
+          <p className="mt-1 text-[9.5px] font-bold text-muted tabular-nums">
+            {percent(badge.progress * 100, locale)}
+          </p>
+        </div>
+      )}
+    </Card>
+  );
 }
 
 export default async function BadgesPage() {
@@ -42,12 +124,18 @@ export default async function BadgesPage() {
   const earnedAt = new Map(held.map((b) => [`${b.key}:${b.tier}`, b.earnedAt]));
   // `computeBadges` says who qualifies right now; the award rows say who
   // actually owns one. A badge is kept once earned, so ownership wins.
-  const all = computeBadges(profile).map((b) => {
+  const all: Held[] = computeBadges(profile).map((b) => {
     const at = earnedAt.get(`${b.key}:${b.tier}`) ?? null;
     return { ...b, earned: b.earned || at !== null, earnedAt: at };
   });
 
   const earnedTotal = all.filter((b) => b.earned).length;
+
+  // The top shelf is the best tier of each family you hold. Everything else —
+  // not yet earned, or earned but since surpassed — waits below in its own
+  // tier, so the same badge is never shown twice on one screen.
+  const best = bestPerFamily(all) as Held[];
+  const bestIds = new Set(best.map((b) => `${b.key}:${b.tier}`));
 
   return (
     <main className="px-5 pt-10">
@@ -78,7 +166,21 @@ export default async function BadgesPage() {
         </span>
       </div>
 
-      {earnedTotal === 0 && (
+      {best.length > 0 ? (
+        <section className="mt-7">
+          <SectionTitle>{d.badgesPage.earned}</SectionTitle>
+          <div className="grid grid-cols-3 gap-2.5">
+            {best.map((b) => (
+              <BadgeTile
+                key={`${b.key}:${b.tier}`}
+                badge={b}
+                d={d}
+                locale={locale}
+              />
+            ))}
+          </div>
+        </section>
+      ) : (
         <Card className="!py-4 mt-5">
           <p className="text-[13.5px] font-bold">
             {d.badgesPage.noneEarnedTitle}
@@ -93,11 +195,17 @@ export default async function BadgesPage() {
           cabinet you have already filled. */}
       {BADGE_TIERS.map((tier) => {
         const badges = all
-          .filter((b) => b.tier === tier)
+          .filter((b) => b.tier === tier && !bestIds.has(`${b.key}:${b.tier}`))
           .sort((a, b) =>
             a.earned === b.earned ? b.progress - a.progress : a.earned ? -1 : 1,
           );
-        const got = badges.filter((b) => b.earned).length;
+        if (badges.length === 0) return null;
+
+        // Counted over the whole tier, not over what is left after the top
+        // shelf borrowed some. "Silver 2/3" when there are ten silver badges
+        // is a number that answers a question nobody asked.
+        const ofTier = all.filter((b) => b.tier === tier);
+        const got = ofTier.filter((b) => b.earned).length;
         const style = TIER_STYLE[tier as BadgeTier];
 
         return (
@@ -110,84 +218,19 @@ export default async function BadgesPage() {
               >
                 {fill(d.badgesPage.tierCount, {
                   n: got,
-                  total: badges.length,
+                  total: ofTier.length,
                 })}
               </span>
             </div>
-            <p className="text-[11.5px] text-muted leading-relaxed -mt-1 mb-2.5">
-              {d.badgesPage.tierIntro[tier]}
-            </p>
 
-            <div className="grid gap-2.5">
+            <div className="grid grid-cols-3 gap-2.5">
               {badges.map((b) => (
-                <Card
+                <BadgeTile
                   key={`${b.key}:${b.tier}`}
-                  className="flex items-center gap-3.5 !py-4"
-                  style={
-                    b.earned
-                      ? { borderColor: style.ring, background: "#FFFDF9" }
-                      : undefined
-                  }
-                >
-                  {/* Same glyph at every tier — only the colour climbs. A
-                      different icon per tier would stop reading as one badge. */}
-                  <span
-                    className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${
-                      b.earned ? style.grad : "bg-cream border border-line"
-                    }`}
-                  >
-                    <IconGlyph
-                      def={iconFor(b.icon)}
-                      size={21}
-                      color={b.earned ? "#fff" : "#B5A99F"}
-                      strokeWidth={b.earned ? 2 : 1.8}
-                    />
-                  </span>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <p
-                        className={`text-[13.5px] font-extrabold ${
-                          b.earned ? "" : "text-muted"
-                        }`}
-                      >
-                        {badgeLabel(b.key, d)}
-                      </p>
-                      {b.earned ? (
-                        <span
-                          className="shrink-0 text-[10.5px] font-bold"
-                          style={{ color: style.ink }}
-                        >
-                          {b.earnedAt
-                            ? fill(d.badgesPage.earnedOn, {
-                                date: fmtDate(b.earnedAt, locale),
-                              })
-                            : tierLabel(tier, d)}
-                        </span>
-                      ) : (
-                        <span className="shrink-0 text-[11px] font-bold text-muted tabular-nums">
-                          {fill(d.badgesPage.progress, {
-                            n: Math.round(b.progress * 100),
-                          })}
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="text-[11.5px] text-muted leading-relaxed mt-0.5">
-                      {badgeDescription(b.key, d)}
-                    </p>
-                    <p
-                      className="text-[11px] font-bold mt-1 mb-2"
-                      style={{ color: b.earned ? style.ink : undefined }}
-                    >
-                      <span className={b.earned ? "" : "text-muted"}>
-                        {badgeRequirement(b, d, locale)}
-                      </span>
-                    </p>
-
-                    {!b.earned && <Meter value={b.progress * 100} />}
-                  </div>
-                </Card>
+                  badge={b}
+                  d={d}
+                  locale={locale}
+                />
               ))}
             </div>
           </section>

@@ -342,19 +342,11 @@ export const en = {
     subtitle:
       "Badges are earned once and kept. They come from what people saw in you, not from anything you can buy.",
     earned: "Earned",
-    locked: "Still to earn",
-    earnedOn: "Earned {date}",
-    progress: "{n}% there",
     noneEarnedTitle: "No badges yet",
     noneEarnedBody:
       "Every badge below is still open. The first ratings you collect start moving them.",
     allEarned: "You have earned every badge. That is rare.",
     countEarned: "{n} of {total} earned",
-    tierIntro: {
-      BRONZE: "Where every badge starts. A handful of people who mean it.",
-      SILVER: "The middle rung — enough people that the number holds up.",
-      GOLD: "Rare on purpose. A high score and the crowd to back it.",
-    },
     tierCount: "{n}/{total}",
     // Requirement fragments, joined with “·”. {n} is the threshold.
     metrics: {
@@ -802,44 +794,34 @@ export const en = {
   // generated from the thresholds themselves — see badgeRequirement().
   badges: {
     trustedPerson: {
-      label: "Trusted Person",
-      description: "People count on you, and enough of them have said so",
+      label: "Trusted Person"
     },
     goodEnergy: {
-      label: "Good Energy",
-      description: "You lift the room you walk into",
+      label: "Good Energy"
     },
     teamPlayer: {
-      label: "Team Player",
-      description: "You are what makes a team work",
+      label: "Team Player"
     },
     communityFavorite: {
-      label: "Community Favorite",
-      description: "A lot of people, and they agree",
+      label: "Community Favorite"
     },
     kindHeart: {
-      label: "Kind Heart",
-      description: "Kindness is the first thing people name",
+      label: "Kind Heart"
     },
     manyWorlds: {
-      label: "Many Worlds",
-      description: "Known well in more than one circle of your life",
+      label: "Many Worlds"
     },
     straightTalker: {
-      label: "Straight Talker",
-      description: "You say the true thing, even when it is the hard one",
+      label: "Straight Talker"
     },
     problemSolver: {
-      label: "Problem Solver",
-      description: "You are who people bring the knot to",
+      label: "Problem Solver"
     },
     greatListener: {
-      label: "Great Listener",
-      description: "People feel heard when they are with you",
+      label: "Great Listener"
     },
     wellKnown: {
-      label: "Well Known",
-      description: "Your circle keeps widening",
+      label: "Well Known"
     },
   },
 

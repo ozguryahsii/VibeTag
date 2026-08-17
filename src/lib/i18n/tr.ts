@@ -339,19 +339,11 @@ export const tr: Dictionary = {
     subtitle:
       "Rozetler bir kez kazanılır ve kalır. İnsanların sende gördüklerinden gelir; satın alınabilecek bir şey değildir.",
     earned: "Kazanılanlar",
-    locked: "Henüz kazanılmayanlar",
-    earnedOn: "Kazanıldı · {date}",
-    progress: "%{n} tamamlandı",
     noneEarnedTitle: "Henüz rozet yok",
     noneEarnedBody:
       "Aşağıdaki rozetlerin hepsi açık. İlk değerlendirmeler geldikçe ilerlemeye başlarlar.",
     allEarned: "Bütün rozetleri kazandın. Bu nadir bir şey.",
     countEarned: "{total} rozetin {n} tanesi",
-    tierIntro: {
-      BRONZE: "Her rozetin başladığı yer. İçten davranan birkaç kişi yeter.",
-      SILVER: "Orta basamak — sayının anlam kazandığı yer.",
-      GOLD: "Bilerek nadir. Yüksek skor ve onu doğrulayacak kalabalık.",
-    },
     tierCount: "{n}/{total}",
     // “·” ile birleştirilen koşul parçaları. {n} eşik değeri.
     metrics: {
@@ -799,44 +791,34 @@ export const tr: Dictionary = {
   // eşiklerden üretilir — bkz. badgeRequirement().
   badges: {
     trustedPerson: {
-      label: "Güven Veren",
-      description: "İnsanlar sana güveniyor ve bunu yeterince kişi söyledi",
+      label: "Güven Veren"
     },
     goodEnergy: {
-      label: "İyi Enerji",
-      description: "Girdiğin ortamı yükseltiyorsun",
+      label: "İyi Enerji"
     },
     teamPlayer: {
-      label: "Takım Oyuncusu",
-      description: "Bir takımı yürüten şey sensin",
+      label: "Takım Oyuncusu"
     },
     communityFavorite: {
-      label: "Topluluk Favorisi",
-      description: "Çok kişi var ve hepsi aynı şeyi söylüyor",
+      label: "Topluluk Favorisi"
     },
     kindHeart: {
-      label: "İyi Kalp",
-      description: "İnsanların önce söylediği şey kibarlığın",
+      label: "İyi Kalp"
     },
     manyWorlds: {
-      label: "Çok Yönlü",
-      description: "Hayatının birden fazla çevresinde iyi tanınıyorsun",
+      label: "Çok Yönlü"
     },
     straightTalker: {
-      label: "Sözü Dürüst",
-      description: "Zor olsa bile doğru olanı söylüyorsun",
+      label: "Sözü Dürüst"
     },
     problemSolver: {
-      label: "Çözüm Bulan",
-      description: "Düğümü insanlar sana getiriyor",
+      label: "Çözüm Bulan"
     },
     greatListener: {
-      label: "İyi Dinleyen",
-      description: "Yanındayken insanlar duyulduğunu hissediyor",
+      label: "İyi Dinleyen"
     },
     wellKnown: {
-      label: "Çevresi Geniş",
-      description: "Çevren büyümeye devam ediyor",
+      label: "Çevresi Geniş"
     },
   },
 

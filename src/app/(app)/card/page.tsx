@@ -3,7 +3,9 @@ import { getPercentile, getVibeProfile } from "@/lib/profile";
 import { VibeCardStudio } from "@/components/VibeCardStudio";
 import { EmptyState, Button } from "@/components/ui";
 import { getDict, getLocale } from "@/lib/i18n/server";
-import { tagLabel } from "@/lib/labels";
+import { badgeLabel, tagLabel } from "@/lib/labels";
+import { bestPerFamily, computeBadges } from "@/lib/badges";
+import { prisma } from "@/lib/db";
 import { LangToggle } from "@/components/LangToggle";
 
 export default async function CardPage() {
@@ -12,6 +14,21 @@ export default async function CardPage() {
   const locale = await getLocale();
   const profile = await getVibeProfile(user.id);
   const percentile = await getPercentile(user.id, profile.score);
+
+  // Owned badges beat the live calculation, exactly as on the Badges tab —
+  // a card must never show fewer badges than the app just congratulated
+  // someone for.
+  const held = await prisma.earnedBadge.findMany({
+    where: { userId: user.id },
+    select: { key: true, tier: true },
+  });
+  const heldIds = new Set(held.map((b) => `${b.key}:${b.tier}`));
+  const badges = bestPerFamily(
+    computeBadges(profile).map((b) => ({
+      ...b,
+      earned: b.earned || heldIds.has(`${b.key}:${b.tier}`),
+    })),
+  );
 
   if (profile.ratingCount === 0) {
     return (
@@ -71,6 +88,12 @@ export default async function CardPage() {
           tags: profile.tags
             .slice(0, 4)
             .map((t) => ({ key: t.key, label: tagLabel(t.key, locale) })),
+          badges: badges.slice(0, 3).map((b) => ({
+            key: b.key,
+            label: badgeLabel(b.key, d),
+            icon: b.icon,
+            tier: b.tier,
+          })),
         }}
       />
     </main>

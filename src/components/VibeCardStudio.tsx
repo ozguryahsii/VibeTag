@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { iconFor, type IconDef } from "@/lib/icons";
+import type { BadgeTier } from "@/lib/badges";
+import { TIER_STYLE } from "@/lib/tier-style";
 import { initialsOf } from "@/components/Avatar";
 import { fill, useD } from "@/components/LocaleProvider";
 
@@ -29,6 +31,8 @@ export type CardData = {
   ratingCount: number;
   percentile: number | null;
   tags: { key: string; label: string }[];
+  /** Best tier per family, best first — already trimmed by the page. */
+  badges: { key: string; label: string; icon: string; tier: BadgeTier }[];
   avatarUrl: string | null;
   avatarColor: string;
 };
@@ -352,6 +356,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
   const [format, setFormat] = useState<FormatKey>("story");
   const [theme, setTheme] = useState<ThemeKey>("auto");
   const [showScore, setShowScore] = useState(true);
+  const [showBadges, setShowBadges] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
 
   const draw = useCallback(() => {
@@ -382,18 +387,21 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     const margin = isWide ? h * 0.07 : w * 0.07;
     const cardW = isWide ? w * 0.5 : w - margin * 2;
     const cardX = (w - cardW) / 2;
-    const cardH = isWide
-      ? h - margin * 2
-      : Math.min(
-          h - margin * 2.4,
-          cardW * (tone === "calm" ? 1.76 : 1.65),
-        );
-    const cardY = (h - cardH) / 2 - (isWide ? 0 : h * 0.012);
-    const radius = cardW * 0.07;
     // Portrait uses the card width as its design unit. Square and wide cards
     // are height-constrained, so the same composition scales down intact
     // instead of letting the score or footer escape the rounded surface.
-    const designRatio = tone === "calm" ? 1.76 : 1.65;
+    //
+    // Badges buy their own room rather than squeezing the rest: without the
+    // extra ratio the medal row lands on the footer rule and silently drops
+    // itself, which looks exactly like a broken toggle.
+    const medals = showBadges ? data.badges.slice(0, 3) : [];
+    const designRatio =
+      (tone === "calm" ? 1.76 : 1.65) + (medals.length > 0 ? 0.15 : 0);
+    const cardH = isWide
+      ? h - margin * 2
+      : Math.min(h - margin * 2.4, cardW * designRatio);
+    const cardY = (h - cardH) / 2 - (isWide ? 0 : h * 0.012);
+    const radius = cardW * 0.07;
     const u = Math.min(cardW, cardH / designRatio);
 
     ctx.save();
@@ -723,6 +731,69 @@ export function VibeCardStudio({ data }: { data: CardData }) {
       cardY + cardH - u * (tone === "calm" ? 0.18 : 0.14);
     const footLineY =
       cardY + cardH - u * (tone === "calm" ? 0.31 : 0.25);
+
+    // -------------------------------------------------------- badge medals
+    // Drawn last of the body, and only if there is honest room above the
+    // footer rule. A badge row that collides with the rater count would cost
+    // more than it adds — the card is the growth loop, not a trophy case.
+    const medalR = u * 0.052;
+    const medalBlock = medalR * 2 + u * 0.055;
+
+    if (medals.length > 0) {
+      const gap = u * 0.075;
+      const step = medalR * 2 + gap;
+      const startX = cx - (step * medals.length - gap) / 2 + medalR;
+      // The card already grew to make room (see designRatio), so the row is
+      // placed rather than conditionally skipped — a toggle that silently
+      // does nothing is worse than a slightly tighter card. The clamp is the
+      // last defence: whatever the pills did above, the medals stay off the
+      // footer rule.
+      const top = Math.min(y, footLineY - medalBlock - u * 0.02);
+      const my = top + medalR + u * 0.005;
+
+      for (let i = 0; i < medals.length; i++) {
+        const m = medals[i];
+        const [from, to] = TIER_STYLE[m.tier].canvas;
+        const mx = startX + i * step;
+
+        const mg = ctx.createLinearGradient(
+          mx - medalR,
+          my - medalR,
+          mx + medalR,
+          my + medalR,
+        );
+        mg.addColorStop(0, from);
+        mg.addColorStop(1, to);
+
+        ctx.beginPath();
+        ctx.arc(mx, my, medalR, 0, Math.PI * 2);
+        ctx.fillStyle = mg;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.85)";
+        ctx.lineWidth = u * 0.005;
+        ctx.stroke();
+
+        // The glyph never changes between tiers — only the metal does.
+        drawIcon(
+          ctx,
+          iconFor(m.icon),
+          mx,
+          my,
+          medalR * 1.05,
+          "#FFFFFF",
+        );
+
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = sans(700, u * 0.026);
+        ctx.fillStyle = to;
+        ctx.fillText(m.label, mx, my + medalR + u * 0.032, step - u * 0.012);
+        ctx.textBaseline = "alphabetic";
+        ctx.textAlign = "left";
+      }
+
+      y = top + medalBlock;
+    }
     ctx.strokeStyle = "rgba(228,215,200,0.95)";
     ctx.lineWidth = u * 0.003;
     ctx.beginPath();
@@ -802,7 +873,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
     ctx.fillText(`@${data.username}`, cx, cardY + cardH + margin * 0.95);
     ctx.textAlign = "left";
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, format, theme, showScore, photoReady, d]);
+  }, [data, format, theme, showScore, showBadges, photoReady, d]);
 
   // Decode the profile photo once, then redraw. Data URLs are same-origin,
   // so the canvas stays untainted and toDataURL keeps working.
@@ -957,6 +1028,25 @@ export function VibeCardStudio({ data }: { data: CardData }) {
           </span>
         </span>
       </label>
+
+      {data.badges.length > 0 && (
+        <label className="mt-2.5 flex items-center gap-3 card p-4 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showBadges}
+            onChange={(e) => setShowBadges(e.target.checked)}
+            className="w-5 h-5 accent-[#F05262]"
+          />
+          <span>
+            <span className="block text-[13.5px] font-bold">
+              {d.card.showBadges}
+            </span>
+            <span className="block text-[12px] text-muted">
+              {d.card.showBadgesBody}
+            </span>
+          </span>
+        </label>
+      )}
 
       <div className="mt-5 grid gap-2.5">
         <button

@@ -6,13 +6,14 @@ import { ReportDialog } from "@/components/ReportDialog";
 import { prisma } from "@/lib/db";
 import { getMyRatingOf, getPercentile, getUserByUsername, getVibeProfile } from "@/lib/profile";
 import { cooldownDaysLeft } from "@/lib/rating-rules";
-import { earnedBadges } from "@/lib/badges";
+import { bestPerFamily, earnedBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
-import { badgeLabel, groupLabel, percent, tagLabel, traitLabel } from "@/lib/labels";
+import { badgeLabel, groupLabel, percent, tagLabel, tierLabel, traitLabel } from "@/lib/labels";
+import { TIER_STYLE } from "@/lib/tier-style";
 import { RELATIONSHIPS } from "@/lib/taxonomy";
-import { groupIconFor } from "@/lib/icons";
+import { groupIconFor, iconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ScoreDial } from "@/components/ScoreDial";
 import { VibeMark } from "@/components/Logo";
@@ -35,7 +36,9 @@ export default async function PublicProfile({
   const firstName = user.name.split(" ")[0];
   const profile = await getVibeProfile(user.id);
   const percentile = await getPercentile(user.id, profile.score);
-  const badges = earnedBadges(profile);
+  // Best tier per family: three Kind Hearts in a row would read as three
+  // badges rather than one climbed.
+  const badges = bestPerFamily(earnedBadges(profile));
   const summary = generateVibeSummary(profile, firstName, d, locale);
   const existing = isMe ? null : await getMyRatingOf(me.id, user.id);
   const daysLeft = existing ? cooldownDaysLeft(existing.lastUpdatedAt) : 0;
@@ -235,12 +238,26 @@ export default async function PublicProfile({
               <SectionTitle>{d.profile.badges}</SectionTitle>
               <div className="flex flex-wrap gap-2">
                 {badges.map((b) => (
-                  <TagPill
-                    key={b.key}
-                    tagKey={b.icon}
-                    label={badgeLabel(b.key, d)}
-                    tone="warm"
-                  />
+                  <span
+                    key={`${b.key}:${b.tier}`}
+                    className="inline-flex items-center gap-1.5 rounded-full border bg-warmwhite px-3 py-1.5"
+                    style={{ borderColor: TIER_STYLE[b.tier].ring }}
+                  >
+                    <span
+                      className={`grid h-5 w-5 place-items-center rounded-full ${TIER_STYLE[b.tier].grad}`}
+                    >
+                      <IconGlyph def={iconFor(b.icon)} size={11} color="#fff" strokeWidth={2.2} />
+                    </span>
+                    <span className="text-[12.5px] font-bold">
+                      {badgeLabel(b.key, d)}
+                    </span>
+                    <span
+                      className="text-[10.5px] font-extrabold"
+                      style={{ color: TIER_STYLE[b.tier].ink }}
+                    >
+                      {tierLabel(b.tier, d)}
+                    </span>
+                  </span>
                 ))}
               </div>
             </section>

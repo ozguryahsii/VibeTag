@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { redeemInviteFor } from "@/lib/invite";
+import { loginWhere } from "@/lib/identity";
 import { getDict } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 import { SUPPORT_EMAIL } from "@/lib/support";
@@ -84,12 +85,16 @@ export async function loginAction(
   formData: FormData,
 ): Promise<FormState> {
   const d = await getDict();
-  const email = String(formData.get("email") ?? "")
-    .trim()
-    .toLowerCase();
+  // Email or username — see lib/identity.ts. The field is still called
+  // `email` in older clients, so both names are accepted.
+  const identifier = String(
+    formData.get("identifier") ?? formData.get("email") ?? "",
+  );
   const password = String(formData.get("password") ?? "");
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = identifier.trim()
+    ? await prisma.user.findFirst({ where: loginWhere(identifier) })
+    : null;
   if (!user || !verifyPassword(password, user.passwordHash)) {
     return { error: d.auth.errors.badCredentials };
   }

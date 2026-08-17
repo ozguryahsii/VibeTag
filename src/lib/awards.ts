@@ -1,9 +1,12 @@
 import "server-only";
 
 import { prisma } from "@/lib/db";
-import { earnedBadges } from "@/lib/badges";
+import { earnedBadges, type BadgeTier } from "@/lib/badges";
 import { getVibeProfile } from "@/lib/profile";
 import { notify } from "@/lib/notifications";
+
+/** A badge somebody owns: the family, and which tier of it. */
+export type HeldBadge = { key: string; tier: BadgeTier };
 
 /**
  * Award any badge a profile now qualifies for.
@@ -17,21 +20,24 @@ import { notify } from "@/lib/notifications";
  * Returns the keys that were awarded just now, so the caller can decide
  * whether that deserves a notification.
  */
-export async function awardBadges(userId: string): Promise<string[]> {
+export async function awardBadges(userId: string): Promise<HeldBadge[]> {
   const profile = await getVibeProfile(userId);
-  const qualifies = earnedBadges(profile).map((b) => b.key);
+  const qualifies = earnedBadges(profile).map((b) => ({
+    key: b.key,
+    tier: b.tier,
+  }));
   if (qualifies.length === 0) return [];
 
   const held = await prisma.earnedBadge.findMany({
     where: { userId },
-    select: { key: true },
+    select: { key: true, tier: true },
   });
-  const heldKeys = new Set(held.map((b) => b.key));
-  const fresh = qualifies.filter((k) => !heldKeys.has(k));
+  const heldIds = new Set(held.map((b) => `${b.key}:${b.tier}`));
+  const fresh = qualifies.filter((b) => !heldIds.has(`${b.key}:${b.tier}`));
   if (fresh.length === 0) return [];
 
   await prisma.earnedBadge.createMany({
-    data: fresh.map((key) => ({ userId, key })),
+    data: fresh.map((b) => ({ userId, key: b.key, tier: b.tier })),
   });
   return fresh;
 }
@@ -44,20 +50,20 @@ export async function awardBadges(userId: string): Promise<string[]> {
  */
 export async function awardAndNotify(userId: string): Promise<void> {
   const fresh = await awardBadges(userId);
-  for (const key of fresh) {
+  for (const badge of fresh) {
     await notify(userId, "BADGE_EARNED", {
-      vars: { badgeKey: key },
-      href: "/home",
+      vars: { badgeKey: badge.key, tier: badge.tier },
+      href: "/badges",
     });
   }
 }
 
-/** Badge keys this user has actually been awarded, newest first. */
-export async function heldBadgeKeys(userId: string): Promise<string[]> {
+/** Badges this user has actually been awarded, newest first. */
+export async function heldBadges(userId: string): Promise<HeldBadge[]> {
   const rows = await prisma.earnedBadge.findMany({
     where: { userId },
     orderBy: { earnedAt: "desc" },
-    select: { key: true },
+    select: { key: true, tier: true },
   });
-  return rows.map((r) => r.key);
+  return rows.map((r) => ({ key: r.key, tier: r.tier as BadgeTier }));
 }

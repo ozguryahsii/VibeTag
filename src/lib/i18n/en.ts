@@ -112,6 +112,8 @@ export const en = {
     name: "Name",
     username: "Username",
     email: "Email",
+    identifier: "Email or username",
+    identifierPlaceholder: "you@example.com or alexmorgan",
     password: "Password",
     passwordHint: "At least 6 characters",
     signIn: "Sign in",
@@ -128,7 +130,7 @@ export const en = {
       password: "Password must be at least 6 characters.",
       emailTaken: "That email is already registered.",
       usernameTaken: "That username is taken.",
-      badCredentials: "Email or password is wrong.",
+      badCredentials: "Those details do not match an account.",
       nameShort: "Name must be at least 2 characters.",
       bioLong: "Bio can be at most 160 characters.",
       imageFormat: "That image format is not supported.",
@@ -348,6 +350,21 @@ export const en = {
       "Every badge below is still open. The first ratings you collect start moving them.",
     allEarned: "You have earned every badge. That is rare.",
     countEarned: "{n} of {total} earned",
+    tierIntro: {
+      BRONZE: "Where every badge starts. A handful of people who mean it.",
+      SILVER: "The middle rung — enough people that the number holds up.",
+      GOLD: "Rare on purpose. A high score and the crowd to back it.",
+    },
+    tierCount: "{n}/{total}",
+    // Requirement fragments, joined with “·”. {n} is the threshold.
+    metrics: {
+      trait: "{label} {n}+",
+      ratings: "{n} ratings",
+      workRatings: "{n} work ratings",
+      circles: "{n} circles",
+      score: "Vibe Score {n}+",
+      energyTag: "energy tag from {n} people",
+    },
   },
 
   card: {
@@ -363,6 +380,8 @@ export const en = {
       "Auto picks the tone from your score — a high score glows, a calm score stays elegant.",
     showScore: "Show the score",
     showScoreBody: "Turn it off to share only your tags.",
+    showBadges: "Show my badges",
+    showBadgesBody: "Your best three go on the card, in their tier colours.",
     share: "Share",
     download: "Download PNG ({w}×{h})",
     downloaded: "Card downloaded 🎉",
@@ -459,7 +478,7 @@ export const en = {
     ratingHiddenBody:
       "A rating you received broke the rules and no longer counts towards your Vibe Score.",
     badgeEarned: "You earned a new badge 🏅",
-    badgeEarnedBody: "“{badge}” is now on your My Vibe profile.",
+    badgeEarnedBody: "“{badge}” at {tierName} is now on your My Vibe profile.",
     generic: "Something happened on your profile",
     kicker: "RECENT ACTIVITY",
   },
@@ -779,28 +798,55 @@ export const en = {
     positivity: "Do they lift the room?",
   },
 
+  // Descriptions say what the badge *means*; the numbers for each tier are
+  // generated from the thresholds themselves — see badgeRequirement().
   badges: {
     trustedPerson: {
       label: "Trusted Person",
-      description: "Reliability 90+ and at least 8 ratings",
+      description: "People count on you, and enough of them have said so",
     },
     goodEnergy: {
       label: "Good Energy",
-      description: "Positive energy 90+ or the energy tag from 10+ people",
+      description: "You lift the room you walk into",
     },
     teamPlayer: {
       label: "Team Player",
-      description: "Teamwork 88+ and at least 5 work ratings",
+      description: "You are what makes a team work",
     },
     communityFavorite: {
       label: "Community Favorite",
-      description: "Rated by 25+ people with a score of 88+",
+      description: "A lot of people, and they agree",
     },
-    kindHeart: { label: "Kind Heart", description: "Kindness 92+" },
+    kindHeart: {
+      label: "Kind Heart",
+      description: "Kindness is the first thing people name",
+    },
     manyWorlds: {
       label: "Many Worlds",
-      description: "Rated from at least 3 different circles",
+      description: "Known well in more than one circle of your life",
     },
+    straightTalker: {
+      label: "Straight Talker",
+      description: "You say the true thing, even when it is the hard one",
+    },
+    problemSolver: {
+      label: "Problem Solver",
+      description: "You are who people bring the knot to",
+    },
+    greatListener: {
+      label: "Great Listener",
+      description: "People feel heard when they are with you",
+    },
+    wellKnown: {
+      label: "Well Known",
+      description: "Your circle keeps widening",
+    },
+  },
+
+  badgeTiers: {
+    BRONZE: "Bronze",
+    SILVER: "Silver",
+    GOLD: "Gold",
   },
 
   ai: {

@@ -4,13 +4,14 @@ import { prisma } from "@/lib/db";
 import { unreadCount } from "@/lib/notifications";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
-import { badgeDescription, badgeLabel, tagLabel, traitLabel } from "@/lib/labels";
+import { badgeLabel, tagLabel, tierLabel, traitLabel } from "@/lib/labels";
+import { TIER_STYLE } from "@/lib/tier-style";
 import { LangToggle } from "@/components/LangToggle";
 import { getPercentile, getVibeProfile } from "@/lib/profile";
-import { computeBadges } from "@/lib/badges";
+import { bestPerFamily, computeBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
-import { ICONS } from "@/lib/icons";
+import { ICONS, iconFor } from "@/lib/icons";
 import { ScoreDial } from "@/components/ScoreDial";
 import { VibeMark } from "@/components/Logo";
 import { Avatar, Button, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
@@ -33,18 +34,25 @@ export default async function HomePage() {
     getLocale(),
     prisma.earnedBadge.findMany({
       where: { userId: user.id },
-      select: { key: true },
+      select: { key: true, tier: true },
     }),
   ]);
 
   // Owned badges beat the live calculation — a badge is kept once earned, and
   // the shelf here has to agree with the Badges tab.
-  const heldKeys = new Set(held.map((b) => b.key));
+  const heldIds = new Set(held.map((b) => `${b.key}:${b.tier}`));
   const badges = computeBadges(profile).map((b) => ({
     ...b,
-    earned: b.earned || heldKeys.has(b.key),
+    earned: b.earned || heldIds.has(`${b.key}:${b.tier}`),
   }));
-  const earned = badges.filter((b) => b.earned);
+  // One row per family: bronze, silver and gold Kind Heart side by side would
+  // say the same thing three times on a shelf this narrow.
+  const earned = bestPerFamily(badges);
+  // Nothing earned yet? Show the nearest bronze rungs instead of an empty
+  // shelf — the point of the shelf is that it looks reachable.
+  const nextUp = badges
+    .filter((b) => !b.earned && b.tier === "BRONZE")
+    .sort((a, b) => b.progress - a.progress);
   const summary = generateVibeSummary(profile, user.name.split(" ")[0], d, locale);
 
   return (
@@ -263,20 +271,28 @@ export default async function HomePage() {
           {d.home.badges}
         </SectionTitle>
         <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
-          {(earned.length ? earned : badges).slice(0, 6).map((b) => (
+          {(earned.length ? earned : nextUp).slice(0, 6).map((b) => (
             <div
-              key={b.key}
+              key={`${b.key}:${b.tier}`}
               className="card shrink-0 w-[132px] p-3.5 text-center"
               style={{ opacity: b.earned ? 1 : 0.55 }}
             >
               <div className="grid place-items-center h-7">
-                <IconGlyph def={ICONS[b.icon]} size={24} color="#FF7A4D" strokeWidth={1.8} />
+                <IconGlyph
+                  def={iconFor(b.icon)}
+                  size={24}
+                  color={b.earned ? TIER_STYLE[b.tier].ink : "#B5A99F"}
+                  strokeWidth={1.8}
+                />
               </div>
               <div className="text-[12.5px] font-extrabold mt-1.5 leading-tight">
                 {badgeLabel(b.key, d)}
               </div>
-              <div className="text-[10.5px] text-muted mt-0.5">
-                {badgeDescription(b.key, d)}
+              <div
+                className="text-[10.5px] font-bold mt-0.5"
+                style={{ color: TIER_STYLE[b.tier].ink }}
+              >
+                {tierLabel(b.tier, d)}
               </div>
               {!b.earned && (
                 <div className="mt-2">

@@ -56,12 +56,14 @@ export function LoginForm() {
       <p className="text-[14px] text-muted mt-1.5">{d.auth.loginBody}</p>
 
       <form action={action} className="mt-8 grid gap-4 relative">
+        {/* Not type="email": a username is a perfectly good answer here, and
+            the browser would refuse to submit one. */}
         <Field
-          label={d.auth.email}
-          name="email"
-          type="email"
-          autoComplete="email"
-          placeholder={d.auth.emailPlaceholder}
+          label={d.auth.identifier}
+          name="identifier"
+          type="text"
+          autoComplete="username"
+          placeholder={d.auth.identifierPlaceholder}
           required
         />
         <Field

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { TagIcon } from "@/components/Icon";
 
 export { Avatar, AnonStack, initialsOf } from "@/components/Avatar";
@@ -60,13 +60,18 @@ export function Card({
   children,
   className = "",
   padded = true,
+  style,
 }: {
   children: ReactNode;
   className?: string;
   padded?: boolean;
+  /** For tints a utility class cannot carry — badge tier colours, say. */
+  style?: CSSProperties;
 }) {
   return (
-    <div className={`card ${padded ? "p-5" : ""} ${className}`}>{children}</div>
+    <div className={`card ${padded ? "p-5" : ""} ${className}`} style={style}>
+      {children}
+    </div>
   );
 }
 

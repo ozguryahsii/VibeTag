@@ -434,8 +434,8 @@ async function main() {
       {
         userId: ozgur.id,
         type: "BADGE_EARNED",
-        vars: JSON.stringify({ badgeKey: "communityFavorite" }),
-        href: "/home",
+        vars: JSON.stringify({ badgeKey: "communityFavorite", tier: "SILVER" }),
+        href: "/badges",
         createdAt: daysAgo(9),
         readAt: daysAgo(8),
       },
@@ -470,10 +470,13 @@ async function main() {
         vibeTags: r.vibeTags.map((t) => ({ tagKey: t.tagKey as never })),
       })),
     );
-    const keys = earnedBadges(profile).map((b) => b.key);
-    if (keys.length) {
+    const owned = earnedBadges(profile).map((b) => ({
+      key: b.key,
+      tier: b.tier,
+    }));
+    if (owned.length) {
       await prisma.earnedBadge.createMany({
-        data: keys.map((key) => ({ userId: u.id, key })),
+        data: owned.map((b) => ({ userId: u.id, key: b.key, tier: b.tier })),
       });
     }
   }

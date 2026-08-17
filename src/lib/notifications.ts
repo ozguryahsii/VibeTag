@@ -2,7 +2,8 @@ import "server-only";
 
 import { prisma } from "@/lib/db";
 import { fill, type Dictionary } from "@/lib/i18n";
-import { badgeLabel } from "@/lib/labels";
+import { badgeLabel, tierLabel } from "@/lib/labels";
+import type { BadgeTier } from "@/lib/badges";
 
 /**
  * In-app notifications. Deliberately vague by design: "you got a new rating"
@@ -83,9 +84,16 @@ export function renderNotification(
   }
 
   // A badge travels as its key so the congratulation is written in the
-  // reader's language, not the language the award happened to fire in.
+  // reader's language, not the language the award happened to fire in. The
+  // tier travels with it: "Kind Heart" and "Kind Heart · Gold" are different
+  // pieces of news, and only one of them is worth interrupting someone for.
   if (typeof vars.badgeKey === "string") {
-    vars = { ...vars, badge: badgeLabel(vars.badgeKey, d) };
+    vars = {
+      ...vars,
+      badge: badgeLabel(vars.badgeKey, d),
+      tierName:
+        typeof vars.tier === "string" ? tierLabel(vars.tier as BadgeTier, d) : "",
+    };
   }
 
   const t = d.notifications;

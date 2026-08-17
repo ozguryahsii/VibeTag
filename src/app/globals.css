@@ -31,6 +31,15 @@
   --grad-score: linear-gradient(135deg, #f5ad3c 11%, #f17146 50%, #e73d76 88%);
   --grad-card: linear-gradient(145deg, #f5ad3e 5%, #ef7648 55%, #ec476d 100%);
   --grad-premium: linear-gradient(135deg, #f5ad3c 0%, #ef7651 52%, #d95879 100%);
+  /* Badge tiers. Warmed towards the palette rather than literal metal — a
+     true grey silver looks dead next to the cream, and a true bronze reads
+     as brown. Same hue family as the app, different temperature each. */
+  --grad-bronze: linear-gradient(135deg, #d99a63 8%, #b3703c 55%, #8d5227 100%);
+  --grad-silver: linear-gradient(135deg, #d8d2c8 8%, #b0a99f 55%, #8d867d 100%);
+  --grad-gold: linear-gradient(135deg, #f6d16a 8%, #e0aa38 55%, #c1842a 100%);
+  --tier-bronze: #a9642f;
+  --tier-silver: #8d867d;
+  --tier-gold: #b8801f;
   --font-score: Didot, "Bodoni 72", "Bodoni MT", var(--font-playfair),
     "Times New Roman", serif;
   --font-score-serif: var(--font-score);
@@ -91,6 +100,18 @@ select {
 
 @utility grad-premium {
   background-image: var(--grad-premium);
+}
+
+@utility grad-bronze {
+  background-image: var(--grad-bronze);
+}
+
+@utility grad-silver {
+  background-image: var(--grad-silver);
+}
+
+@utility grad-gold {
+  background-image: var(--grad-gold);
 }
 
 @utility grad-text {

@@ -109,6 +109,8 @@ export const tr: Dictionary = {
     name: "İsim",
     username: "Kullanıcı adı",
     email: "E-posta",
+    identifier: "E-posta veya kullanıcı adı",
+    identifierPlaceholder: "sen@ornek.com ya da ozguryahsi",
     password: "Şifre",
     passwordHint: "En az 6 karakter",
     signIn: "Giriş yap",
@@ -125,7 +127,7 @@ export const tr: Dictionary = {
       password: "Şifre en az 6 karakter olmalı.",
       emailTaken: "Bu e-posta zaten kayıtlı.",
       usernameTaken: "Bu kullanıcı adı alınmış.",
-      badCredentials: "E-posta veya şifre hatalı.",
+      badCredentials: "Bu bilgiler bir hesapla eşleşmiyor.",
       nameShort: "İsim en az 2 karakter olmalı.",
       bioLong: "Bio en fazla 160 karakter olabilir.",
       imageFormat: "Görsel biçimi desteklenmiyor.",
@@ -345,6 +347,21 @@ export const tr: Dictionary = {
       "Aşağıdaki rozetlerin hepsi açık. İlk değerlendirmeler geldikçe ilerlemeye başlarlar.",
     allEarned: "Bütün rozetleri kazandın. Bu nadir bir şey.",
     countEarned: "{total} rozetin {n} tanesi",
+    tierIntro: {
+      BRONZE: "Her rozetin başladığı yer. İçten davranan birkaç kişi yeter.",
+      SILVER: "Orta basamak — sayının anlam kazandığı yer.",
+      GOLD: "Bilerek nadir. Yüksek skor ve onu doğrulayacak kalabalık.",
+    },
+    tierCount: "{n}/{total}",
+    // “·” ile birleştirilen koşul parçaları. {n} eşik değeri.
+    metrics: {
+      trait: "{label} {n}+",
+      ratings: "{n} değerlendirme",
+      workRatings: "{n} iş değerlendirmesi",
+      circles: "{n} çevre",
+      score: "Vibe Score {n}+",
+      energyTag: "{n} kişiden enerji etiketi",
+    },
   },
 
   card: {
@@ -360,6 +377,8 @@ export const tr: Dictionary = {
       "Auto, kartın tonunu skoruna göre seçer — yüksek skor ışıldar, sakin skor zarif kalır.",
     showScore: "Skoru göster",
     showScoreBody: "Kapatırsan kartta sadece etiketlerin görünür.",
+    showBadges: "Rozetlerimi göster",
+    showBadgesBody: "En iyi üç rozetin, kendi seviye renkleriyle karta eklenir.",
     share: "Paylaş",
     download: "PNG indir ({w}×{h})",
     downloaded: "Kart indirildi 🎉",
@@ -456,7 +475,7 @@ export const tr: Dictionary = {
     ratingHiddenBody:
       "Aldığın bir değerlendirme kuralları ihlal ediyordu; artık Vibe Score'una sayılmıyor.",
     badgeEarned: "Yeni bir rozet kazandın 🏅",
-    badgeEarnedBody: "“{badge}” artık My Vibe profilinde.",
+    badgeEarnedBody: "“{badge}” rozetinin {tierName} seviyesi artık My Vibe profilinde.",
     generic: "Profilinde bir gelişme var",
     kicker: "SON HAREKETLER",
   },
@@ -776,28 +795,55 @@ export const tr: Dictionary = {
     positivity: "Ortama enerji katar mı?",
   },
 
+  // Açıklamalar rozetin ne anlama geldiğini söyler; her seviyenin sayıları
+  // eşiklerden üretilir — bkz. badgeRequirement().
   badges: {
     trustedPerson: {
       label: "Güven Veren",
-      description: "Güvenilirlik 90+ ve en az 8 değerlendirme",
+      description: "İnsanlar sana güveniyor ve bunu yeterince kişi söyledi",
     },
     goodEnergy: {
       label: "İyi Enerji",
-      description: "Pozitif enerji 90+ veya 10+ kişiden enerji etiketi",
+      description: "Girdiğin ortamı yükseltiyorsun",
     },
     teamPlayer: {
       label: "Takım Oyuncusu",
-      description: "Takım çalışması 88+ ve en az 5 iş değerlendirmesi",
+      description: "Bir takımı yürüten şey sensin",
     },
     communityFavorite: {
       label: "Topluluk Favorisi",
-      description: "25+ kişi değerlendirdi ve skor 88+",
+      description: "Çok kişi var ve hepsi aynı şeyi söylüyor",
     },
-    kindHeart: { label: "İyi Kalp", description: "Kibarlık 92+" },
+    kindHeart: {
+      label: "İyi Kalp",
+      description: "İnsanların önce söylediği şey kibarlığın",
+    },
     manyWorlds: {
       label: "Çok Yönlü",
-      description: "En az 3 farklı çevreden değerlendirildi",
+      description: "Hayatının birden fazla çevresinde iyi tanınıyorsun",
     },
+    straightTalker: {
+      label: "Sözü Dürüst",
+      description: "Zor olsa bile doğru olanı söylüyorsun",
+    },
+    problemSolver: {
+      label: "Çözüm Bulan",
+      description: "Düğümü insanlar sana getiriyor",
+    },
+    greatListener: {
+      label: "İyi Dinleyen",
+      description: "Yanındayken insanlar duyulduğunu hissediyor",
+    },
+    wellKnown: {
+      label: "Çevresi Geniş",
+      description: "Çevren büyümeye devam ediyor",
+    },
+  },
+
+  badgeTiers: {
+    BRONZE: "Bronz",
+    SILVER: "Gümüş",
+    GOLD: "Altın",
   },
 
   ai: {

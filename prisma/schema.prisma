@@ -267,11 +267,14 @@ model EarnedBadge {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  /// Key from lib/badges.ts.
-  key      String
+  /// Family key from lib/badges.ts.
+  key String
+  /// BRONZE | SILVER | GOLD. Each tier is earned and kept on its own, so
+  /// reaching gold leaves three rows and the shelf can show the climb.
+  tier     String   @default("BRONZE")
   earnedAt DateTime @default(now())
 
-  @@unique([userId, key])
+  @@unique([userId, key, tier])
   @@index([userId])
 }
 

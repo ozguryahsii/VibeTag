@@ -63,7 +63,15 @@ services:
     # Migrations run on every start, before the server accepts traffic. They
     # are idempotent, so a restart is safe; a release that adds a column does
     # not need a separate step anyone can forget.
-    command: sh -c "npx prisma migrate deploy && node server.js"
+    #
+    # The CLI is invoked by file rather than through `npx prisma`. The
+    # standalone image carries `node_modules/prisma` but not the
+    # `node_modules/.bin` symlinks Next.js had no reason to trace, so `npx`
+    # cannot find the binary and the container restart-loops on
+    # "sh: prisma: not found".
+    command: >
+      sh -c "node node_modules/prisma/build/index.js migrate deploy
+      && node server.js"
 
 volumes:
   pgdata:

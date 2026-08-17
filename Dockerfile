@@ -48,6 +48,10 @@ COPY --from=build --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=build --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=build --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+# The bin symlinks are what `npx prisma` resolves through. The container does
+# not need them — the start command calls the CLI by file — but without them
+# every interactive `docker exec … npx prisma` fails confusingly.
+COPY --from=build --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 
 USER nextjs
 EXPOSE 3000

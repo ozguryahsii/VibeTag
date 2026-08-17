@@ -14,7 +14,8 @@
 #     network are a global namespace; this one is unmistakably ours.
 #   * The database publishes **no port at all**. The app reaches it over the
 #     private compose network; nothing else on the host can, and there is no
-#     5432/5433 to fight over.
+#     5432/5433 to fight over. It answers to `vibetag-db`, not `db`, for the
+#     same reason the web service is not called `app` — see below.
 #   * The app binds to 127.0.0.1 only, on APP_PORT (default 3100). Your
 #     existing reverse proxy is what faces the internet — this stack installs
 #     nothing system-wide and touches no shared config.
@@ -40,6 +41,16 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+    networks:
+      default:
+        # `db` is the most-used service name there is, and the web container
+        # also joins the shared proxy network, where somebody else's `db` may
+        # already answer to it. Docker resolves the name across every network
+        # a container is on, so `postgresql://…@db:5432` can quietly reach a
+        # neighbour's database — which then rejects our credentials and looks
+        # for all the world like a wrong password. `vibetag-db` cannot collide.
+        aliases:
+          - vibetag-db
 
   # Migrations, as their own step rather than something the app does on the
   # way up.
@@ -59,7 +70,7 @@ services:
         condition: service_healthy
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://vibetag:${POSTGRES_PASSWORD}@db:5432/vibetag
+      DATABASE_URL: postgresql://vibetag:${POSTGRES_PASSWORD}@vibetag-db:5432/vibetag
     command: npx prisma migrate deploy
 
   vibetag:
@@ -80,7 +91,7 @@ services:
       # Overrides whatever .env says. The app talks to the database over the
       # compose network, never through the host, and this is the one setting
       # people reliably get wrong when copying a dev file to a server.
-      DATABASE_URL: postgresql://vibetag:${POSTGRES_PASSWORD}@db:5432/vibetag
+      DATABASE_URL: postgresql://vibetag:${POSTGRES_PASSWORD}@vibetag-db:5432/vibetag
     ports:
       - "127.0.0.1:${APP_PORT:-3100}:3000"
     # Just the server. Migrations already ran — see the `migrate` service.

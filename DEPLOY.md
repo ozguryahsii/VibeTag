@@ -241,6 +241,25 @@ curl -s localhost:3100/api/health                                  # {"ok":true}
 docker exec <proxy-container> wget -qO- http://vibetag:3000/api/health
 ```
 
+A **503** from that health check means Next.js is up but the database query
+failed. The reason is in `docker compose -f docker-compose.prod.yml logs
+vibetag`, tagged `[health]`; to ask Prisma directly:
+
+```bash
+docker exec vibetag-vibetag-1 printenv DATABASE_URL
+docker exec vibetag-vibetag-1 node -e 'const{PrismaClient}=require("@prisma/client");new PrismaClient().$queryRaw`SELECT 1`.then(r=>console.log("OK",r)).catch(e=>console.error("ERR",e.message))'
+```
+
+`Authentication failed` while `migrate` succeeded with the same URL is the
+name-collision case: the app is on the shared proxy network as well, and on a
+shared network service names are a global namespace. That is why the database
+answers to `vibetag-db` rather than `db`. If you see it anyway, check who else
+claims the name:
+
+```bash
+docker network inspect "$PROXY_NETWORK" -f '{{range .Containers}}{{.Name}} {{end}}'
+```
+
 Swap can come back off once the build is done: `sudo swapoff /swapfile &&
 sudo rm /swapfile`. Leaving it costs nothing but 2 GB of disk, and saves the
 next build.

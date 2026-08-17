@@ -2,9 +2,17 @@
 #
 #   docker compose up -d db
 #
-# Nothing else in the app is containerised for development — Next.js runs on
-# the host so hot reload stays instant. This is only here so the database is
-# one command instead of an install guide.
+# Published on 5433, not 5432. A Mac with Postgres.app or Homebrew's
+# postgresql already owns the default port, and the failure when they collide
+# is genuinely confusing: the container refuses to start, then Prisma connects
+# to the *other* server and reports an authentication error, which reads like
+# a credentials problem rather than a port one.
+#
+# Override with DB_PORT in .env if 5433 is taken too.
+#
+# Nothing else is containerised for development — Next.js runs on the host so
+# hot reload stays instant. This is only here so the database is one command
+# instead of an install guide.
 
 services:
   db:
@@ -16,12 +24,12 @@ services:
       POSTGRES_PASSWORD: vibetag
       POSTGRES_DB: vibetag
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5433}:5432"
     volumes:
       - vibetag-pgdata:/var/lib/postgresql/data
     healthcheck:
-      # `migrate deploy` on a database that is still starting fails in a way
-      # that looks like a schema problem, so wait for it to actually answer.
+      # `migrate deploy` against a database that is still starting fails in a
+      # way that looks like a schema problem, so wait for it to actually answer.
       test: ["CMD-SHELL", "pg_isready -U vibetag -d vibetag"]
       interval: 3s
       timeout: 3s

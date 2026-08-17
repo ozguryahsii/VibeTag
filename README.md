@@ -29,10 +29,37 @@ npm run db:reset          # migration + demo verisi (41 kullanıcı, ~400 değer
 npm run dev               # http://localhost:3000
 ```
 
-Docker yoksa: `brew install postgresql@16 && brew services start postgresql@16`,
-sonra `createdb vibetag` ve `.env` içindeki `DATABASE_URL`'i kendi kullanıcı
-adınla güncelle. Ya da Neon/Supabase'de ücretsiz bir geliştirme veritabanı aç
-ve bağlantı adresini yapıştır — yerel kurulum gerekmez.
+Container **5433** portunda açılıyor, 5432'de değil — Mac'te Postgres.app ya
+da Homebrew'un postgresql'i çoğu zaman varsayılan portu zaten tutuyor.
+
+### Zaten bir PostgreSQL çalışıyorsa
+
+Docker'a hiç gerek yok, mevcut sunucunu kullan:
+
+```bash
+createdb vibetag
+```
+
+`.env` içinde:
+
+```
+DATABASE_URL="postgresql://$(whoami)@localhost:5432/vibetag"
+```
+
+Docker da yoksa Postgres de yoksa:
+`brew install postgresql@16 && brew services start postgresql@16`. Ya da
+Neon/Supabase'de ücretsiz bir geliştirme veritabanı açıp bağlantı adresini
+yapıştır — yerel kurulum gerekmez.
+
+### Takıldığın yer
+
+| Hata | Sebep |
+| --- | --- |
+| `Bind for 0.0.0.0:5433 failed: port is already allocated` | 5433 de dolu. `.env`'de `DB_PORT`'u değiştir (5434 gibi) ve `DATABASE_URL`'deki portu da aynı yap. |
+| `P1000: Authentication failed` | Container ayakta değil ve Prisma **başka** bir Postgres'e bağlanıyor. `docker compose ps` ile kontrol et. |
+| `P1001: Can't reach database server` | Container henüz hazır değil. `docker compose ps` çıktısında `healthy` yazmasını bekle. |
+
+Ne çalışıyor diye bakmak için: `lsof -nP -iTCP:5432 -sTCP:LISTEN`
 
 ### Demo hesapları (şifre hepsinde `vibetag`)
 

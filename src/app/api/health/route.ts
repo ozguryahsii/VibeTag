@@ -15,7 +15,11 @@ export async function GET() {
   try {
     await prisma.$queryRaw`SELECT 1`;
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (error) {
+    // The response stays opaque, but the reason goes to the container log.
+    // A health check that swallows its own error tells you only that
+    // something is wrong, which is the least useful half of the message.
+    console.error("[health] database check failed:", error);
     return NextResponse.json({ ok: false }, { status: 503 });
   }
 }

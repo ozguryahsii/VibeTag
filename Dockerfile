@@ -14,6 +14,15 @@ RUN npm ci
 # --------------------------------------------------------------- build
 FROM node:22-alpine AS build
 WORKDIR /app
+
+# NEXT_PUBLIC_* is inlined into the bundle at build time, not read at runtime.
+# Setting these only in the container's environment leaves them baked as empty
+# — push would silently never work and no amount of restarting would fix it.
+ARG NEXT_PUBLIC_APP_URL=""
+ARG NEXT_PUBLIC_VAPID_PUBLIC_KEY=""
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_VAPID_PUBLIC_KEY=$NEXT_PUBLIC_VAPID_PUBLIC_KEY
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate && npm run build

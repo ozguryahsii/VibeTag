@@ -2,16 +2,17 @@
 
 Two paths. Pick one — they are alternatives, not steps.
 
-| | **A · Vercel + Neon** | **B · VPS + Docker** |
+| | **A · Vercel + Neon** | **B · Your own server** |
 | --- | --- | --- |
 | Setup time | ~15 min | ~45 min |
-| Cost to start | Free tier | ~5 €/month |
+| Cost to start | Free tier | Whatever the box already costs |
 | You manage | Nothing | OS, TLS, backups, updates |
-| Good when | You want it live today | You want the data on your own machine |
+| Good when | You want it live today | You already have a server, or want the data on it |
 
-Path A unless there is a reason. Nothing here locks you in: the app is a plain
-Next.js server against a plain Postgres, and moving later is a database dump
-and a rebuild.
+Path B is written for a machine that is **already running other applications**
+and is careful not to disturb them. Nothing here locks you in either way: the
+app is a plain Next.js server against a plain Postgres, and moving later is a
+database dump and a rebuild.
 
 ---
 
@@ -52,12 +53,12 @@ and set the environment variables before the first deploy:
 
 ```
 DATABASE_URL                  = postgresql://…  (Neon, pooled)
-NEXT_PUBLIC_APP_URL           = https://vibetag.app
-SUPPORT_EMAIL                 = destek@vibetag.app
+NEXT_PUBLIC_APP_URL           = https://vibetag.net
+SUPPORT_EMAIL                 = destek@vibetag.net
 CRON_SECRET                   = <openssl rand -hex 32>
 NEXT_PUBLIC_VAPID_PUBLIC_KEY  = <public key>
 VAPID_PRIVATE_KEY             = <private key>
-VAPID_SUBJECT                 = mailto:destek@vibetag.app
+VAPID_SUBJECT                 = mailto:destek@vibetag.net
 ```
 
 `NEXT_PUBLIC_APP_URL` matters more than it looks. Invite links and QR codes
@@ -82,7 +83,7 @@ Prefer the build command — then every future release migrates itself.
 
 ### 4. Domain
 
-Vercel → Settings → Domains → add `vibetag.app`, then set the DNS records it
+Vercel → Settings → Domains → add `vibetag.net`, then set the DNS records it
 shows you. TLS is automatic.
 
 ### 5. Nightly fraud sweep
@@ -101,106 +102,217 @@ button in the moderation queue weekly.
 
 ---
 
-## B · VPS + Docker
+## B · Your own server, alongside whatever else runs there
 
-Assumes Ubuntu 24.04 and a domain already pointed at the server's IP.
+Written for a box that is already serving other applications. The stack keeps
+entirely to itself: no system packages, no shared config, no ports fought
+over. Everything below is scoped to a compose project called `vibetag`.
 
-### 1. Server
+### 0. Look before touching anything
+
+Run this first and read the output. It changes what the next steps look like.
 
 ```bash
-ssh root@<ip>
-apt update && apt upgrade -y
-curl -fsSL https://get.docker.com | sh
-adduser --disabled-password --gecos "" vibetag
-usermod -aG docker vibetag
+echo "── ports in use ──"
+sudo ss -tlnp | grep -E ':(80|443|3000|3100|5432|5433)\b' || echo "  none of interest"
+
+echo "── which proxy ──"
+for s in nginx caddy apache2 traefik haproxy; do
+  systemctl is-active --quiet $s && echo "  $s (systemd)"
+done
+docker ps --format '  {{.Names}} → {{.Ports}}' 2>/dev/null | grep -E ':(80|443)->' || true
+
+echo "── docker ──"
+docker --version && docker compose version
+docker ps --format '  {{.Names}}'
+docker network ls --format '  {{.Name}}'
+docker volume ls --format '  {{.Name}}' | grep -i vibe || echo "  no vibetag volume yet"
+
+echo "── room ──"
+df -h / | tail -1
+free -m | head -2
 ```
 
-### 2. Code and configuration
+Three things matter in that output:
+
+1. **Which reverse proxy** terminates 443. That is the one file we will touch,
+   and only to add a server block — never to change an existing one.
+2. **Whether 3100 is free.** If not, set `APP_PORT` to something that is.
+3. **Whether a `vibetag` container, network or volume already exists.** It
+   should not; if it does, we are not starting from where we think.
+
+### 1. Code
 
 ```bash
-su - vibetag
-git clone https://github.com/ozguryahsii/VibeTag.git app && cd app
+sudo adduser --disabled-password --gecos "" vibetag
+sudo usermod -aG docker vibetag
+sudo -iu vibetag
+
+git clone https://github.com/ozguryahsii/VibeTag.git app
+cd app
 git checkout <tag>          # always a tag, never a branch
-cp .env.example .env && nano .env
 ```
 
-Set `DATABASE_URL` to the compose database and `NEXT_PUBLIC_APP_URL` to your
-real origin:
+A separate unix user is not ceremony: it keeps this app's files, and anything
+that compromises it, away from your other applications.
 
-```
-DATABASE_URL="postgresql://vibetag:<strong-password>@db:5432/vibetag"
-NEXT_PUBLIC_APP_URL="https://vibetag.app"
-```
-
-Change the password in `docker-compose.yml` to match. The default
-`vibetag:vibetag` is for a laptop, not the internet.
-
-### 3. Run
+### 2. Configuration
 
 ```bash
-docker compose up -d db
-docker build -t vibetag .
-docker run --rm --env-file .env --network app_default vibetag \
-  npx prisma migrate deploy
-docker run -d --name vibetag-app --restart unless-stopped \
-  --env-file .env --network app_default -p 127.0.0.1:3000:3000 vibetag
+cp .env.example .env
+nano .env
 ```
 
-Bound to `127.0.0.1` on purpose — the app is reached through the proxy, never
-directly.
+```
+NEXT_PUBLIC_APP_URL="https://vibetag.net"
+POSTGRES_PASSWORD="<openssl rand -hex 24>"
+APP_PORT="3100"                      # whatever the port check said is free
+SUPPORT_EMAIL="destek@vibetag.net"
+CRON_SECRET="<openssl rand -hex 32>"
+NEXT_PUBLIC_VAPID_PUBLIC_KEY="..."   # npx web-push generate-vapid-keys
+VAPID_PRIVATE_KEY="..."
+VAPID_SUBJECT="mailto:destek@vibetag.net"
+```
 
-### 4. TLS and proxy
+Leave `DATABASE_URL` alone — the compose file overrides it with the internal
+address, which is the setting people most often get wrong when copying a dev
+file onto a server.
+
+`NEXT_PUBLIC_APP_URL` and `NEXT_PUBLIC_VAPID_PUBLIC_KEY` are compiled into the
+build, not read at runtime. Changing either means rebuilding, not restarting.
+
+### 3. Start
 
 ```bash
-apt install -y caddy
+docker compose -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f app     # Ctrl-C to leave
 ```
 
-`/etc/caddy/Caddyfile`:
+Migrations run on start, before the server takes traffic.
 
+```bash
+curl -s localhost:3100/api/health      # {"ok":true}
 ```
-vibetag.app {
-    reverse_proxy 127.0.0.1:3000
+
+Nothing is reachable from outside yet — that is the next step, and it is the
+only one that touches shared configuration.
+
+### 4. Reverse proxy
+
+Add a new site. Do not edit the blocks serving your other apps.
+
+**nginx** — `/etc/nginx/sites-available/vibetag.net`:
+
+```nginx
+server {
+    server_name vibetag.net;
+
+    location / {
+        proxy_pass http://127.0.0.1:3100;
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        # Without this the app builds invite links as http:// behind your TLS.
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        "upgrade";
+    }
+
+    # Profile photos are data URLs today, so a server action can carry one.
+    client_max_body_size 6m;
 }
 ```
 
 ```bash
-systemctl reload caddy
+sudo ln -s /etc/nginx/sites-available/vibetag.net /etc/nginx/sites-enabled/
+sudo nginx -t          # never reload without this passing
+sudo systemctl reload nginx
+sudo certbot --nginx -d vibetag.net
 ```
 
-Caddy obtains and renews the certificate on its own.
-
-### 5. Nightly sweep
-
-`crontab -e`:
+**Caddy** — append to `/etc/caddy/Caddyfile`:
 
 ```
-0 3 * * * curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" https://vibetag.app/api/cron/fraud-sweep >/dev/null
+vibetag.net {
+    reverse_proxy 127.0.0.1:3100
+    request_body { max_size 6MB }
+}
+```
+
+```bash
+sudo caddy validate --config /etc/caddy/Caddyfile
+sudo systemctl reload caddy
+```
+
+Caddy handles the certificate itself; with nginx, certbot does.
+
+### 5. Nightly fraud sweep
+
+As the `vibetag` user, `crontab -e` — not root's crontab, and not a file in
+`/etc/cron.d` that another app might also be editing:
+
+```
+0 3 * * * curl -fsS -X POST -H "Authorization: Bearer <CRON_SECRET>" https://vibetag.net/api/cron/fraud-sweep >/dev/null
 ```
 
 ### 6. Backups
 
-The one thing nobody sets up until they need it:
-
-```
-0 4 * * * docker exec vibetag-db pg_dump -U vibetag vibetag | gzip > /home/vibetag/backups/$(date +\%F).sql.gz
+```bash
+mkdir -p ~/backups
 ```
 
-Create `~/backups` first, and copy them somewhere that is not this server.
+`crontab -e`:
 
----
+```
+0 4 * * * docker exec vibetag-db-1 pg_dump -U vibetag vibetag | gzip > ~/backups/vibetag-$(date +\%F).sql.gz
+0 5 * * 0 find ~/backups -name '*.sql.gz' -mtime +30 -delete
+```
+
+Check the container name against `docker compose -f docker-compose.prod.yml ps`
+first, and copy the dumps somewhere that is not this server.
+
+### Updating later
+
+```bash
+sudo -iu vibetag && cd app
+git fetch --tags && git checkout <new-tag>
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Migrations apply on start. Nothing else on the server is touched.
+
+### Removing it cleanly
+
+```bash
+docker compose -f docker-compose.prod.yml down          # keeps the data
+docker compose -f docker-compose.prod.yml down -v       # deletes it too
+```
+
+Scoped to the `vibetag` project — no other container is affected.
 
 ## After deploying — either path
 
 Run these before telling anyone the link exists.
 
 ```bash
-curl -s https://vibetag.app/api/health          # {"ok":true}
-curl -s -o /dev/null -w "%{http_code}\n" https://vibetag.app/    # 200
-curl -s -o /dev/null -w "%{http_code}\n" https://vibetag.app/legal/kvkk    # 200
+curl -s https://vibetag.net/api/health                                     # {"ok":true}
+curl -s -o /dev/null -w "%{http_code}\n" https://vibetag.net/              # 200
+curl -s -o /dev/null -w "%{http_code}\n" https://vibetag.net/legal/kvkk    # 200
 
 # Must refuse without the secret
-curl -s -o /dev/null -w "%{http_code}\n" -X POST https://vibetag.app/api/cron/fraud-sweep   # 403
+curl -s -o /dev/null -w "%{http_code}\n" -X POST https://vibetag.net/api/cron/fraud-sweep   # 403
 ```
+
+On a shared server, also confirm you broke nothing:
+
+```bash
+sudo nginx -t                        # or: sudo caddy validate --config /etc/caddy/Caddyfile
+docker ps --format '{{.Names}}\t{{.Status}}'
+```
+
+Every container that was up before should still be up.
 
 Then in a browser, on a phone:
 
@@ -231,8 +343,9 @@ Path A: Vercel → Deployments → the previous one → Promote.
 Path B:
 
 ```bash
+sudo -iu vibetag && cd app
 git checkout <previous-tag>
-docker build -t vibetag . && docker restart vibetag-app
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 Both roll back *code*. A migration that dropped a column is not undone by

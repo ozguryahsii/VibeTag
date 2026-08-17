@@ -1,0 +1,64 @@
+# Production stack: the app and its database, and nothing else.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Written to be a good neighbour on a server that already runs other things:
+#
+#   * `name:` fixes the compose project, so containers, the network and the
+#     volume are all prefixed `vibetag_` and cannot collide with a sibling
+#     project's `db` or `app`.
+#   * The database publishes **no port at all**. The app reaches it over the
+#     private compose network; nothing else on the host can, and there is no
+#     5432/5433 to fight over.
+#   * The app binds to 127.0.0.1 only, on APP_PORT (default 3100). Your
+#     existing reverse proxy is what faces the internet — this stack installs
+#     nothing system-wide and touches no shared config.
+#
+# Everything is read from .env — see .env.example.
+
+name: vibetag
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vibetag
+      # No default on purpose: an accidentally password-less production
+      # database should fail to start, loudly, rather than come up open.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: vibetag
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vibetag -d vibetag"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      args:
+        # Inlined at build time — see the Dockerfile.
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?set NEXT_PUBLIC_APP_URL in .env}
+        NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${NEXT_PUBLIC_VAPID_PUBLIC_KEY:-}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      # Overrides whatever .env says. The app talks to the database over the
+      # compose network, never through the host, and this is the one setting
+      # people reliably get wrong when copying a dev file to a server.
+      DATABASE_URL: postgresql://vibetag:${POSTGRES_PASSWORD}@db:5432/vibetag
+    ports:
+      - "127.0.0.1:${APP_PORT:-3100}:3000"
+    # Migrations run on every start, before the server accepts traffic. They
+    # are idempotent, so a restart is safe; a release that adds a column does
+    # not need a separate step anyone can forget.
+    command: sh -c "npx prisma migrate deploy && node server.js"
+
+volumes:
+  pgdata:

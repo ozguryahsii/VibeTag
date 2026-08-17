@@ -42,16 +42,17 @@ COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=build --chown=nextjs:nodejs /app/public ./public
 
-# Migrations and the Prisma CLI, so `db:deploy` can run from inside the image
-# on release rather than needing a second toolchain on the host.
+# The generated client and its query engine. Next.js does not trace these, so
+# they have to be named explicitly or every database call fails at runtime.
+#
+# The Prisma *CLI* is deliberately absent. It is not a self-contained binary —
+# it pulls in effect, c12, deepmerge-ts and more — and hand-picking those out
+# of node_modules is a game with no end. Migrations run from the build stage
+# instead, as their own step; see the `migrate` service in
+# docker-compose.prod.yml.
 COPY --from=build --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=build --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=build --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-# The bin symlinks are what `npx prisma` resolves through. The container does
-# not need them — the start command calls the CLI by file — but without them
-# every interactive `docker exec … npx prisma` fails confusingly.
-COPY --from=build --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 
 USER nextjs
 EXPOSE 3000

@@ -41,6 +41,27 @@ services:
       timeout: 3s
       retries: 20
 
+  # Migrations, as their own step rather than something the app does on the
+  # way up.
+  #
+  # It runs from the build stage, which still has the full node_modules: the
+  # Prisma CLI needs a real dependency tree and the slim runtime image
+  # deliberately does not carry one. Running to completion before the app
+  # starts also means that with two app containers there is still exactly one
+  # migration, instead of a race between them.
+  migrate:
+    build:
+      context: .
+      target: build
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://vibetag:${POSTGRES_PASSWORD}@db:5432/vibetag
+    command: npx prisma migrate deploy
+
   vibetag:
     build:
       context: .
@@ -52,6 +73,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     env_file: .env
     environment:
       # Overrides whatever .env says. The app talks to the database over the
@@ -60,18 +83,8 @@ services:
       DATABASE_URL: postgresql://vibetag:${POSTGRES_PASSWORD}@db:5432/vibetag
     ports:
       - "127.0.0.1:${APP_PORT:-3100}:3000"
-    # Migrations run on every start, before the server accepts traffic. They
-    # are idempotent, so a restart is safe; a release that adds a column does
-    # not need a separate step anyone can forget.
-    #
-    # The CLI is invoked by file rather than through `npx prisma`. The
-    # standalone image carries `node_modules/prisma` but not the
-    # `node_modules/.bin` symlinks Next.js had no reason to trace, so `npx`
-    # cannot find the binary and the container restart-loops on
-    # "sh: prisma: not found".
-    command: >
-      sh -c "node node_modules/prisma/build/index.js migrate deploy
-      && node server.js"
+    # Just the server. Migrations already ran — see the `migrate` service.
+    command: node server.js
 
 volumes:
   pgdata:

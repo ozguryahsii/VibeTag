@@ -226,7 +226,13 @@ docker compose -f docker-compose.prod.yml ps
 docker compose -f docker-compose.prod.yml logs -f vibetag     # Ctrl-C to leave
 ```
 
-Migrations run on start, before the server takes traffic.
+Three containers come up in order: the database, then a one-shot `migrate`
+that applies pending migrations and exits, then the app. If the migration
+fails the app never starts — which is the point.
+
+```bash
+docker compose -f docker-compose.prod.yml logs migrate
+```
 
 ```bash
 # host-published setup

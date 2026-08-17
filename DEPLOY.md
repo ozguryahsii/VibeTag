@@ -349,6 +349,23 @@ sudo systemctl reload caddy
 
 Caddy handles the certificate itself; with nginx, certbot does.
 
+**A certbot container that only renews is half a renewal.** The common setup —
+`while :; do certbot renew; sleep 12h; done` — writes the new certificate and
+stops there. nginx keeps serving the one it loaded at startup, so the change
+is invisible until something restarts it, and if nothing does, every site on
+that proxy expires on the same day. Renewal has to reload the proxy:
+
+```bash
+# in the certbot container's command
+certbot renew --deploy-hook "..."      # if it can reach the proxy, or
+# on the host, weekly:
+docker exec <proxy-container> nginx -s reload
+```
+
+A reload is not a restart: existing connections finish, and the other sites
+never drop a request. This is shared configuration — agree it with whoever
+owns the server before changing it.
+
 ### 6. Nightly fraud sweep
 
 As the `vibetag` user, `crontab -e` — not root's crontab, and not a file in

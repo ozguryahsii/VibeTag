@@ -82,6 +82,12 @@ export function LoginForm() {
         <div className="mt-1">
           <Submit label={pending ? d.auth.signingIn : d.auth.signIn} />
         </div>
+        <Link
+          href="/forgot"
+          className="text-center text-[13px] font-bold text-coral"
+        >
+          {d.forgot.link}
+        </Link>
       </form>
 
       <p className="mt-auto pt-8 text-center text-[14px] text-muted">

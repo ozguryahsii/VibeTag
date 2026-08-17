@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 import { recomputeAllRatings } from "@/lib/fraud";
+import { pruneRateLimits } from "@/lib/rate-limit";
+import { pruneOtpCodes } from "@/lib/otp";
+import { pruneErrors } from "@/lib/errors";
 
 /**
- * Nightly fake-rating sweep.
+ * The nightly sweep.
  *
  * The live check only sees the moment a rating is written. Reciprocal rings
  * and burst patterns often only close days later, so the detector has to get
@@ -24,5 +28,21 @@ export async function POST(request: Request) {
   }
 
   const result = await recomputeAllRatings();
-  return NextResponse.json(result);
+
+  // Housekeeping, in the same pass. Every one of these tables only ever grows
+  // otherwise: expired sessions are the worst of them, since one row is added
+  // per sign-in and nothing has ever removed one.
+  const [sessions, rateLimits, otpCodes, errors] = await Promise.all([
+    prisma.session
+      .deleteMany({ where: { expiresAt: { lt: new Date() } } })
+      .then((r) => r.count),
+    pruneRateLimits(),
+    pruneOtpCodes(),
+    pruneErrors(),
+  ]);
+
+  return NextResponse.json({
+    ...result,
+    pruned: { sessions, rateLimits, otpCodes, errors },
+  });
 }

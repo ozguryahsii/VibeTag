@@ -18,6 +18,8 @@ import { iconFor } from "@/lib/icons";
 import { IconGlyph } from "@/components/Icon";
 import { LangToggle } from "@/components/LangToggle";
 import { Card, Meter, SectionTitle } from "@/components/ui";
+import { verificationState } from "@/lib/verification";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -130,6 +132,7 @@ export default async function BadgesPage() {
   });
 
   const earnedTotal = all.filter((b) => b.earned).length;
+  const verifications = verificationState(user);
 
   // The top shelf is the best tier of each family you hold. Everything else —
   // not yet earned, or earned but since surpassed — waits below in its own
@@ -190,6 +193,71 @@ export default async function BadgesPage() {
           </p>
         </Card>
       )}
+
+      {/* Verification sits above the ladder, and apart from it. These are not
+          earned from what people saw in you — they are proofs you supplied —
+          so mixing them into the tiers would blur what a badge means here. */}
+      <section className="mt-7">
+        <SectionTitle>{d.badgesPage.verification}</SectionTitle>
+        <div className="grid grid-cols-3 gap-2.5">
+          {verifications.map((v) => (
+            <Card
+              key={v.key}
+              padded={false}
+              className="flex flex-col items-center p-2.5 text-center"
+              style={
+                v.earned
+                  ? { borderColor: "rgba(64,160,110,0.3)", background: "#FBFDFB" }
+                  : { opacity: v.available ? 0.72 : 0.5 }
+              }
+            >
+              <span
+                className={`grid h-10 w-10 place-items-center rounded-full ${
+                  v.earned ? "" : "bg-cream border border-line"
+                }`}
+                style={
+                  v.earned
+                    ? { background: "linear-gradient(135deg,#5FC08A,#2F8C5E)" }
+                    : undefined
+                }
+              >
+                <IconGlyph
+                  def={iconFor(v.icon)}
+                  size={19}
+                  color={v.earned ? "#fff" : "#B5A99F"}
+                  strokeWidth={v.earned ? 2 : 1.8}
+                />
+              </span>
+              <p
+                className={`mt-1.5 text-[11.5px] font-extrabold leading-[1.15] ${
+                  v.earned ? "" : "text-muted"
+                }`}
+              >
+                {d.verifications[v.key].label}
+              </p>
+              <p className="mt-1 text-[9.5px] text-muted leading-tight">
+                {d.verifications[v.key].description}
+              </p>
+              {v.earned ? (
+                <p className="mt-1 text-[9.5px] font-bold tabular-nums" style={{ color: "#2F8C5E" }}>
+                  {v.at ? fmtDate(v.at, locale) : ""}
+                </p>
+              ) : v.available ? (
+                <Link
+                  href="/verify"
+                  className="mt-1.5 text-[10px] font-extrabold text-coral"
+                >
+                  {d.badgesPage.verifyNow}
+                </Link>
+              ) : (
+                <p className="mt-1.5 text-[9.5px] font-bold text-muted">
+                  {d.badgesPage.comingSoon}
+                </p>
+              )}
+            </Card>
+          ))}
+        </div>
+      </section>
 
       {/* Bronze first: the page reads as a ladder you climb, not a trophy
           cabinet you have already filled. */}

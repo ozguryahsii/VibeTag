@@ -10,6 +10,11 @@ export default async function AppLayout({
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  // New accounts confirm their email before the app opens. Accounts that
+  // existed before verification arrived carry mustVerifyEmail = false and are
+  // never sent here — locking somebody out of an account they already had is
+  // not a security improvement.
+  if (user.mustVerifyEmail) redirect("/verify");
 
   // The inbox badge lives on the tab bar now, so the count is read once here
   // rather than on whichever screen happens to show a header.

@@ -366,7 +366,36 @@ A reload is not a restart: existing connections finish, and the other sites
 never drop a request. This is shared configuration — agree it with whoever
 owns the server before changing it.
 
-### 6. Nightly fraud sweep
+### 6. Email (Resend)
+
+Without this, nobody can register: the sign-up code has nowhere to go, and the
+verification screen is the only thing a new account can reach.
+
+Two steps at [resend.com](https://resend.com), in this order:
+
+1. **Domains → Add domain.** Resend shows a set of DKIM and SPF records; put
+   them in Cloudflare DNS for `vibetag.net` **grey-clouded** (they are TXT and
+   MX records, not web traffic). Wait for it to say Verified. An unverified
+   domain gets rejected or filed as spam, which for a sign-up code is the same
+   as not sending it.
+2. **API Keys → Create.** Sending permission is enough.
+
+Then, in `.env` on the server:
+
+```bash
+RESEND_API_KEY="re_…"
+EMAIL_FROM="Vibe Tag <noreply@vibetag.net>"
+```
+
+```bash
+docker compose -f docker-compose.prod.yml -f docker-compose.proxy.yml up -d
+```
+
+No rebuild — neither variable is baked into the bundle. Check it works by
+registering a throwaway account and watching for the code; if nothing arrives,
+`/moderation/errors` will have the reason.
+
+### 7. Nightly fraud sweep
 
 As the `vibetag` user, `crontab -e` — not root's crontab, and not a file in
 `/etc/cron.d` that another app might also be editing:
@@ -375,7 +404,7 @@ As the `vibetag` user, `crontab -e` — not root's crontab, and not a file in
 0 3 * * * curl -fsS -X POST -H "Authorization: Bearer <CRON_SECRET>" https://vibetag.net/api/cron/fraud-sweep >/dev/null
 ```
 
-### 7. Backups
+### 8. Backups
 
 ```bash
 mkdir -p ~/backups

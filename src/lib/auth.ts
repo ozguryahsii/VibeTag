@@ -62,6 +62,12 @@ export type SessionUser = {
   avatarColor: string;
   plan: Plan;
   isVerified: boolean;
+  emailVerifiedAt: Date | null;
+  phoneVerifiedAt: Date | null;
+  idVerifiedAt: Date | null;
+  /// True until a new account confirms its email. Grandfathered accounts are
+  /// false, so nobody who already had an account is locked out of it.
+  mustVerifyEmail: boolean;
   isAdmin: boolean;
   ratingPolicy: string;
 };
@@ -95,6 +101,10 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     avatarColor: u.avatarColor,
     plan: u.plan as Plan,
     isVerified: u.isVerified,
+    emailVerifiedAt: u.emailVerifiedAt,
+    phoneVerifiedAt: u.phoneVerifiedAt,
+    idVerifiedAt: u.idVerifiedAt,
+    mustVerifyEmail: u.mustVerifyEmail,
     isAdmin: u.isAdmin,
     ratingPolicy: u.ratingPolicy,
   };

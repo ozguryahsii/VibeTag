@@ -4,27 +4,10 @@ import { useRef, useState } from "react";
 import { useActionState } from "react";
 import { updateProfileAction, type FormState } from "@/lib/actions/auth";
 import { Avatar } from "@/components/Avatar";
+import { PhotoCropper } from "@/components/PhotoCropper";
 import { useD } from "@/components/LocaleProvider";
 
 const COLORS = ["#FF8A3D", "#FF5C77", "#FF7AA2", "#E8845C", "#D96C5F", "#F3A76F"];
-
-/** Downscale to a square 512px JPEG before it ever leaves the device. */
-async function toSquareDataUrl(file: File, size = 512): Promise<string> {
-  const bitmap = await createImageBitmap(file);
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("no 2d context");
-
-  const scale = Math.max(size / bitmap.width, size / bitmap.height);
-  const w = bitmap.width * scale;
-  const h = bitmap.height * scale;
-  ctx.drawImage(bitmap, (size - w) / 2, (size - h) / 2, w, h);
-  bitmap.close?.();
-
-  return canvas.toDataURL("image/jpeg", 0.82);
-}
 
 export function ProfileEditor({
   name,
@@ -44,26 +27,21 @@ export function ProfileEditor({
   );
   const [photo, setPhoto] = useState<string | null>(avatarUrl);
   const [color, setColor] = useState(avatarColor);
-  const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [cropping, setCropping] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
+  function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+    // Reset the input so picking the same file twice still opens the cropper.
+    e.target.value = "";
     if (!file) return;
-    if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type)) {
+    if (!/^image\/(jpeg|png|webp|heic|heif|gif|avif)$/.test(file.type)) {
       setLocalError(d.settings.photoBadType);
       return;
     }
-    setBusy(true);
     setLocalError(null);
-    try {
-      setPhoto(await toSquareDataUrl(file));
-    } catch {
-      setLocalError(d.settings.photoUnreadable);
-    } finally {
-      setBusy(false);
-    }
+    setCropping(file);
   }
 
   return (
@@ -90,11 +68,7 @@ export function ProfileEditor({
         <div className="flex-1">
           <p className="text-[13.5px] font-extrabold">{d.settings.photo}</p>
           <p className="text-[11.5px] text-muted leading-relaxed mt-0.5">
-            {busy
-              ? d.settings.photoPreparing
-              : photo
-                ? d.settings.photoChange
-                : d.settings.photoNone}
+            {photo ? d.settings.photoChange : d.settings.photoNone}
           </p>
           {photo && (
             <button
@@ -115,6 +89,17 @@ export function ProfileEditor({
         className="hidden"
         onChange={onPick}
       />
+
+      {cropping && (
+        <PhotoCropper
+          file={cropping}
+          onCancel={() => setCropping(null)}
+          onDone={(dataUrl) => {
+            setPhoto(dataUrl);
+            setCropping(null);
+          }}
+        />
+      )}
 
       <div>
         <span className="block text-[10.5px] font-extrabold tracking-[0.14em] uppercase text-muted mb-2.5 ml-1">
@@ -175,7 +160,7 @@ export function ProfileEditor({
 
       <button
         type="submit"
-        disabled={pending || busy}
+        disabled={pending}
         className="h-12 rounded-full grad-score text-white font-bold text-[14.5px] active:scale-[0.98] transition-transform disabled:opacity-50"
       >
         {pending ? d.common.saving : d.common.save}

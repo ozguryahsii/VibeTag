@@ -112,6 +112,11 @@ export default async function ModerationPage() {
       <p className="text-[13px] text-muted mt-1 leading-relaxed">
         {d.moderation.subtitle}
       </p>
+      <p className="mt-2 text-[12.5px]">
+        <Link href="/moderation/errors" className="font-bold text-coral">
+          {d.errorsPage.open}
+        </Link>
+      </p>
 
       <div className="mt-4">
         <FraudSweep />

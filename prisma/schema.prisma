@@ -37,8 +37,22 @@ model User {
   // FREE | SILVER (Vibe Insights) | GOLD (Vibe Identity)
   plan String @default("FREE")
 
-  // Trust signals used by fake-rating detection.
+  /// Trust signal used by fake-rating detection and shown as ✅ on profiles.
+  /// True once any verification has been passed — today that means email.
   isVerified Boolean @default(false)
+
+  /// One timestamp per verification method, so a profile can say *how* it was
+  /// verified rather than just that it was. Phone and identity are not offered
+  /// yet; the columns exist so the badge shelf and the schema agree from the
+  /// start instead of being retrofitted around a live table.
+  emailVerifiedAt DateTime?
+  phoneVerifiedAt DateTime?
+  idVerifiedAt    DateTime?
+
+  /// New accounts must confirm their email before the app opens. Accounts that
+  /// existed before verification was introduced are grandfathered — being
+  /// locked out of an account you already had is not a security improvement.
+  mustVerifyEmail Boolean @default(true)
 
   /// Can open the moderation queue. Not a role system — one boolean is
   /// honest about what this actually is until there is a second kind of staff.
@@ -70,6 +84,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   sessions        Session[]
+  otpCodes        OtpCode[]
   ratingsReceived Rating[]  @relation("RatingsReceived")
   ratingsGiven    Rating[]  @relation("RatingsGiven")
 
@@ -268,7 +283,7 @@ model EarnedBadge {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   /// Family key from lib/badges.ts.
-  key String
+  key      String
   /// BRONZE | SILVER | GOLD. Each tier is earned and kept on its own, so
   /// reaching gold leaves three rows and the shelf can show the climb.
   tier     String   @default("BRONZE")
@@ -459,4 +474,69 @@ model Message {
   createdAt DateTime  @default(now())
 
   @@index([conversationId, createdAt])
+}
+
+/// A one-time code sent by email.
+///
+/// The code itself is never stored — only a hash, the same way a password is.
+/// A leaked backup should not be a working set of account-takeover tokens.
+model OtpCode {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// REGISTER | VERIFY | RESET — a code minted to confirm a new account must
+  /// not be usable to reset that account's password.
+  purpose  String
+  /// Where it was sent. Kept so a code stays bound to the address that got it,
+  /// even if the account's email changes in between.
+  email    String
+  codeHash String
+
+  /// Wrong guesses so far. Enough of them burns the code.
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+}
+
+/// A fixed-window counter for rate limiting.
+///
+/// In the database rather than in memory: the app is one container today but
+/// a restart must not hand an attacker a fresh budget, and a second container
+/// must not double it.
+model RateLimit {
+  id     String   @id @default(cuid())
+  /// "login:1.2.3.4", "otp:someone@example.com" — the thing being limited.
+  bucket String
+  /// Start of the window this row counts.
+  window DateTime
+  count  Int      @default(1)
+
+  @@unique([bucket, window])
+  @@index([window])
+}
+
+/// Something that went wrong, kept where an admin can actually see it.
+///
+/// Deliberately not a third-party service: this application stores personal
+/// data under KVKK, and sending stack traces to another company is a decision
+/// for its owner to make, not a default to slip in.
+model ErrorLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  /// ERROR | WARN
+  level   String  @default("ERROR")
+  /// Route, action or job the failure came from.
+  where   String
+  message String
+  stack   String?
+  /// Who was signed in, when there was anybody.
+  userId  String?
+
+  @@index([createdAt])
 }

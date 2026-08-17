@@ -7,6 +7,8 @@ import { ProfileEditor } from "@/components/ProfileEditor";
 import { DeleteAccount } from "@/components/DeleteAccount";
 import { PushToggle } from "@/components/PushToggle";
 import { Avatar } from "@/components/Avatar";
+import { IconGlyph } from "@/components/Icon";
+import { ICONS } from "@/lib/icons";
 import { Card, SectionTitle } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
@@ -255,6 +257,25 @@ export default async function SettingsPage() {
           </div>
         )}
       </div>
+
+      {!user.emailVerifiedAt && (
+        <Link href="/verify" className="block mt-4">
+          <Card className="flex items-center gap-3.5">
+            <span className="w-10 h-10 shrink-0 grid place-items-center rounded-full"
+              style={{ background: "linear-gradient(135deg,#5FC08A,#2F8C5E)" }}>
+              <IconGlyph def={ICONS.envelope} size={18} color="#fff" />
+            </span>
+            <span className="flex-1">
+              <span className="block text-[13.5px] font-extrabold">
+                {d.settings.verifyTitle}
+              </span>
+              <span className="block text-[12px] text-muted leading-relaxed">
+                {d.settings.verifyBody}
+              </span>
+            </span>
+          </Card>
+        </Link>
+      )}
 
       {user.isAdmin && (
         <div className="mt-7">

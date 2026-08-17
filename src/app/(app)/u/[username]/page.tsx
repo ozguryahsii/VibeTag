@@ -15,6 +15,7 @@ import { TIER_STYLE } from "@/lib/tier-style";
 import { RELATIONSHIPS } from "@/lib/taxonomy";
 import { groupIconFor, iconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
+import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { ScoreDial } from "@/components/ScoreDial";
 import { VibeMark } from "@/components/Logo";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
@@ -92,7 +93,7 @@ export default async function PublicProfile({
         </div>
 
         <div className="relative z-10 flex flex-col items-center">
-          <Avatar
+          <PhotoLightbox
             name={user.name}
             url={user.avatarUrl}
             color={user.avatarColor}

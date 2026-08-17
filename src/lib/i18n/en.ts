@@ -347,6 +347,9 @@ export const en = {
       "Every badge below is still open. The first ratings you collect start moving them.",
     allEarned: "You have earned every badge. That is rare.",
     countEarned: "{n} of {total} earned",
+    verification: "Verification",
+    verifyNow: "Verify →",
+    comingSoon: "Coming soon",
     tierCount: "{n}/{total}",
     // Requirement fragments, joined with “·”. {n} is the threshold.
     metrics: {
@@ -384,6 +387,107 @@ export const en = {
     moodStandout: "Standout profile",
     moodGrowing: "Growing strong",
     moodRoom: "Room to grow",
+  },
+
+  photo: {
+    cropTitle: "Choose your crop",
+    cropHint:
+      "Drag to move, pinch or use the slider to zoom. The circle is what people will see.",
+    zoom: "Zoom",
+    use: "Use this",
+    open: "Open photo",
+    close: "Tap anywhere to close",
+  },
+
+  otp: {
+    tooMany: "Too many attempts. Try again in {n} minutes.",
+    sendFailed: "We could not send the code just now. Try again in a moment.",
+    errors: {
+      none: "Ask for a code first.",
+      expired: "That code has expired. Ask for a new one.",
+      wrong: "That code is not right.",
+      burned: "Too many wrong tries. Ask for a new code.",
+    },
+    mailExpiry: "The code is good for 10 minutes.",
+    mailIgnore: "If you did not ask for this, you can ignore this email — nothing has changed.",
+    verifyMail: {
+      subject: "Your Vibe Tag code",
+      heading: "Confirm your email",
+      body: "Enter this code in Vibe Tag to confirm this address is yours.",
+    },
+    resetMail: {
+      subject: "Reset your Vibe Tag password",
+      heading: "Set a new password",
+      body: "Enter this code in Vibe Tag to choose a new password. Every other device will be signed out.",
+    },
+  },
+
+  verify: {
+    kicker: "ONE LAST STEP",
+    title: "Confirm your email",
+    body: "We sent a six-digit code to {email}. Enter it and your account is ready.",
+    voluntaryTitle: "Verify your email",
+    voluntaryBody:
+      "We sent a six-digit code to {email}. Verifying earns you the Email badge and the ✅ on your profile.",
+    code: "Code",
+    submit: "Confirm",
+    submitting: "Confirming…",
+    resend: "Send another code",
+    resending: "Sending…",
+    resent: "Sent. Check your inbox — and your spam folder.",
+    spam: "Not there? Look in spam. Mail can take a minute.",
+    wrongAccount: "Wrong account?",
+    signOut: "Sign out",
+    later: "Not now",
+  },
+
+  forgot: {
+    kicker: "FORGOTTEN PASSWORD",
+    title: "Let's get you back in",
+    body: "Type your email or username. If we find an account, a code is on its way.",
+    submit: "Send me a code",
+    submitting: "Sending…",
+    sentTitle: "Check your email",
+    sentBody:
+      "If that matches an account, a six-digit code is on its way. It is good for 10 minutes.",
+    haveCode: "I have a code →",
+    backToLogin: "Back to sign in",
+    link: "Forgotten your password?",
+  },
+
+  reset: {
+    kicker: "NEW PASSWORD",
+    title: "Choose a new password",
+    body: "Enter the code we emailed you, then the password you want from now on.",
+    submit: "Save and sign in",
+    submitting: "Saving…",
+    newPassword: "New password",
+    signedOutNote: "Saving this signs out every other device.",
+  },
+
+  verifications: {
+    email: {
+      label: "Email verified",
+      description: "You confirmed the address you signed up with",
+    },
+    phone: {
+      label: "Phone verified",
+      description: "Confirmed by a code sent to your phone",
+    },
+    identity: {
+      label: "Identity verified",
+      description: "Confirmed against an ID card or passport",
+    },
+  },
+
+  errorsPage: {
+    kicker: "OPERATIONS",
+    title: "Errors",
+    subtitle:
+      "Everything the server failed at, newest first. Kept for 30 days and never sent anywhere else.",
+    empty: "Nothing has gone wrong in the last 30 days.",
+    lastDay: "{n} in the last 24 hours",
+    open: "Errors →",
   },
 
   invite: {
@@ -504,6 +608,8 @@ export const en = {
   },
 
   settings: {
+    verifyTitle: "Verify your email",
+    verifyBody: "Earn the Email badge and the ✅ on your profile. Takes a minute.",
     kicker: "YOUR VIBE IDENTITY",
     title: "Profile",
     myProfile: "My profile",

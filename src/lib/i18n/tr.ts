@@ -344,6 +344,9 @@ export const tr: Dictionary = {
       "Aşağıdaki rozetlerin hepsi açık. İlk değerlendirmeler geldikçe ilerlemeye başlarlar.",
     allEarned: "Bütün rozetleri kazandın. Bu nadir bir şey.",
     countEarned: "{total} rozetin {n} tanesi",
+    verification: "Doğrulama",
+    verifyNow: "Doğrula →",
+    comingSoon: "Yakında",
     tierCount: "{n}/{total}",
     // “·” ile birleştirilen koşul parçaları. {n} eşik değeri.
     metrics: {
@@ -381,6 +384,107 @@ export const tr: Dictionary = {
     moodStandout: "Öne çıkan profil",
     moodGrowing: "Yükselişte",
     moodRoom: "Gelişime açık",
+  },
+
+  photo: {
+    cropTitle: "Kırpmayı seç",
+    cropHint:
+      "Kaydırarak taşı, iki parmakla ya da çubukla yakınlaştır. İnsanların göreceği şey daire içinde kalan.",
+    zoom: "Yakınlaştır",
+    use: "Bunu kullan",
+    open: "Fotoğrafı aç",
+    close: "Kapatmak için bir yere dokun",
+  },
+
+  otp: {
+    tooMany: "Çok fazla deneme. {n} dakika sonra tekrar dene.",
+    sendFailed: "Kodu şu an gönderemedik. Birazdan tekrar dene.",
+    errors: {
+      none: "Önce bir kod iste.",
+      expired: "Bu kodun süresi doldu. Yeni bir tane iste.",
+      wrong: "Bu kod doğru değil.",
+      burned: "Çok fazla yanlış deneme. Yeni bir kod iste.",
+    },
+    mailExpiry: "Kod 10 dakika geçerli.",
+    mailIgnore: "Bunu sen istemediysen bu e-postayı yok sayabilirsin — hiçbir şey değişmedi.",
+    verifyMail: {
+      subject: "Vibe Tag kodun",
+      heading: "E-postanı doğrula",
+      body: "Bu adresin sana ait olduğunu onaylamak için bu kodu Vibe Tag'e gir.",
+    },
+    resetMail: {
+      subject: "Vibe Tag şifreni sıfırla",
+      heading: "Yeni bir şifre belirle",
+      body: "Yeni bir şifre seçmek için bu kodu Vibe Tag'e gir. Diğer bütün cihazlardan çıkış yapılacak.",
+    },
+  },
+
+  verify: {
+    kicker: "SON BİR ADIM",
+    title: "E-postanı doğrula",
+    body: "{email} adresine altı haneli bir kod gönderdik. Kodu gir, hesabın hazır.",
+    voluntaryTitle: "E-postanı doğrula",
+    voluntaryBody:
+      "{email} adresine altı haneli bir kod gönderdik. Doğrulayınca E-posta rozetini ve profilindeki ✅ işaretini kazanırsın.",
+    code: "Kod",
+    submit: "Onayla",
+    submitting: "Onaylanıyor…",
+    resend: "Yeni kod gönder",
+    resending: "Gönderiliyor…",
+    resent: "Gönderildi. Gelen kutunu — ve spam klasörünü — kontrol et.",
+    spam: "Gelmediyse spam klasörüne bak. Postanın gelmesi bir dakikayı bulabilir.",
+    wrongAccount: "Yanlış hesap mı?",
+    signOut: "Çıkış yap",
+    later: "Şimdi değil",
+  },
+
+  forgot: {
+    kicker: "ŞİFRENİ Mİ UNUTTUN",
+    title: "Seni geri sokalım",
+    body: "E-postanı ya da kullanıcı adını yaz. Bir hesap bulursak kod yola çıkar.",
+    submit: "Bana kod gönder",
+    submitting: "Gönderiliyor…",
+    sentTitle: "E-postana bak",
+    sentBody:
+      "Bu bir hesapla eşleşiyorsa altı haneli bir kod yola çıktı. Kod 10 dakika geçerli.",
+    haveCode: "Kodum var →",
+    backToLogin: "Girişe dön",
+    link: "Şifreni mi unuttun?",
+  },
+
+  reset: {
+    kicker: "YENİ ŞİFRE",
+    title: "Yeni bir şifre seç",
+    body: "E-posta ile gönderdiğimiz kodu, sonra da bundan sonra kullanacağın şifreyi gir.",
+    submit: "Kaydet ve giriş yap",
+    submitting: "Kaydediliyor…",
+    newPassword: "Yeni şifre",
+    signedOutNote: "Bunu kaydetmek diğer bütün cihazlardan çıkış yapar.",
+  },
+
+  verifications: {
+    email: {
+      label: "E-posta doğrulandı",
+      description: "Kayıt olduğun adresi onayladın",
+    },
+    phone: {
+      label: "Telefon doğrulandı",
+      description: "Telefonuna gönderilen kodla onaylandı",
+    },
+    identity: {
+      label: "Kimlik doğrulandı",
+      description: "Kimlik kartı veya pasaport ile onaylandı",
+    },
+  },
+
+  errorsPage: {
+    kicker: "İŞLETİM",
+    title: "Hatalar",
+    subtitle:
+      "Sunucuda ters giden her şey, en yenisi üstte. 30 gün tutulur ve hiçbir yere gönderilmez.",
+    empty: "Son 30 günde ters giden bir şey olmamış.",
+    lastDay: "Son 24 saatte {n} tane",
+    open: "Hatalar →",
   },
 
   invite: {
@@ -501,6 +605,8 @@ export const tr: Dictionary = {
   },
 
   settings: {
+    verifyTitle: "E-postanı doğrula",
+    verifyBody: "E-posta rozetini ve profilindeki ✅ işaretini kazan. Bir dakika sürer.",
     kicker: "VIBE KİMLİĞİN",
     title: "Profil",
     myProfile: "Profilim",

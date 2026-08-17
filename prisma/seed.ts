@@ -209,6 +209,10 @@ async function main() {
       avatarColor: "#FF8A3D",
       plan: "GOLD",
       isVerified: true,
+      emailVerifiedAt: daysAgo(240),
+      // Seeded accounts stand in for people who already had one: gating a
+      // demo database behind an inbox nobody can read helps nothing.
+      mustVerifyEmail: false,
       isAdmin: true,
       locale: "tr",
       shareLocation: true,
@@ -246,7 +250,14 @@ async function main() {
                 : rnd() > 0.85
                   ? "SILVER"
                   : "FREE",
-          isVerified: rnd() > 0.7,
+          ...(() => {
+            const verified = rnd() > 0.7;
+            return {
+              isVerified: verified,
+              emailVerifiedAt: verified ? daysAgo(60) : null,
+            };
+          })(),
+          mustVerifyEmail: false,
           ...seededLocation(i),
           createdAt: daysAgo(30 + Math.floor(rnd() * 200)),
         },

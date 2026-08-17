@@ -12,6 +12,7 @@ import { bestPerFamily, computeBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ICONS, iconFor } from "@/lib/icons";
+import { PhotoLightbox } from "@/components/PhotoLightbox";
 import { ScoreDial } from "@/components/ScoreDial";
 import { VibeMark } from "@/components/Logo";
 import { Avatar, Button, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
@@ -126,7 +127,7 @@ export default async function HomePage() {
         </div>
 
         <div className="relative z-10 flex flex-col items-center">
-          <Avatar
+          <PhotoLightbox
             name={user.name}
             url={user.avatarUrl}
             color={user.avatarColor}

@@ -7,6 +7,11 @@
 #   * `name:` fixes the compose project, so containers, the network and the
 #     volume are all prefixed `vibetag_` and cannot collide with a sibling
 #     project's `db` or `app`.
+#   * The web service is called `vibetag`, not `app`. Docker registers a
+#     service name as a DNS alias on every network it joins, so an `app` here
+#     sharing a proxy network with somebody else's `app` would have the proxy
+#     round-robin between two unrelated applications. Names on a shared
+#     network are a global namespace; this one is unmistakably ours.
 #   * The database publishes **no port at all**. The app reaches it over the
 #     private compose network; nothing else on the host can, and there is no
 #     5432/5433 to fight over.
@@ -36,7 +41,7 @@ services:
       timeout: 3s
       retries: 20
 
-  app:
+  vibetag:
     build:
       context: .
       args:

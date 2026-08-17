@@ -198,7 +198,12 @@ Widening the app's bind to `0.0.0.0` would work and would also expose it to
 the internet directly, past the proxy. Instead put `PROXY_NETWORK` in `.env`
 with the network above, and add the overlay to every compose command — the
 app joins that network, publishes no host port at all, and the proxy reaches
-it by container name.
+it as `http://vibetag:3000`.
+
+One thing to check before you do: **service names become DNS aliases on a
+shared network.** If another project on that network already has a service
+called `vibetag`, rename ours. This is also why ours is not called `app` —
+half the compose files in the world have an `app`.
 
 ### 4. Build and start
 
@@ -218,7 +223,7 @@ docker compose -f docker-compose.prod.yml up -d --build
 #   -f docker-compose.prod.yml -f docker-compose.proxy.yml
 
 docker compose -f docker-compose.prod.yml ps
-docker compose -f docker-compose.prod.yml logs -f app     # Ctrl-C to leave
+docker compose -f docker-compose.prod.yml logs -f vibetag     # Ctrl-C to leave
 ```
 
 Migrations run on start, before the server takes traffic.
@@ -227,7 +232,7 @@ Migrations run on start, before the server takes traffic.
 # host-published setup
 curl -s localhost:3100/api/health                                  # {"ok":true}
 # proxy-network setup — ask from inside the proxy container
-docker exec <proxy-container> wget -qO- http://vibetag-app-1:3000/api/health
+docker exec <proxy-container> wget -qO- http://vibetag:3000/api/health
 ```
 
 Swap can come back off once the build is done: `sudo swapoff /swapfile &&
@@ -283,7 +288,7 @@ Same server block as above, with one change: `proxy_pass` goes to the
 container, since there is no host port.
 
 ```nginx
-    proxy_pass http://vibetag-app-1:3000;
+    proxy_pass http://vibetag:3000;
 ```
 
 Reload without restarting, so the other sites never drop a request:

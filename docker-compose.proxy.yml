@@ -8,14 +8,19 @@
 # internet, bypassing the proxy) the app simply joins the network the proxy is
 # already on and is reached by name:
 #
-#   proxy_pass http://vibetag-app-1:3000;
+#   proxy_pass http://vibetag:3000;
+#
+# `vibetag` is the service name, which Docker resolves on that network. It is
+# deliberately not `app`: a service name becomes a DNS alias, and two
+# containers answering to `app` on one network would have the proxy split
+# traffic between unrelated applications.
 #
 # Set PROXY_NETWORK in .env to that network — `docker inspect <proxy> -f
 # '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'` will tell you.
 # The network is `external`, so this never creates or modifies it.
 
 services:
-  app:
+  vibetag:
     # No host port at all: the only route in is through the proxy.
     ports: !reset []
     networks:

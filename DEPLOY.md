@@ -241,6 +241,16 @@ curl -s localhost:3100/api/health                                  # {"ok":true}
 docker exec <proxy-container> wget -qO- http://vibetag:3000/api/health
 ```
 
+**Connection refused** while the log says `Ready` means the server is
+listening on an address you are not asking. Check what it printed:
+
+```bash
+docker compose -f docker-compose.prod.yml logs vibetag | grep Local
+```
+
+`http://0.0.0.0:3000` is right; a container id there means `HOSTNAME` is
+reaching the standalone server, which binds to it.
+
 A **503** from that health check means Next.js is up but the database query
 failed. The reason is in `docker compose -f docker-compose.prod.yml logs
 vibetag`, tagged `[health]`; to ask Prisma directly:

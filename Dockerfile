@@ -32,6 +32,12 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
+# The standalone server binds to $HOSTNAME, and Docker sets HOSTNAME to the
+# container id. Left alone it therefore listens on whichever single address
+# that id happens to resolve to — not 127.0.0.1, and not necessarily the
+# network the reverse proxy is on. Both show up as "connection refused" from
+# somewhere while the log cheerfully says "Ready".
+ENV HOSTNAME=0.0.0.0
 
 # Never run the app as root in a container.
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001

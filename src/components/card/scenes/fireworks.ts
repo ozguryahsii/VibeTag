@@ -5,110 +5,154 @@ import {
   crestTop,
   firework,
   noise,
+  ribbon,
   sparkle,
 } from "@/components/card/paint";
 
 /**
  * Fireworks — Vibe Score 99.
  *
- * A single point on the ladder, and the first band with an overlay: bursts are
- * drawn *over* the card border, not inside it, so they read as happening in
- * front of the card rather than printed on it.
+ * The most kinetic card in the ladder. A deliberately open orbit and sweeping
+ * warm light keep the score in motion, while asymmetrical edge fireworks make
+ * the celebration feel spontaneous rather than perfectly staged.
  */
 export const fireworks: Scene = {
   key: "fireworks",
   name: "Fireworks",
 
   palette: {
-    page: "#F7F1F8",
-    card: "#FFF9F5",
-    shadow: "rgba(120,60,200,0.28)",
-    border: "#C98BEA",
+    page: "#FBF3EC",
+    card: "#FFF9F1",
+    shadow: "rgba(196,86,65,0.26)",
+    border: "#EDAF82",
 
-    ink: "#231733",
-    inkSoft: "#6C5E7E",
-    accent: "#8B5CF6",
-    divider: "rgba(139,92,246,0.72)",
+    ink: "#321C19",
+    inkSoft: "#785A50",
+    accent: "#E9555D",
+    divider: "rgba(233,85,93,0.7)",
 
-    score: ["#FFD24A", "#F0607E", "#7C4DEF"],
-    avatarRing: ["#FFD24A", "#F0607E", "#7C4DEF"],
+    score: ["#ECAA36", "#F06A4E", "#E6386B"],
+    avatarRing: ["#F0B53E", "#F06A4E", "#E6386B"],
 
-    pillFill: "rgba(255,251,255,0.86)",
-    pillBorder: "#D5B4F2",
-    pillInk: "#8B5CF6",
+    pillFill: "rgba(255,250,242,0.9)",
+    pillBorder: "#F0BE9E",
+    pillInk: "#D94F55",
 
-    rule: "rgba(226,206,240,0.95)",
+    rule: "rgba(235,194,168,0.94)",
     raterStack: [
-      ["#FFE0B0", "#FFC178"],
-      ["#E3C6FF", "#BE95F6"],
-      ["#B9E7F5", "#83C9E0"],
+      ["#FFE1B2", "#EFB36F"],
+      ["#FFD0C5", "#ED927C"],
+      ["#F8BED0", "#E77798"],
     ],
 
-    brand: "rgba(31,31,31,0.4)",
-    mark: ["#FFD24A", "#F0607E", "#7C4DEF"],
+    brand: "rgba(63,38,31,0.48)",
+    mark: ["#EFB23E", "#F06A4E", "#E6386B"],
     markAlpha: 1,
     rays: {
-      stroke: "rgba(200,140,255,0.66)",
-      embers: ["#7C4DEF", "#FFD24A"],
-      count: 22,
+      stroke: "rgba(236,108,76,0.68)",
+      embers: ["#E9A63A", "#E6386B"],
+      count: 24,
     },
     moodGlyph: "★",
   },
 
   backdrop({ ctx, w, h }) {
-    ctx.fillStyle = "#F7F1F8";
+    ctx.save();
+    ctx.fillStyle = "#FBF3EC";
     ctx.fillRect(0, 0, w, h);
-    bloom(ctx, w * 0.82, h * 0.07, w * 0.75, "rgba(255,200,90,0.18)");
-    bloom(ctx, w * 0.16, h * 0.93, w * 0.8, "rgba(124,77,239,0.18)");
+    bloom(ctx, w * 0.84, h * 0.08, w * 0.74, "rgba(244,174,64,0.2)");
+    bloom(ctx, w * 0.13, h * 0.91, w * 0.82, "rgba(231,62,105,0.15)");
+    ctx.restore();
   },
 
   surface({ ctx, cardX, cardY, cardW, cardH, cx, u }) {
-    ctx.fillStyle = "#FFF9F5";
+    ctx.save();
+    ctx.fillStyle = "#FFF9F1";
     ctx.fillRect(cardX, cardY, cardW, cardH);
 
     crestTop(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#FFD888", alpha: 0.5, depth: 0.23, reach: 0.96 },
-      { fill: "#F0607E", alpha: 0.64, depth: 0.18, reach: 0.75 },
-      { fill: "#7C4DEF", alpha: 0.7, depth: 0.12, reach: 0.5 },
+      { fill: "#F7CF72", alpha: 0.5, depth: 0.24, reach: 0.98 },
+      { fill: "#F58A60", alpha: 0.52, depth: 0.18, reach: 0.78 },
+      { fill: "#E94770", alpha: 0.52, depth: 0.115, reach: 0.52 },
     ]);
+
+    // Broad, low-opacity sweeps provide speed without becoming confetti.
+    ribbon(ctx, cardX, cardY, cardW, cardH, "#F1B63E", "#F06C4D", 0.31, 0.05, 0.17);
+    ribbon(ctx, cardX, cardY, cardW, cardH, "#F37A55", "#E6386B", 0.52, 0.035, 0.2);
+    ribbon(ctx, cardX, cardY, cardW, cardH, "#E94A68", "#E9A63A", 0.7, 0.022, 0.14);
+
     crestBottom(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#FFDC96", alpha: 0.46, depth: 0.885, reach: 0.83 },
-      { fill: "#F0607E", alpha: 0.62, depth: 0.932, reach: 0.86 },
-      { fill: "#7C4DEF", alpha: 0.76, depth: 0.972, reach: 0.9 },
+      { fill: "#F7D27D", alpha: 0.42, depth: 0.885, reach: 0.83 },
+      { fill: "#F1845F", alpha: 0.5, depth: 0.932, reach: 0.86 },
+      { fill: "#E63A69", alpha: 0.58, depth: 0.972, reach: 0.9 },
     ]);
 
-    bloom(ctx, cx, cardY + u * 0.26, u * 0.6, "rgba(255,230,190,0.32)");
+    bloom(ctx, cx, cardY + u * 0.25, u * 0.62, "rgba(255,224,170,0.32)");
 
-    for (let i = 0; i < 20; i++) {
+    // The incomplete orbit is the visual difference between 99 and 100: it
+    // races around the score but intentionally leaves a bright opening.
+    const orbitY = cardY + u * 0.82;
+    bloom(ctx, cx, orbitY, u * 0.5, "rgba(242,130,72,0.12)");
+    ctx.save();
+    const orbit = ctx.createLinearGradient(cx - u * 0.38, orbitY, cx + u * 0.38, orbitY);
+    orbit.addColorStop(0, "#EAA83A");
+    orbit.addColorStop(0.48, "#F06A4E");
+    orbit.addColorStop(1, "#E6386B");
+    ctx.strokeStyle = orbit;
+    ctx.lineCap = "round";
+    ctx.shadowColor = "rgba(238,95,77,0.3)";
+    ctx.shadowBlur = u * 0.03;
+    ctx.globalAlpha = 0.5;
+    ctx.lineWidth = u * 0.01;
+    ctx.beginPath();
+    ctx.ellipse(cx, orbitY, u * 0.385, u * 0.255, -0.08, 0.48, Math.PI * 1.82);
+    ctx.stroke();
+    ctx.globalAlpha = 0.28;
+    ctx.lineWidth = u * 0.004;
+    ctx.beginPath();
+    ctx.ellipse(cx, orbitY, u * 0.42, u * 0.285, -0.08, 2.82, Math.PI * 1.68);
+    ctx.stroke();
+    ctx.restore();
+
+    for (let i = 0; i < 22; i++) {
       sparkle(
         ctx,
-        cardX + cardW * (0.04 + noise(i * 11) * 0.92),
-        cardY + cardH * (0.02 + noise(i * 37) * 0.95),
-        cardW * (0.005 + noise(i * 41) * 0.006),
+        cardX + cardW * (0.035 + noise(i * 11) * 0.93),
+        cardY + cardH * (0.018 + noise(i * 37) * 0.96),
+        cardW * (0.004 + noise(i * 41) * 0.006),
+        i % 4 === 0 ? "rgba(230,56,107,0.82)" : "rgba(235,164,53,0.8)",
       );
     }
+    ctx.restore();
   },
 
   overlay({ ctx, cardX, cardY, cardW, cardH }) {
-    const palette = ["#FFD24A", "#F0607E", "#7C4DEF", "#4FC3D9"];
-    // Kept away from the middle third, where the score and the name live.
-    const bursts: [number, number, number][] = [
-      [0.16, 0.11, 0.12],
-      [0.85, 0.17, 0.09],
-      [0.24, 0.86, 0.1],
-      [0.8, 0.9, 0.075],
+    const colors = ["#ECAF38", "#F06A4E", "#E6386B", "#F59A67"];
+    // Uneven placement gives 99 its electric, still-in-motion character. All
+    // centres stay at the safe edge so the shared typography remains clear.
+    const bursts: [number, number, number, number][] = [
+      [0.075, 0.09, 0.115, 0.78],
+      [0.88, 0.13, 0.082, 0.7],
+      [0.015, 0.37, 0.064, 0.56],
+      [0.985, 0.58, 0.092, 0.72],
+      [0.15, 0.88, 0.096, 0.74],
+      [0.72, 0.96, 0.07, 0.62],
+      [0.93, 0.79, 0.052, 0.54],
     ];
+
+    ctx.save();
     for (let i = 0; i < bursts.length; i++) {
-      const [fx, fy, fr] = bursts[i];
+      const [fx, fy, fr, alpha] = bursts[i];
       firework(
         ctx,
         cardX + cardW * fx,
         cardY + cardH * fy,
         cardW * fr,
-        palette,
-        i * 13,
-        0.85,
+        colors,
+        i * 19 + 5,
+        alpha,
       );
     }
+    ctx.restore();
   },
 };

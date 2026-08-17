@@ -1,84 +1,149 @@
 import type { Scene } from "@/components/card/scene";
-import { bloom as glow, crestBottom, crestTop, noise, sparkle } from "@/components/card/paint";
+import {
+  bloom as glow,
+  crestBottom,
+  crestTop,
+  noise,
+  sparkle,
+} from "@/components/card/paint";
+
+function petalGlint(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  angle: number,
+  color: string,
+) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.ellipse(-size * 0.22, 0, size * 0.52, size * 0.2, -0.3, 0, Math.PI * 2);
+  ctx.ellipse(size * 0.22, 0, size * 0.52, size * 0.2, 0.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
 
 /**
  * Bloom — Vibe Score 91–92.
  *
- * Sunset with the pink brought forward and a soft halo behind the avatar. The
- * sparkle count doubles and they spread down the card instead of hugging the
- * top edge, so the whole surface feels alive rather than just its border.
+ * Rose moves to the front, a warm halo opens behind the avatar, and tiny
+ * petal glints drift through the margins. It is visibly richer than Sunset
+ * while remaining soft, light and personal rather than spectacle-led.
  */
 export const bloom: Scene = {
   key: "bloom",
   name: "Bloom",
 
   palette: {
-    page: "#FCF6F3",
-    card: "#FDF8F1",
-    shadow: "rgba(236,71,109,0.22)",
-    border: "#F5A5A0",
+    page: "#FCF5F1",
+    card: "#FFF8F1",
+    shadow: "rgba(219,75,95,0.23)",
+    border: "#F0A29B",
 
-    ink: "#2C1E1E",
-    inkSoft: "#7A6663",
-    accent: "#EC476D",
-    divider: "rgba(236,71,109,0.66)",
+    ink: "#35201F",
+    inkSoft: "#7B625E",
+    accent: "#DD5268",
+    divider: "rgba(221,82,104,0.64)",
 
-    score: ["#F7B94A", "#F0664F", "#E33A82"],
-    avatarRing: ["#F8BE5B", "#F0714F", "#E9459A"],
+    score: ["#F1BB4E", "#EF7A50", "#E55366", "#D83F78"],
+    avatarRing: ["#F3C764", "#EF7D53", "#DE4D73"],
 
-    pillFill: "rgba(255,248,244,0.78)",
-    pillBorder: "#F4BBB8",
-    pillInk: "#E85F63",
+    pillFill: "rgba(255,249,243,0.86)",
+    pillBorder: "#EFB7AE",
+    pillInk: "#D95762",
 
-    rule: "rgba(238,213,209,0.95)",
+    rule: "rgba(232,202,196,0.92)",
     raterStack: [
-      ["#FFD2BE", "#FFB394"],
-      ["#FFC2D4", "#FF9FC0"],
-      ["#F0DAD6", "#D6B9B4"],
+      ["#FAD7BC", "#EEA083"],
+      ["#F9C6CF", "#EB8EA4"],
+      ["#F1DDD5", "#D5B0A8"],
     ],
 
-    brand: "rgba(31,31,31,0.4)",
-    mark: ["#FFA84A", "#FA6A69", "#EA3C90"],
-    markAlpha: 1,
+    brand: "rgba(53,32,31,0.5)",
+    mark: ["#F0B552", "#E96A5F", "#D94376"],
+    markAlpha: 0.98,
     rays: {
-      stroke: "rgba(245,140,90,0.55)",
-      embers: ["#EC476D", "#F7B94A"],
-      count: 14,
+      stroke: "rgba(225,103,87,0.5)",
+      embers: ["#DA466F", "#F0B94F"],
+      count: 15,
     },
-    moodGlyph: "★",
+    moodGlyph: "✦",
   },
 
   backdrop({ ctx, w, h }) {
-    ctx.fillStyle = "#FCF6F3";
+    ctx.fillStyle = "#FCF5F1";
     ctx.fillRect(0, 0, w, h);
-    glow(ctx, w * 0.85, h * 0.05, w * 0.72, "rgba(247,150,80,0.16)");
-    glow(ctx, w * 0.13, h * 0.95, w * 0.74, "rgba(236,71,109,0.13)");
+    glow(ctx, w * 0.84, h * 0.06, w * 0.72, "rgba(239,166,92,0.16)");
+    glow(ctx, w * 0.14, h * 0.94, w * 0.76, "rgba(220,72,108,0.14)");
   },
 
   surface({ ctx, cardX, cardY, cardW, cardH, cx, u }) {
-    ctx.fillStyle = "#FDF8F1";
+    const wash = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
+    wash.addColorStop(0, "#FFF7EF");
+    wash.addColorStop(0.5, "#FFFCF8");
+    wash.addColorStop(1, "#FFF3EF");
+    ctx.fillStyle = wash;
     ctx.fillRect(cardX, cardY, cardW, cardH);
+
     crestTop(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#F9C46E", alpha: 0.58, depth: 0.23, reach: 0.95 },
-      { fill: "#F5865F", alpha: 0.8, depth: 0.19, reach: 0.74 },
-      { fill: "#EC4F7E", alpha: 0.9, depth: 0.13, reach: 0.52 },
+      { fill: "#F5D194", alpha: 0.46, depth: 0.22, reach: 0.97 },
+      { fill: "#EE9B72", alpha: 0.55, depth: 0.17, reach: 0.75 },
+      { fill: "#DE5D79", alpha: 0.64, depth: 0.105, reach: 0.49 },
     ]);
     crestBottom(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#F9C87A", alpha: 0.52, depth: 0.89, reach: 0.83 },
-      { fill: "#F58F6C", alpha: 0.7, depth: 0.935, reach: 0.86 },
-      { fill: "#EC5385", alpha: 0.88, depth: 0.972, reach: 0.9 },
-      { fill: "#E33A92", alpha: 0.64, depth: 0.995, reach: 0.94 },
+      { fill: "#F5D5A4", alpha: 0.46, depth: 0.895, reach: 0.83 },
+      { fill: "#EE9A70", alpha: 0.56, depth: 0.936, reach: 0.86 },
+      { fill: "#E25D75", alpha: 0.66, depth: 0.972, reach: 0.9 },
+      { fill: "#D64078", alpha: 0.52, depth: 0.996, reach: 0.945 },
     ]);
 
-    // A halo where the avatar will land, so the portrait sits in light.
-    glow(ctx, cx, cardY + u * 0.28, u * 0.5, "rgba(255,214,150,0.28)");
+    // Bloom's signature: layered champagne light behind the portrait.
+    glow(ctx, cx, cardY + u * 0.245, u * 0.49, "rgba(244,186,91,0.2)");
+    glow(ctx, cx, cardY + u * 0.245, u * 0.34, "rgba(231,92,111,0.12)");
 
-    for (let i = 0; i < 9; i++) {
+    const petals: [number, number, number][] = [
+      [0.1, 0.2, -0.55],
+      [0.89, 0.25, 0.42],
+      [0.075, 0.43, 0.28],
+      [0.92, 0.5, -0.38],
+      [0.11, 0.7, -0.2],
+      [0.88, 0.76, 0.48],
+      [0.18, 0.085, 0.36],
+      [0.79, 0.07, -0.25],
+      [0.13, 0.87, 0.55],
+      [0.84, 0.9, -0.5],
+    ];
+    const petalColors = [
+      "rgba(237,173,79,0.68)",
+      "rgba(226,83,107,0.62)",
+      "rgba(239,125,91,0.6)",
+    ];
+    petals.forEach(([px, py, angle], i) => {
+      petalGlint(
+        ctx,
+        cardX + cardW * px,
+        cardY + cardH * py,
+        u * (0.014 + noise(i * 19) * 0.007),
+        angle,
+        petalColors[i % petalColors.length],
+      );
+    });
+
+    for (let i = 0; i < 10; i++) {
+      const onLeft = i % 2 === 0;
       sparkle(
         ctx,
-        cardX + cardW * (0.06 + noise(i * 5) * 0.88),
-        cardY + cardH * (0.02 + noise(i * 13) * 0.94),
-        cardW * (0.005 + noise(i * 17) * 0.005),
+        cardX +
+          cardW *
+            (onLeft
+              ? 0.06 + noise(i + 30) * 0.07
+              : 0.87 + noise(i + 30) * 0.07),
+        cardY + cardH * (0.12 + noise(i * 29 + 8) * 0.76),
+        u * (0.0035 + noise(i * 31) * 0.0035),
+        i % 3 === 0 ? "#F0B950" : "#DF5871",
       );
     }
   },

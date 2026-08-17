@@ -1,5 +1,6 @@
 import type { Scene } from "@/components/card/scene";
-import { bloom, crestBottom, crestTop } from "@/components/card/paint";
+import { bloom } from "@/components/card/paint";
+import { fineGlint, flowField, paperGrain } from "@/components/card/fine-art";
 
 /**
  * Amber — Vibe Score 76–80.
@@ -12,22 +13,22 @@ export const amber: Scene = {
   name: "Amber",
 
   palette: {
-    page: "#FBF5E9",
-    card: "#FEFAF2",
+    page: "#FBF4E9",
+    card: "#FFF2E2",
     shadow: "rgba(177,115,36,0.17)",
-    border: "rgba(234,193,132,0.94)",
+    border: "rgba(229,177,117,0.76)",
 
     ink: "#2F2218",
     inkSoft: "#7D6B57",
-    accent: "#C7812A",
+    accent: "#CF7540",
     divider: "rgba(205,151,75,0.68)",
 
-    score: ["#F0B64A", "#D8892F", "#B76826"],
-    avatarRing: ["#F2C36C", "#D98A34"],
+    score: ["#E8A246", "#E8794A", "#DF5E52"],
+    avatarRing: ["#F0BE69", "#E9864B", "#DC6452"],
 
-    pillFill: "rgba(255,249,236,0.9)",
-    pillBorder: "rgba(232,192,132,0.82)",
-    pillInk: "#B8782B",
+    pillFill: "rgba(255,252,246,0.35)",
+    pillBorder: "rgba(220,151,91,0.58)",
+    pillInk: "#B86E39",
 
     rule: "rgba(231,211,180,0.94)",
     raterStack: [
@@ -36,9 +37,9 @@ export const amber: Scene = {
       ["#F9EBD1", "#E5CC9F"],
     ],
 
-    brand: "rgba(47,34,24,0.4)",
-    mark: ["#F2CB77", "#E2A34A", "#C8792F"],
-    markAlpha: 0.9,
+    brand: "rgba(47,34,24,0.48)",
+    mark: ["#E1A34D", "#D87842", "#AE5C37"],
+    markAlpha: 0.88,
     rays: null,
     moodGlyph: "✦",
   },
@@ -53,48 +54,54 @@ export const amber: Scene = {
     bloom(ctx, w * 0.1, h * 0.94, w * 0.58, "rgba(215,126,45,0.07)");
   },
 
-  surface({ ctx, cardX, cardY, cardW, cardH }) {
+  surface(geom) {
+    const { ctx, cardX, cardY, cardW, cardH, cx, scoreCenterY, u } = geom;
     const paper = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
-    paper.addColorStop(0, "#FFFDF7");
-    paper.addColorStop(0.58, "#FCF8EE");
-    paper.addColorStop(1, "#F9EFD9");
+    paper.addColorStop(0, "#FFF9F0");
+    paper.addColorStop(0.52, "#FFF1E2");
+    paper.addColorStop(1, "#FDE7D2");
     ctx.fillStyle = paper;
     ctx.fillRect(cardX, cardY, cardW, cardH);
 
-    crestTop(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#FAE4B6", alpha: 0.72, depth: 0.21, reach: 0.94 },
-      { fill: "#F3C875", alpha: 0.58, depth: 0.15, reach: 0.75 },
-      { fill: "#E7A447", alpha: 0.34, depth: 0.09, reach: 0.48 },
-    ]);
-    crestBottom(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#F9E6BD", alpha: 0.94, depth: 0.875, reach: 0.81 },
-      { fill: "#F2C978", alpha: 0.84, depth: 0.932, reach: 0.86 },
-      { fill: "#E4A044", alpha: 0.7, depth: 0.982, reach: 0.92 },
-    ]);
+    bloom(ctx, cx, scoreCenterY, u * 0.5, "rgba(237,151,76,0.075)");
+    bloom(
+      ctx,
+      cardX + cardW * 0.08,
+      cardY + cardH * 0.7,
+      cardW * 0.56,
+      "rgba(234,130,69,0.055)",
+    );
 
-    // Fine reflective threads make Amber feel lit rather than merely beige.
-    ctx.save();
-    const filament = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY);
-    filament.addColorStop(0, "rgba(255,255,255,0.12)");
-    filament.addColorStop(0.55, "rgba(255,246,207,0.8)");
-    filament.addColorStop(1, "rgba(199,123,35,0.18)");
-    ctx.strokeStyle = filament;
-    ctx.lineCap = "round";
-    for (let i = 0; i < 3; i++) {
-      ctx.globalAlpha = 0.38 - i * 0.08;
-      ctx.lineWidth = cardW * (0.003 - i * 0.0005);
-      ctx.beginPath();
-      ctx.moveTo(cardX - cardW * 0.03, cardY + cardH * (0.06 + i * 0.025));
-      ctx.bezierCurveTo(
-        cardX + cardW * 0.22,
-        cardY + cardH * (0.02 + i * 0.02),
-        cardX + cardW * 0.4,
-        cardY + cardH * (0.15 + i * 0.01),
-        cardX + cardW * 0.68,
-        cardY + cardH * (0.1 + i * 0.018),
-      );
-      ctx.stroke();
+    flowField(geom, {
+      count: 30,
+      colors: ["#F6DDC1", "#EFB888", "#E99568", "#FFF6E8"],
+      y: [0.29, 0.43, 0.31, 0.49],
+      spread: 0.15,
+      alpha: 0.25,
+      lineWidth: 0.00108,
+      seed: 58,
+    });
+    flowField(geom, {
+      count: 12,
+      colors: ["#F5D3AC", "#E78E5E", "#FFF4E4"],
+      y: [0.63, 0.5, 0.68, 0.56],
+      spread: 0.086,
+      alpha: 0.15,
+      lineWidth: 0.00095,
+      seed: 151,
+      reverse: true,
+    });
+    paperGrain(geom, "#A66E4E", 195, 0.023, 79);
+
+    const glints: [number, number, number, string, number][] = [
+      [0.12, 0.1, 0.0075, "#FFFFFF", 0.62],
+      [0.89, 0.18, 0.006, "#EFA45B", 0.48],
+      [0.1, 0.48, 0.0045, "#E78D56", 0.4],
+      [0.9, 0.64, 0.007, "#FFFFFF", 0.62],
+      [0.17, 0.83, 0.005, "#E9A465", 0.44],
+    ];
+    for (const [x, y, r, color, alpha] of glints) {
+      fineGlint(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, color, alpha);
     }
-    ctx.restore();
   },
 };

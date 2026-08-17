@@ -1,5 +1,8 @@
 import type { CardBandKey } from "@/lib/card-bands";
 
+/** The references use two deliberate compositions, split at Radiant (93). */
+export type CardLayoutKind = "editorial" | "celebratory";
+
 /**
  * A Vibe Card scene: everything about a band that is *look* rather than
  * *layout*.
@@ -30,6 +33,12 @@ export type SceneGeom = {
   cx: number;
   /** Design unit — every size in the composition is a multiple of this. */
   u: number;
+  /** Shared content profile selected from the score, never from user choice. */
+  layout: CardLayoutKind;
+  /** Stable anchors for artwork that needs to follow the shared composition. */
+  avatarCenterY: number;
+  scoreCenterY: number;
+  footerRuleY: number;
 };
 
 /** Colours the shared composition paints with. */

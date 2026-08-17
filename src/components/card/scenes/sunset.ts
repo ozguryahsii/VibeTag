@@ -1,98 +1,140 @@
 import type { Scene } from "@/components/card/scene";
-import { bloom, crestBottom, crestTop, noise, sparkle } from "@/components/card/paint";
+import {
+  diamondDust,
+  fineBurst,
+  fineGlint,
+  flowField,
+  paperGrain,
+} from "@/components/card/fine-art";
+import { bloom } from "@/components/card/paint";
 
 /**
  * Sunset — Vibe Score 86–90.
  *
- * The first openly celebratory card: champagne, apricot and coral arrive as a
- * complete palette, while the score earns its first restrained rays. The
- * decoration stays at the edges and the portrait deliberately has no halo;
- * Bloom owns that next step on the ladder.
+ * The first openly bright card. Fine apricot contours move through the paper,
+ * but celebration is still restrained to one small burst and the first quiet
+ * rays around the score.
  */
 export const sunset: Scene = {
   key: "sunset",
   name: "Sunset",
 
   palette: {
-    page: "#FBF7F0",
-    card: "#FFF9EF",
-    shadow: "rgba(218,106,54,0.2)",
-    border: "#F1B478",
+    page: "#FBF6EF",
+    card: "#FFD6C4",
+    shadow: "rgba(183,112,66,0.18)",
+    border: "rgba(230,145,112,0.78)",
 
-    ink: "#38261F",
-    inkSoft: "#79675D",
-    accent: "#E96949",
-    divider: "rgba(225,112,71,0.58)",
+    ink: "#34251F",
+    inkSoft: "#78685F",
+    accent: "#D86B4A",
+    divider: "rgba(218,122,82,0.5)",
 
-    score: ["#EFB447", "#F18A48", "#EA5B57", "#DD506C"],
-    avatarRing: ["#EFC15F", "#EF8D4D", "#E85B61"],
+    score: ["#D89B43", "#E9854B", "#E26355", "#D9546E"],
+    avatarRing: ["#E2B256", "#E6814E", "#D85869"],
 
-    pillFill: "rgba(255,250,239,0.84)",
-    pillBorder: "#EDC69D",
-    pillInk: "#D96545",
+    pillFill: "rgba(255,250,241,0.82)",
+    pillBorder: "rgba(222,160,109,0.58)",
+    pillInk: "#C86246",
 
-    rule: "rgba(225,205,182,0.9)",
+    rule: "rgba(219,196,172,0.78)",
     raterStack: [
-      ["#F8D7AD", "#EFA96E"],
-      ["#F8C8BD", "#EC9180"],
-      ["#F3E1C9", "#D6B58D"],
+      ["#F3D7B4", "#DFA36C"],
+      ["#F2C9BC", "#DC8E7C"],
+      ["#EEDDCB", "#C9A98B"],
     ],
 
-    brand: "rgba(56,38,31,0.48)",
-    mark: ["#EFB94D", "#EF7D4D", "#DF5269"],
-    markAlpha: 0.96,
+    brand: "rgba(52,37,31,0.44)",
+    mark: ["#DEAB4A", "#E3744F", "#D6536C"],
+    markAlpha: 0.9,
     rays: {
-      stroke: "rgba(224,136,54,0.42)",
-      embers: ["#E85E57", "#EFB74D"],
-      count: 12,
+      stroke: "rgba(215,127,67,0.34)",
+      embers: ["#D85A66", "#DDA646"],
+      count: 10,
     },
-    moodGlyph: "★",
+    moodGlyph: "✦",
   },
 
   backdrop({ ctx, w, h }) {
-    ctx.fillStyle = "#FBF7F0";
+    const paper = ctx.createLinearGradient(0, 0, w, h);
+    paper.addColorStop(0, "#FCF8F2");
+    paper.addColorStop(0.58, "#FAF4EC");
+    paper.addColorStop(1, "#FFF8F0");
+    ctx.fillStyle = paper;
     ctx.fillRect(0, 0, w, h);
-    bloom(ctx, w * 0.86, h * 0.05, w * 0.7, "rgba(237,175,82,0.14)");
-    bloom(ctx, w * 0.12, h * 0.95, w * 0.72, "rgba(229,101,75,0.1)");
+    bloom(ctx, w * 0.82, h * 0.08, w * 0.58, "rgba(224,157,76,0.1)");
+    bloom(ctx, w * 0.15, h * 0.9, w * 0.66, "rgba(214,83,101,0.07)");
   },
 
-  surface({ ctx, cardX, cardY, cardW, cardH, u }) {
+  surface(g) {
+    const { ctx, cardX, cardY, cardW, cardH, scoreCenterY } = g;
     const wash = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
-    wash.addColorStop(0, "#FFF9EE");
-    wash.addColorStop(0.56, "#FFFCF6");
-    wash.addColorStop(1, "#FFF6EA");
+    wash.addColorStop(0, "#FFE5D2");
+    wash.addColorStop(0.52, "#FFD1C0");
+    wash.addColorStop(1, "#F7A89E");
     ctx.fillStyle = wash;
     ctx.fillRect(cardX, cardY, cardW, cardH);
 
-    crestTop(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#F6D49A", alpha: 0.45, depth: 0.205, reach: 0.96 },
-      { fill: "#F3AE65", alpha: 0.5, depth: 0.155, reach: 0.72 },
-      { fill: "#EA735C", alpha: 0.54, depth: 0.095, reach: 0.46 },
-    ]);
-    crestBottom(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#F5D7A6", alpha: 0.45, depth: 0.9, reach: 0.84 },
-      { fill: "#F1A25F", alpha: 0.52, depth: 0.94, reach: 0.865 },
-      { fill: "#EA6B5B", alpha: 0.57, depth: 0.974, reach: 0.9 },
-      { fill: "#DD526C", alpha: 0.42, depth: 0.996, reach: 0.94 },
-    ]);
+    flowField(g, {
+      count: 24,
+      colors: ["#FFF0DE", "#F4B184", "#E87970", "#FFF8EE"],
+      y: [0.26, 0.39, 0.29, 0.47],
+      spread: 0.105,
+      alpha: 0.27,
+      lineWidth: 0.00105,
+      seed: 186,
+    });
+    flowField(g, {
+      count: 18,
+      colors: ["#FFEBD8", "#F2A27D", "#DE6675", "#FFF4E8"],
+      y: [0.91, 0.79, 0.95, 0.81],
+      spread: 0.075,
+      alpha: 0.22,
+      lineWidth: 0.0009,
+      seed: 190,
+      reverse: true,
+    });
+    flowField(g, {
+      count: 16,
+      colors: ["#FFF4E8", "#F2A783", "#E56C70"],
+      y: [0.42, 0.58, 0.45, 0.64],
+      spread: 0.07,
+      alpha: 0.18,
+      lineWidth: 0.001,
+      seed: 192,
+    });
 
-    // The first celebratory sparks stay in the margins, leaving the avatar
-    // and copy quiet. Their seeded placement is identical on every export.
-    const edgeColors = ["#EFB84C", "#EA7657", "#DE596A"];
-    for (let i = 0; i < 8; i++) {
-      const onLeft = i % 2 === 0;
-      const px =
-        cardX +
-        cardW *
-          (onLeft ? 0.07 + noise(i + 8) * 0.05 : 0.88 + noise(i + 8) * 0.05);
-      const py = cardY + cardH * (0.12 + noise(i * 17 + 4) * 0.72);
-      sparkle(
-        ctx,
-        px,
-        py,
-        u * (0.0045 + noise(i * 23) * 0.0035),
-        edgeColors[i % edgeColors.length],
-      );
-    }
+    bloom(
+      ctx,
+      cardX + cardW * 0.5,
+      scoreCenterY,
+      cardW * 0.42,
+      "rgba(226,143,69,0.055)",
+    );
+    fineBurst(ctx, cardX + cardW * 0.12, cardY + cardH * 0.115, cardW * 0.07, {
+      colors: ["#DCA846", "#E17E55", "#D95D69"],
+      spokes: 25,
+      alpha: 0.34,
+      seed: 193,
+    });
+
+    diamondDust(g, 7, ["#DCAA4E", "#D96A67"], 197, 0.38);
+    fineGlint(
+      ctx,
+      cardX + cardW * 0.89,
+      cardY + cardH * 0.31,
+      cardW * 0.009,
+      "#DCA34A",
+      0.42,
+    );
+    fineGlint(
+      ctx,
+      cardX + cardW * 0.1,
+      cardY + cardH * 0.71,
+      cardW * 0.006,
+      "#D75B6D",
+      0.34,
+    );
+    paperGrain(g, "#806A5B", 210, 0.025, 199);
   },
 };

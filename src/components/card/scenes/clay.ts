@@ -1,5 +1,6 @@
 import type { Scene } from "@/components/card/scene";
-import { bloom, crestBottom, crestTop, ribbon } from "@/components/card/paint";
+import { bloom } from "@/components/card/paint";
+import { fineGlint, flowField, paperGrain } from "@/components/card/fine-art";
 
 /**
  * Clay — Vibe Score 61–70.
@@ -12,22 +13,22 @@ export const clay: Scene = {
   name: "Clay",
 
   palette: {
-    page: "#F6F1EA",
-    card: "#FCF8F2",
+    page: "#F7F1E9",
+    card: "#FBF5EC",
     shadow: "rgba(91,65,48,0.13)",
-    border: "rgba(205,187,169,0.88)",
+    border: "rgba(199,181,162,0.7)",
 
     ink: "#30251F",
     inkSoft: "#7F7067",
-    accent: "#9A674E",
+    accent: "#976644",
     divider: "rgba(170,134,111,0.62)",
 
-    score: ["#513E34"],
-    avatarRing: ["#C4A48D", "#A9745A"],
+    score: ["#795A37"],
+    avatarRing: ["#D0B08B", "#A97551"],
 
-    pillFill: "rgba(242,232,220,0.94)",
-    pillBorder: "rgba(190,151,123,0.28)",
-    pillInk: "#8E604A",
+    pillFill: "rgba(255,251,245,0.27)",
+    pillBorder: "rgba(177,132,99,0.48)",
+    pillInk: "#875E43",
 
     rule: "rgba(220,205,190,0.92)",
     raterStack: [
@@ -36,9 +37,9 @@ export const clay: Scene = {
       ["#F0E4D7", "#D5BDAB"],
     ],
 
-    brand: "rgba(48,37,31,0.4)",
-    mark: ["#C9A58B", "#B78468", "#9F6B53"],
-    markAlpha: 0.68,
+    brand: "rgba(48,37,31,0.47)",
+    mark: ["#9D7757", "#815B40", "#684733"],
+    markAlpha: 0.76,
     rays: null,
     moodGlyph: "↗",
   },
@@ -49,27 +50,48 @@ export const clay: Scene = {
     wash.addColorStop(1, "#F0E8DE");
     ctx.fillStyle = wash;
     ctx.fillRect(0, 0, w, h);
-    bloom(ctx, w * 0.12, h * 0.92, w * 0.64, "rgba(170,104,72,0.08)");
+    bloom(ctx, w * 0.12, h * 0.92, w * 0.64, "rgba(170,104,72,0.06)");
   },
 
-  surface({ ctx, cardX, cardY, cardW, cardH }) {
+  surface(geom) {
+    const { ctx, cardX, cardY, cardW, cardH } = geom;
     const paper = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
     paper.addColorStop(0, "#FFFDF9");
-    paper.addColorStop(1, "#F8F1E9");
+    paper.addColorStop(0.55, "#FBF6EE");
+    paper.addColorStop(1, "#F7EEE3");
     ctx.fillStyle = paper;
     ctx.fillRect(cardX, cardY, cardW, cardH);
 
-    crestTop(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#F1E4D7", alpha: 0.64, depth: 0.18, reach: 0.91 },
-      { fill: "#DDBCA7", alpha: 0.38, depth: 0.115, reach: 0.62 },
-    ]);
-    crestBottom(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#F2E5D7", alpha: 0.94, depth: 0.89, reach: 0.82 },
-      { fill: "#E4C7B3", alpha: 0.82, depth: 0.94, reach: 0.87 },
-      { fill: "#C99678", alpha: 0.64, depth: 0.985, reach: 0.93 },
-    ]);
+    bloom(
+      ctx,
+      cardX + cardW * 0.12,
+      cardY + cardH * 0.76,
+      cardW * 0.54,
+      "rgba(196,137,91,0.055)",
+    );
+    flowField(geom, {
+      count: 24,
+      colors: ["#EAD9C4", "#D6B18A", "#F4E8D8"],
+      y: [0.32, 0.42, 0.31, 0.45],
+      spread: 0.13,
+      alpha: 0.2,
+      lineWidth: 0.00105,
+      seed: 35,
+    });
+    flowField(geom, {
+      count: 10,
+      colors: ["#E4CEB4", "#C99569", "#F4E7D7"],
+      y: [0.59, 0.5, 0.65, 0.55],
+      spread: 0.078,
+      alpha: 0.12,
+      lineWidth: 0.0009,
+      seed: 117,
+      reverse: true,
+    });
+    paperGrain(geom, "#8D725E", 185, 0.024, 56);
 
-    ribbon(ctx, cardX, cardY, cardW, cardH, "#DDBCA7", "#F7F1EA", 0.43, 0.024, 0.1);
-    ribbon(ctx, cardX, cardY, cardW, cardH, "#FCF8F2", "#C99678", 0.63, 0.016, 0.075);
+    fineGlint(ctx, cardX + cardW * 0.12, cardY + cardH * 0.25, cardW * 0.007, "#E5BE86", 0.42);
+    fineGlint(ctx, cardX + cardW * 0.88, cardY + cardH * 0.39, cardW * 0.006, "#FFFFFF", 0.5);
+    fineGlint(ctx, cardX + cardW * 0.82, cardY + cardH * 0.76, cardW * 0.0045, "#C99061", 0.34);
   },
 };

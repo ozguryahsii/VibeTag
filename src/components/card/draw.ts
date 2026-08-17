@@ -3,7 +3,7 @@ import { bandFor, type CardBand } from "@/lib/card-bands";
 import { fill, type Dictionary } from "@/lib/i18n";
 import { initialsOf } from "@/components/Avatar";
 import { SCENES } from "@/components/card/scenes";
-import type { Scene } from "@/components/card/scene";
+import type { CardLayoutKind, Scene } from "@/components/card/scene";
 import type { BadgeTier } from "@/lib/badges";
 import { TIER_STYLE } from "@/lib/tier-style";
 import { fingerprint, icon, noise, roundRect, shade } from "@/components/card/paint";
@@ -106,28 +106,42 @@ export function drawCard({
   const p = scene.palette;
 
   // ------------------------------------------------------------- geometry
-  const isWide = format === "wide";
-  const margin = isWide ? h * 0.07 : w * 0.07;
-  const cardW = isWide ? w * 0.5 : w - margin * 2;
+  // The reference is one tall portrait object on three differently shaped
+  // canvases. Export formats change the page around it, never the card itself.
+  const cardRatio = 2.21;
+  const pageInset = Math.min(w, h) * 0.06;
+  const cardW = Math.min(w - pageInset * 2, (h - pageInset * 2) / cardRatio);
+  const cardH = cardW * cardRatio;
   const cardX = (w - cardW) / 2;
-
-  // Badges buy their own room rather than squeezing the rest: without the
-  // extra ratio the medal row lands on the footer rule and silently drops
-  // itself, which looks exactly like a broken toggle.
-  const medals = showBadges ? data.badges.slice(0, 3) : [];
-  const designRatio = 1.65 + (medals.length > 0 ? 0.15 : 0);
-  const cardH = isWide
-    ? h - margin * 2
-    : Math.min(h - margin * 2.4, cardW * designRatio);
-  const cardY = (h - cardH) / 2 - (isWide ? 0 : h * 0.012);
-  const radius = cardW * 0.07;
-  // Portrait uses the card width as its design unit. Square and wide cards are
-  // height-constrained, so the same composition scales down intact instead of
-  // letting the score or footer escape the rounded surface.
-  const u = Math.min(cardW, cardH / designRatio);
+  const cardY = (h - cardH) / 2;
+  const radius = cardW * 0.058;
+  const u = cardW;
   const cx = cardX + cardW / 2;
 
-  const geom = { ctx, w, h, cardX, cardY, cardW, cardH, radius, cx, u };
+  // Badges occupy a permanent compact strip above the footer. Toggling them
+  // never resizes or shifts the card, so exports remain directly comparable.
+  const medals = showBadges ? data.badges.slice(0, 3) : [];
+  const layout: CardLayoutKind = data.score >= 93 ? "celebratory" : "editorial";
+  const avatarCenterY = cardY + u * (layout === "editorial" ? 0.49 : 0.305);
+  const scoreCenterY = cardY + u * (layout === "editorial" ? 1.26 : 1.01);
+  const footerRuleY = cardY + u * (layout === "editorial" ? 1.82 : 1.845);
+
+  const geom = {
+    ctx,
+    w,
+    h,
+    cardX,
+    cardY,
+    cardW,
+    cardH,
+    radius,
+    cx,
+    u,
+    layout,
+    avatarCenterY,
+    scoreCenterY,
+    footerRuleY,
+  };
 
   // ------------------------------------------------------------- backdrop
   scene.backdrop(geom);
@@ -135,8 +149,8 @@ export function drawCard({
   // ---------------------------------------------------------------- card
   ctx.save();
   ctx.shadowColor = p.shadow;
-  ctx.shadowBlur = u * 0.13;
-  ctx.shadowOffsetY = u * 0.035;
+  ctx.shadowBlur = u * 0.09;
+  ctx.shadowOffsetY = u * 0.022;
   ctx.fillStyle = p.card;
   roundRect(ctx, cardX, cardY, cardW, cardH, radius);
   ctx.fill();
@@ -151,8 +165,8 @@ export function drawCard({
   fingerprint(
     ctx,
     cardX + cardW - u * 0.19,
-    cardY + u * 0.06,
-    u * 0.13,
+    cardY + u * 0.045,
+    u * 0.15,
     p.mark,
     p.markAlpha,
   );
@@ -164,8 +178,8 @@ export function drawCard({
   };
 
   // ---------------------------------------------------------------- avatar
-  const ar = u * 0.154;
-  let y = cardY + u * (isWide ? 0.065 : 0.09) + ar;
+  const ar = u * (layout === "editorial" ? 0.295 : 0.17);
+  let y = avatarCenterY;
 
   ctx.save();
   ctx.shadowColor = "rgba(31,31,31,0.15)";
@@ -212,14 +226,15 @@ export function drawCard({
   ctx.stroke();
 
   // ------------------------------------------------------------------ name
-  y += ar + u * 0.075;
+  y = cardY + u * (layout === "editorial" ? 0.9 : 0.61);
   ctx.fillStyle = p.ink;
-  ctx.font = sans(600, u * 0.068);
+  ctx.font =
+    layout === "editorial" ? serif(400, u * 0.068) : sans(700, u * 0.068);
   center(data.name, y);
 
   // --------------------------------------------------------------- divider
-  y += u * 0.055;
-  const dw = u * 0.11;
+  y = cardY + u * (layout === "editorial" ? 0.965 : 0.65);
+  const dw = u * 0.1;
   ctx.strokeStyle = p.divider;
   ctx.lineWidth = u * 0.002;
   ctx.beginPath();
@@ -234,16 +249,16 @@ export function drawCard({
   ctx.fill();
 
   // -------------------------------------------------------------- MY VIBE
-  y += u * 0.075;
+  y = cardY + u * (layout === "editorial" ? 1.064 : 0.78);
   ctx.fillStyle = p.accent;
-  ctx.font = sans(600, u * 0.04);
+  ctx.font = sans(600, u * (layout === "editorial" ? 0.038 : 0.04));
   ctx.letterSpacing = `${u * 0.0155}px`;
   center("MY VIBE", y);
   ctx.letterSpacing = "0px";
 
   if (showScore) {
-    const scoreSize = u * 0.39;
-    const scoreCy = y + u * 0.22;
+    const scoreSize = u * (layout === "editorial" ? 0.4 : 0.42);
+    const scoreCy = scoreCenterY;
 
     // ------------------------------------------------------------- rays
     if (p.rays) {
@@ -284,7 +299,7 @@ export function drawCard({
     }
 
     // ------------------------------------------------------------ score
-    y += u * 0.31;
+    y = cardY + u * (layout === "editorial" ? 1.39 : 1.18);
     ctx.font = serif(400, scoreSize);
     ctx.fillStyle = paintOf(
       ctx,
@@ -300,18 +315,26 @@ export function drawCard({
     // Cleared of the numeral rather than tucked under it: Didot and its
     // fallbacks draw old-style figures, so 2, 5, 7 and 9 hang below the
     // baseline and would otherwise cross the label.
-    y += u * 0.1;
+    y = cardY + u * (layout === "editorial" ? 1.465 : 1.265);
     ctx.fillStyle = p.accent;
     ctx.font = sans(600, u * 0.0365);
     ctx.letterSpacing = `${u * 0.0135}px`;
     center("VIBE SCORE", y);
     ctx.letterSpacing = "0px";
   } else {
-    y += u * 0.03;
+    y = cardY + u * (layout === "editorial" ? 1.15 : 0.88);
   }
 
   // -------------------------------------------------------------- mood line
-  y += u * 0.085;
+  y = cardY +
+    u *
+      (showScore
+        ? layout === "editorial"
+          ? 1.57
+          : 1.41
+        : layout === "editorial"
+          ? 1.3
+          : 1.05);
   const moodText = !showScore
     ? d.card.seeMeAs
     : data.percentile && data.score >= 80
@@ -322,9 +345,18 @@ export function drawCard({
           ? d.card.moodGrowing
           : d.card.moodRoom;
 
-  ctx.font = sans(600, u * 0.0445);
-  const mw = ctx.measureText(moodText).width;
-  const glyphR = u * 0.026;
+  const moodWeight = layout === "editorial" ? 500 : 600;
+  let moodFont = u * (layout === "editorial" ? 0.04 : 0.05);
+  const glyphR = u * (layout === "editorial" ? 0.024 : 0.027);
+  const moodChrome = glyphR * 2 + u * 0.022;
+  ctx.font = sans(moodWeight, moodFont);
+  let mw = ctx.measureText(moodText).width;
+  const moodLimit = u * 0.82;
+  if (mw + moodChrome > moodLimit) {
+    moodFont *= (moodLimit - moodChrome) / mw;
+    ctx.font = sans(moodWeight, moodFont);
+    mw = ctx.measureText(moodText).width;
+  }
   const moodStart = cx - (mw + glyphR * 2 + u * 0.022) / 2;
 
   ctx.beginPath();
@@ -340,32 +372,36 @@ export function drawCard({
   ctx.textBaseline = "alphabetic";
   ctx.textAlign = "left";
 
-  ctx.font = sans(500, u * 0.0445);
+  ctx.font = sans(moodWeight, moodFont);
   ctx.fillStyle = p.accent;
   ctx.fillText(moodText, moodStart + glyphR * 2 + u * 0.022, y);
 
   // ------------------------------------------------------------ trait pills
-  y += u * 0.07;
-  const pillH = u * 0.107;
-  const pillGap = u * 0.022;
-  let pillFont = u * 0.041;
-  const chosen = data.tags.slice(0, 4);
+  y += u * (layout === "editorial" ? 0.065 : 0.075);
+  const pillH = u * (layout === "editorial" ? 0.098 : 0.118);
+  const pillGap = u * (layout === "editorial" ? 0.018 : 0.025);
+  const pillWeight = layout === "editorial" ? 500 : 600;
+  let pillFont = u * (layout === "editorial" ? 0.036 : 0.041);
+  // The calm reference keeps one restrained row; the celebratory reference
+  // expands to a deliberate two-column grid.
+  const chosen = data.tags.slice(0, layout === "editorial" ? 3 : 4);
 
-  const limit = cardW * 0.84;
-  ctx.font = sans(600, pillFont);
+  const limit = u * (layout === "editorial" ? 0.9 : 0.88);
+  ctx.font = sans(pillWeight, pillFont);
   const iconBox = () => pillFont * 1.18;
-  let widths = chosen.map(
-    (t) => ctx.measureText(t.label).width + iconBox() + u * 0.088,
-  );
+  const measureWidths = () =>
+    chosen.map(
+      (t) =>
+        ctx.measureText(t.label).width +
+        iconBox() +
+        u * (layout === "editorial" ? 0.07 : 0.088),
+    );
+  let widths = measureWidths();
 
-  // Fixed grid: everything in one row if it fits, otherwise pairs. Capping at
-  // two rows keeps the pills from ever running into the footer rule — long
-  // labels shrink the type instead of adding a third row.
-  const oneRow =
-    widths.reduce((a, b) => a + b, 0) + pillGap * (chosen.length - 1) <= limit;
-  const rows: number[][] = oneRow
-    ? [chosen.map((_, i) => i)]
-    : chosen.reduce<number[][]>((acc, _, i) => {
+  const rows: number[][] =
+    layout === "editorial"
+      ? [chosen.map((_, i) => i)]
+      : chosen.reduce<number[][]>((acc, _, i) => {
         if (i % 2 === 0) acc.push([i]);
         else acc[acc.length - 1].push(i);
         return acc;
@@ -380,7 +416,8 @@ export function drawCard({
     if (widest > limit) {
       const k = limit / widest;
       pillFont *= k;
-      widths = widths.map((wd) => wd * k);
+      ctx.font = sans(pillWeight, pillFont);
+      widths = measureWidths();
     }
   }
 
@@ -404,7 +441,7 @@ export function drawCard({
         iconBox(),
         p.pillInk,
       );
-      ctx.font = sans(600, pillFont);
+      ctx.font = sans(pillWeight, pillFont);
       ctx.fillStyle = p.pillInk;
       ctx.textBaseline = "middle";
       ctx.fillText(t.label, x + u * 0.03 + iconBox() + u * 0.022, y + pillH / 2);
@@ -412,32 +449,29 @@ export function drawCard({
 
       x += widths[i] + pillGap;
     }
-    y += pillH + pillGap * 0.7;
+    y += pillH + pillGap;
   }
 
   // ------------------------------------------------------------ footer lines
-  const footY = cardY + cardH - u * 0.14;
-  const footLineY = cardY + cardH - u * 0.25;
+  const footLineY = footerRuleY;
+  const footY = cardY + u * (layout === "editorial" ? 1.95 : 1.98);
 
   // ----------------------------------------------------------- badge medals
-  const medalR = u * 0.052;
-  const medalBlock = medalR * 2 + u * 0.055;
-
+  // A narrow, always-reserved strip keeps the badge toggle useful without
+  // changing the composition or introducing a second large hierarchy.
   if (medals.length > 0) {
-    const gap = u * 0.075;
-    const step = medalR * 2 + gap;
-    const startX = cx - (step * medals.length - gap) / 2 + medalR;
-    // The card already grew to make room (see designRatio), so the row is
-    // placed rather than conditionally skipped — a toggle that silently does
-    // nothing is worse than a slightly tighter card. The clamp is the last
-    // defence: whatever the pills did above, the medals stay off the rule.
-    const top = Math.min(y, footLineY - medalBlock - u * 0.02);
-    const my = top + medalR + u * 0.005;
+    const medalR = u * 0.0215;
+    const gap = u * 0.018;
+    const cellW = u * 0.245;
+    const total = cellW * medals.length + gap * (medals.length - 1);
+    const startX = cx - total / 2;
+    const my = footLineY - u * 0.055;
 
     for (let i = 0; i < medals.length; i++) {
       const m = medals[i];
       const [from, to] = TIER_STYLE[m.tier].canvas;
-      const mx = startX + i * step;
+      const cellX = startX + i * (cellW + gap);
+      const mx = cellX + medalR;
 
       const mg = ctx.createLinearGradient(
         mx - medalR,
@@ -453,22 +487,24 @@ export function drawCard({
       ctx.fillStyle = mg;
       ctx.fill();
       ctx.strokeStyle = "rgba(255,255,255,0.85)";
-      ctx.lineWidth = u * 0.005;
+      ctx.lineWidth = u * 0.003;
       ctx.stroke();
 
       // The glyph never changes between tiers — only the metal does.
-      icon(ctx, iconFor(m.icon), mx, my, medalR * 1.05, "#FFFFFF");
+      icon(ctx, iconFor(m.icon), mx, my, medalR * 1.12, "#FFFFFF");
 
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.font = sans(700, u * 0.026);
-      ctx.fillStyle = p.ink;
-      ctx.fillText(m.label, mx, my + medalR + u * 0.032, step - u * 0.012);
-      ctx.textBaseline = "alphabetic";
       ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.font = sans(700, u * 0.019);
+      ctx.fillStyle = p.ink;
+      ctx.fillText(
+        m.label,
+        cellX + medalR * 2 + u * 0.01,
+        my,
+        cellW - medalR * 2 - u * 0.012,
+      );
+      ctx.textBaseline = "alphabetic";
     }
-
-    y = top + medalBlock;
   }
 
   // ----------------------------------------------------------- rater footer
@@ -481,9 +517,9 @@ export function drawCard({
 
   // Stand-in avatars: raters are anonymous by design, so these are decorative
   // silhouettes — never the actual people who rated you.
-  const stackR = u * 0.041;
+  const stackR = u * 0.056;
   const shown = Math.min(3, data.ratingCount);
-  let sx = cardX + u * 0.11 + stackR;
+  let sx = cardX + u * 0.075 + stackR;
 
   for (let i = 0; i < shown; i++) {
     ctx.beginPath();
@@ -505,25 +541,74 @@ export function drawCard({
     pg.addColorStop(1, to);
     ctx.fillStyle = pg;
     ctx.fillRect(sx - stackR, footY - stackR, stackR * 2, stackR * 2);
-    ctx.fillStyle = "rgba(255,255,255,0.8)";
+
+    // Three tiny fictional portrait illustrations. They communicate “people”
+    // much more clearly than the old white head-and-shoulders glyphs while
+    // preserving rater anonymity (these never represent actual accounts).
+    const skin = ["#E7B188", "#C98963", "#D8A47D"][i % 3];
+    const hair = ["#553225", "#241F1D", "#6A4331"][i % 3];
+    ctx.fillStyle = shade(to, -12 - i * 3);
     ctx.beginPath();
-    ctx.arc(sx, footY - stackR * 0.2, stackR * 0.3, 0, Math.PI * 2);
+    ctx.ellipse(
+      sx,
+      footY + stackR * 0.78,
+      stackR * 0.68,
+      stackR * 0.58,
+      0,
+      0,
+      Math.PI * 2,
+    );
     ctx.fill();
+
+    ctx.fillStyle = skin;
     ctx.beginPath();
-    ctx.arc(sx, footY + stackR * 0.72, stackR * 0.5, 0, Math.PI * 2);
+    ctx.ellipse(
+      sx + (i - 1) * stackR * 0.035,
+      footY - stackR * 0.08,
+      stackR * 0.34,
+      stackR * 0.44,
+      0,
+      0,
+      Math.PI * 2,
+    );
     ctx.fill();
+
+    ctx.fillStyle = hair;
+    ctx.beginPath();
+    ctx.ellipse(
+      sx,
+      footY - stackR * 0.35,
+      stackR * (i === 0 ? 0.42 : 0.37),
+      stackR * (i === 0 ? 0.28 : 0.23),
+      i === 2 ? -0.16 : 0.08,
+      Math.PI,
+      Math.PI * 2,
+    );
+    ctx.fill();
+
+    ctx.fillStyle = "rgba(54,39,33,0.72)";
+    for (const dx of [-0.12, 0.12]) {
+      ctx.beginPath();
+      ctx.arc(sx + stackR * dx, footY - stackR * 0.06, stackR * 0.025, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.restore();
     sx += stackR * 1.25;
   }
 
   ctx.textBaseline = "middle";
-  const textX = shown > 0 ? sx + stackR * 0.7 : cardX + u * 0.11;
-  ctx.font = sans(500, u * 0.034);
+  const textX = shown > 0 ? sx + stackR * 0.62 : cardX + u * 0.09;
+  ctx.font = sans(500, u * (layout === "editorial" ? 0.032 : 0.036));
   ctx.fillStyle = p.inkSoft;
   ctx.fillText(d.common.ratedBy, textX, footY - u * 0.022);
-  ctx.font = sans(500, u * 0.045);
+  ctx.font = sans(500, u * (layout === "editorial" ? 0.043 : 0.047));
   ctx.fillStyle = p.ink;
-  ctx.fillText(`${data.ratingCount} ${d.common.people}`, textX, footY + u * 0.028);
+  ctx.fillText(
+    `${data.ratingCount} ${d.common.people}`,
+    textX,
+    footY + u * 0.03,
+    cardX + cardW - u * 0.07 - textX,
+  );
   ctx.textBaseline = "alphabetic";
 
   ctx.restore(); // end card clip
@@ -537,16 +622,4 @@ export function drawCard({
 
   // Anything that belongs in front of the card — bursts, confetti.
   scene.overlay?.(geom);
-
-  // ----------------------------------------------------------- outer branding
-  ctx.textAlign = "center";
-  ctx.fillStyle = p.brand;
-  ctx.font = sans(800, u * 0.031);
-  ctx.letterSpacing = `${u * 0.01}px`;
-  ctx.fillText("VIBE TAG", cx, cardY + cardH + margin * 0.62);
-  ctx.letterSpacing = "0px";
-  ctx.font = sans(500, u * 0.027);
-  ctx.fillStyle = p.inkSoft;
-  ctx.fillText(`@${data.username}`, cx, cardY + cardH + margin * 0.95);
-  ctx.textAlign = "left";
 }

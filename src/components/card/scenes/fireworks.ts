@@ -1,158 +1,172 @@
 import type { Scene } from "@/components/card/scene";
 import {
-  bloom,
-  crestBottom,
-  crestTop,
-  firework,
-  noise,
-  ribbon,
-  sparkle,
-} from "@/components/card/paint";
+  cornerWash,
+  diamondDust,
+  fineBurst,
+  fineGlint,
+  fineHalo,
+  flowField,
+  paperGrain,
+  radialHairlines,
+} from "@/components/card/fine-art";
+import { bloom } from "@/components/card/paint";
 
 /**
  * Fireworks — Vibe Score 99.
  *
- * The most kinetic card in the ladder. A deliberately open orbit and sweeping
- * warm light keep the score in motion, while asymmetrical edge fireworks make
- * the celebration feel spontaneous rather than perfectly staged.
+ * The energetic peak: an asymmetric S-shaped river, an intentionally open
+ * double orbit and six fine fireworks. It feels in motion rather than complete.
  */
 export const fireworks: Scene = {
   key: "fireworks",
   name: "Fireworks",
 
   palette: {
-    page: "#FBF3EC",
-    card: "#FFF9F1",
-    shadow: "rgba(196,86,65,0.26)",
-    border: "#EDAF82",
+    page: "#FBF2EB",
+    card: "#FFF8F1",
+    shadow: "rgba(184,78,67,0.27)",
+    border: "rgba(228,137,105,0.84)",
 
-    ink: "#321C19",
-    inkSoft: "#785A50",
-    accent: "#E9555D",
-    divider: "rgba(233,85,93,0.7)",
+    ink: "#301D19",
+    inkSoft: "#74564F",
+    accent: "#DF4F5B",
+    divider: "rgba(224,78,91,0.62)",
 
-    score: ["#ECAA36", "#F06A4E", "#E6386B"],
-    avatarRing: ["#F0B53E", "#F06A4E", "#E6386B"],
+    score: ["#DB9B32", "#E96C47", "#E33F61", "#D72E76"],
+    avatarRing: ["#E1A539", "#EA654B", "#D82F74"],
 
-    pillFill: "rgba(255,250,242,0.9)",
-    pillBorder: "#F0BE9E",
-    pillInk: "#D94F55",
+    pillFill: "rgba(255,249,241,0.9)",
+    pillBorder: "rgba(231,145,118,0.7)",
+    pillInk: "#C8464E",
 
-    rule: "rgba(235,194,168,0.94)",
+    rule: "rgba(229,184,159,0.86)",
     raterStack: [
-      ["#FFE1B2", "#EFB36F"],
-      ["#FFD0C5", "#ED927C"],
-      ["#F8BED0", "#E77798"],
+      ["#F8D8A5", "#E2A154"],
+      ["#F7C2B8", "#DD7F70"],
+      ["#F1BFD0", "#CD708F"],
     ],
 
-    brand: "rgba(63,38,31,0.48)",
-    mark: ["#EFB23E", "#F06A4E", "#E6386B"],
+    brand: "rgba(48,29,25,0.5)",
+    mark: ["#DFA136", "#E9624A", "#D82F74"],
     markAlpha: 1,
-    rays: {
-      stroke: "rgba(236,108,76,0.68)",
-      embers: ["#E9A63A", "#E6386B"],
-      count: 24,
-    },
+    // The custom 32-line field and open halo below replace the short shared rays.
+    rays: { stroke: "rgba(218,96,71,0)", embers: ["#DCA036", "#D73370"], count: 0 },
     moodGlyph: "★",
   },
 
   backdrop({ ctx, w, h }) {
-    ctx.save();
-    ctx.fillStyle = "#FBF3EC";
+    const paper = ctx.createLinearGradient(0, 0, w, h);
+    paper.addColorStop(0, "#FDF7F0");
+    paper.addColorStop(0.5, "#FAEEE6");
+    paper.addColorStop(1, "#FFF5ED");
+    ctx.fillStyle = paper;
     ctx.fillRect(0, 0, w, h);
-    bloom(ctx, w * 0.84, h * 0.08, w * 0.74, "rgba(244,174,64,0.2)");
-    bloom(ctx, w * 0.13, h * 0.91, w * 0.82, "rgba(231,62,105,0.15)");
-    ctx.restore();
+    bloom(ctx, w * 0.82, h * 0.08, w * 0.74, "rgba(228,142,52,0.15)");
+    bloom(ctx, w * 0.14, h * 0.91, w * 0.84, "rgba(205,43,107,0.13)");
   },
 
-  surface({ ctx, cardX, cardY, cardW, cardH, cx, u }) {
-    ctx.save();
-    ctx.fillStyle = "#FFF9F1";
+  surface(g) {
+    const { ctx, cardX, cardY, cardW, cardH, avatarCenterY, scoreCenterY } = g;
+    const ivory = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
+    ivory.addColorStop(0, "#FFF7EE");
+    ivory.addColorStop(0.48, "#FFFBF6");
+    ivory.addColorStop(1, "#FFF0EA");
+    ctx.fillStyle = ivory;
     ctx.fillRect(cardX, cardY, cardW, cardH);
 
-    crestTop(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#F7CF72", alpha: 0.5, depth: 0.24, reach: 0.98 },
-      { fill: "#F58A60", alpha: 0.52, depth: 0.18, reach: 0.78 },
-      { fill: "#E94770", alpha: 0.52, depth: 0.115, reach: 0.52 },
-    ]);
+    cornerWash(g, {
+      edge: "topLeft",
+      colors: ["#FFDEAA", "#F2955E", "#E44770"],
+      reach: 0.9,
+      depth: 0.27,
+      alpha: 0.3,
+    });
+    cornerWash(g, {
+      edge: "bottomRight",
+      colors: ["#FFD59E", "#ED7857", "#D72D78"],
+      reach: 0.93,
+      depth: 0.29,
+      alpha: 0.34,
+    });
 
-    // Broad, low-opacity sweeps provide speed without becoming confetti.
-    ribbon(ctx, cardX, cardY, cardW, cardH, "#F1B63E", "#F06C4D", 0.31, 0.05, 0.17);
-    ribbon(ctx, cardX, cardY, cardW, cardH, "#F37A55", "#E6386B", 0.52, 0.035, 0.2);
-    ribbon(ctx, cardX, cardY, cardW, cardH, "#E94A68", "#E9A63A", 0.7, 0.022, 0.14);
+    // The approved 99 card is defined by one restless S-current, not a stack
+    // of broad painted ribbons. Parallel hairlines preserve light and detail.
+    flowField(g, {
+      count: 48,
+      colors: ["#E8BB58", "#EB8657", "#E44F68", "#D72D78"],
+      y: [-0.055, 0.57, 0.36, 1.055],
+      spread: 0.18,
+      alpha: 0.29,
+      lineWidth: 0.00105,
+      seed: 503,
+    });
+    flowField(g, {
+      count: 22,
+      colors: ["#F0CC79", "#E98B5B", "#D93A73"],
+      y: [0.02, 0.62, 0.4, 0.98],
+      spread: 0.072,
+      alpha: 0.12,
+      lineWidth: 0.00085,
+      seed: 509,
+      reverse: true,
+    });
 
-    crestBottom(ctx, cardX, cardY, cardW, cardH, [
-      { fill: "#F7D27D", alpha: 0.42, depth: 0.885, reach: 0.83 },
-      { fill: "#F1845F", alpha: 0.5, depth: 0.932, reach: 0.86 },
-      { fill: "#E63A69", alpha: 0.58, depth: 0.972, reach: 0.9 },
-    ]);
+    bloom(ctx, cardX + cardW * 0.5, avatarCenterY, cardW * 0.31, "rgba(229,149,58,0.09)");
+    bloom(ctx, cardX + cardW * 0.5, scoreCenterY, cardW * 0.58, "rgba(226,91,66,0.1)");
+    radialHairlines(
+      ctx,
+      cardX + cardW * 0.5,
+      scoreCenterY,
+      cardW * 0.48,
+      cardW * 0.35,
+      32,
+      ["#DCA036", "#E86649", "#D73370"],
+      0.2,
+      521,
+    );
+    fineHalo(ctx, cardX + cardW * 0.5, scoreCenterY, cardW * 0.42, cardW * 0.3, {
+      colors: ["#DDA037", "#E86549", "#D72F74"],
+      open: Math.PI * 0.36,
+      rotation: -0.5,
+      alpha: 0.52,
+      lines: 2,
+    });
 
-    bloom(ctx, cx, cardY + u * 0.25, u * 0.62, "rgba(255,224,170,0.32)");
-
-    // The incomplete orbit is the visual difference between 99 and 100: it
-    // races around the score but intentionally leaves a bright opening.
-    const orbitY = cardY + u * 0.82;
-    bloom(ctx, cx, orbitY, u * 0.5, "rgba(242,130,72,0.12)");
-    ctx.save();
-    const orbit = ctx.createLinearGradient(cx - u * 0.38, orbitY, cx + u * 0.38, orbitY);
-    orbit.addColorStop(0, "#EAA83A");
-    orbit.addColorStop(0.48, "#F06A4E");
-    orbit.addColorStop(1, "#E6386B");
-    ctx.strokeStyle = orbit;
-    ctx.lineCap = "round";
-    ctx.shadowColor = "rgba(238,95,77,0.3)";
-    ctx.shadowBlur = u * 0.03;
-    ctx.globalAlpha = 0.5;
-    ctx.lineWidth = u * 0.01;
-    ctx.beginPath();
-    ctx.ellipse(cx, orbitY, u * 0.385, u * 0.255, -0.08, 0.48, Math.PI * 1.82);
-    ctx.stroke();
-    ctx.globalAlpha = 0.28;
-    ctx.lineWidth = u * 0.004;
-    ctx.beginPath();
-    ctx.ellipse(cx, orbitY, u * 0.42, u * 0.285, -0.08, 2.82, Math.PI * 1.68);
-    ctx.stroke();
-    ctx.restore();
-
-    for (let i = 0; i < 22; i++) {
-      sparkle(
-        ctx,
-        cardX + cardW * (0.035 + noise(i * 11) * 0.93),
-        cardY + cardH * (0.018 + noise(i * 37) * 0.96),
-        cardW * (0.004 + noise(i * 41) * 0.006),
-        i % 4 === 0 ? "rgba(230,56,107,0.82)" : "rgba(235,164,53,0.8)",
-      );
-    }
-    ctx.restore();
-  },
-
-  overlay({ ctx, cardX, cardY, cardW, cardH }) {
-    const colors = ["#ECAF38", "#F06A4E", "#E6386B", "#F59A67"];
-    // Uneven placement gives 99 its electric, still-in-motion character. All
-    // centres stay at the safe edge so the shared typography remains clear.
     const bursts: [number, number, number, number][] = [
-      [0.075, 0.09, 0.115, 0.78],
-      [0.88, 0.13, 0.082, 0.7],
-      [0.015, 0.37, 0.064, 0.56],
-      [0.985, 0.58, 0.092, 0.72],
-      [0.15, 0.88, 0.096, 0.74],
-      [0.72, 0.96, 0.07, 0.62],
-      [0.93, 0.79, 0.052, 0.54],
+      [0.075, 0.085, 0.095, 0.64],
+      [0.86, 0.15, 0.074, 0.54],
+      [0.035, 0.37, 0.057, 0.4],
+      [0.94, 0.54, 0.082, 0.57],
+      [0.155, 0.86, 0.078, 0.54],
+      [0.78, 0.94, 0.06, 0.43],
     ];
-
-    ctx.save();
-    for (let i = 0; i < bursts.length; i++) {
-      const [fx, fy, fr, alpha] = bursts[i];
-      firework(
-        ctx,
-        cardX + cardW * fx,
-        cardY + cardH * fy,
-        cardW * fr,
-        colors,
-        i * 19 + 5,
+    bursts.forEach(([x, y, r, alpha], index) =>
+      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, {
+        colors: ["#DFA33B", "#E96B4B", "#D83172", "#ED9A61"],
+        spokes: 28 + (index % 3) * 3,
         alpha,
-      );
-    }
-    ctx.restore();
+        seed: 523 + index * 31,
+      }),
+    );
+
+    diamondDust(g, 32, ["#DFA238", "#E45B50", "#D52F75"], 547, 0.62);
+    const glints: [number, number, number][] = [
+      [0.16, 0.24, 0.009],
+      [0.9, 0.31, 0.012],
+      [0.1, 0.6, 0.007],
+      [0.88, 0.76, 0.009],
+      [0.31, 0.96, 0.006],
+    ];
+    glints.forEach(([x, y, r], index) =>
+      fineGlint(
+        ctx,
+        cardX + cardW * x,
+        cardY + cardH * y,
+        cardW * r,
+        index % 2 === 0 ? "#DFA238" : "#D72F74",
+        0.54,
+      ),
+    );
+    paperGrain(g, "#7D584F", 260, 0.03, 557);
   },
 };

@@ -14,8 +14,8 @@ import type { CardBand } from "@/lib/card-bands";
 const SAMPLE: Omit<CardData, "score"> = {
   name: "Özgür Yahşi",
   username: "ozguryahsi",
-  ratingCount: 34,
-  percentile: 2,
+  ratingCount: 126,
+  percentile: 5,
   tags: [
     { key: "reliable", label: "Reliable" },
     { key: "creative", label: "Creative" },
@@ -27,18 +27,21 @@ const SAMPLE: Omit<CardData, "score"> = {
     { key: "kindHeart", label: "Kind Heart", icon: "heart", tier: "SILVER" },
     { key: "wellKnown", label: "Well Known", icon: "globe", tier: "BRONZE" },
   ],
-  avatarUrl: null,
+  avatarUrl: "/card-preview/ozgur-avatar.png",
   avatarColor: "#FF8A3D",
 };
 
 /** A score inside the band that shows it at its most typical. */
 function sampleScore(band: CardBand): number {
+  // The approved reference board uses 42 for the monochrome example; keeping
+  // that exact anchor makes side-by-side visual review much easier.
+  if (band.key === "monochrome") return 42;
   return Math.round((band.min + band.max) / 2);
 }
 
 export function BandGallery({ bands }: { bands: CardBand[] }) {
   const [format, setFormat] = useState<FormatKey>("story");
-  const [showBadges, setShowBadges] = useState(true);
+  const [showBadges, setShowBadges] = useState(false);
 
   return (
     <div>

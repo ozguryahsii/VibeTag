@@ -364,9 +364,7 @@ export const tr: Dictionary = {
     formatStory: "Story",
     formatSquare: "Kare",
     formatWide: "Geniş",
-    theme: "TEMA",
-    themeHint:
-      "Auto, kartın tonunu skoruna göre seçer — yüksek skor ışıldar, sakin skor zarif kalır.",
+    styleFromScore: "Kartının tasarımı Vibe Score'unu takip eder ({n}).",
     showScore: "Skoru göster",
     showScoreBody: "Kapatırsan kartta sadece etiketlerin görünür.",
     showBadges: "Rozetlerimi göster",

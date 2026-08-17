@@ -367,9 +367,7 @@ export const en = {
     formatStory: "Story",
     formatSquare: "Square",
     formatWide: "Wide",
-    theme: "THEME",
-    themeHint:
-      "Auto picks the tone from your score — a high score glows, a calm score stays elegant.",
+    styleFromScore: "Your card design follows your Vibe Score ({n}).",
     showScore: "Show the score",
     showScoreBody: "Turn it off to share only your tags.",
     showBadges: "Show my badges",

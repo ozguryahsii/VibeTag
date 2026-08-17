@@ -54,7 +54,7 @@ export const clay: Scene = {
   },
 
   surface(geom) {
-    const { ctx, cardX, cardY, cardW, cardH } = geom;
+    const { ctx, cardX, cardY, cardW, cardH, u } = geom;
     const paper = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
     paper.addColorStop(0, "#FFFDF9");
     paper.addColorStop(0.55, "#FBF6EE");
@@ -66,7 +66,7 @@ export const clay: Scene = {
       ctx,
       cardX + cardW * 0.12,
       cardY + cardH * 0.76,
-      cardW * 0.54,
+      u * 0.54,
       "rgba(196,137,91,0.055)",
     );
     flowField(geom, {
@@ -90,8 +90,8 @@ export const clay: Scene = {
     });
     paperGrain(geom, "#8D725E", 185, 0.024, 56);
 
-    fineGlint(ctx, cardX + cardW * 0.12, cardY + cardH * 0.25, cardW * 0.007, "#E5BE86", 0.42);
-    fineGlint(ctx, cardX + cardW * 0.88, cardY + cardH * 0.39, cardW * 0.006, "#FFFFFF", 0.5);
-    fineGlint(ctx, cardX + cardW * 0.82, cardY + cardH * 0.76, cardW * 0.0045, "#C99061", 0.34);
+    fineGlint(ctx, cardX + cardW * 0.12, cardY + cardH * 0.25, u * 0.007, "#E5BE86", 0.42);
+    fineGlint(ctx, cardX + cardW * 0.88, cardY + cardH * 0.39, u * 0.006, "#FFFFFF", 0.5);
+    fineGlint(ctx, cardX + cardW * 0.82, cardY + cardH * 0.76, u * 0.0045, "#C99061", 0.34);
   },
 };

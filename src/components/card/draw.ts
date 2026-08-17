@@ -106,25 +106,116 @@ export function drawCard({
   const p = scene.palette;
 
   // ------------------------------------------------------------- geometry
-  // The reference is one tall portrait object on three differently shaped
-  // canvases. Export formats change the page around it, never the card itself.
-  const cardRatio = 2.21;
+  // Story keeps the approved portrait composition. Square and wide use the
+  // available canvas as an actual card surface, then reflow the same content
+  // with a height-derived unit so type and portraits stay optically consistent.
+  const portraitRatio = 2.21;
   const pageInset = Math.min(w, h) * 0.06;
-  const cardW = Math.min(w - pageInset * 2, (h - pageInset * 2) / cardRatio);
-  const cardH = cardW * cardRatio;
+  const cardW =
+    format === "story"
+      ? Math.min(w - pageInset * 2, (h - pageInset * 2) / portraitRatio)
+      : w - pageInset * 2;
+  const cardH =
+    format === "story" ? cardW * portraitRatio : h - pageInset * 2;
   const cardX = (w - cardW) / 2;
   const cardY = (h - cardH) / 2;
-  const radius = cardW * 0.058;
-  const u = cardW;
+  const radius = Math.min(cardW, cardH) * 0.058;
+  // Landscape compositions use a slightly larger optical unit than the old
+  // portrait stack. This keeps names, pills and footer copy legible when a
+  // 1600×900 export is scaled down in a social feed.
+  const u = format === "story" ? cardW : cardH / 1.85;
   const cx = cardX + cardW / 2;
 
   // Badges occupy a permanent compact strip above the footer. Toggling them
   // never resizes or shifts the card, so exports remain directly comparable.
   const medals = showBadges ? data.badges.slice(0, 3) : [];
   const layout: CardLayoutKind = data.score >= 93 ? "celebratory" : "editorial";
-  const avatarCenterY = cardY + u * (layout === "editorial" ? 0.49 : 0.305);
-  const scoreCenterY = cardY + u * (layout === "editorial" ? 1.26 : 1.01);
-  const footerRuleY = cardY + u * (layout === "editorial" ? 1.82 : 1.845);
+  const isStory = format === "story";
+  const isSquare = format === "square";
+
+  const identityCenterX = isStory
+    ? cx
+    : isSquare
+      ? cardX + cardW * 0.27
+      : cardX + cardW * 0.18;
+  const scoreCenterX = isStory
+    ? cx
+    : isSquare
+      ? cardX + cardW * 0.7
+      : cx;
+  const traitCenterX = isStory
+    ? cx
+    : isSquare
+      ? cx
+      : cardX + cardW * 0.82;
+
+  const formatY = (storyUnits: number, squareRatio: number, wideRatio: number) =>
+    cardY +
+    (isStory ? u * storyUnits : cardH * (isSquare ? squareRatio : wideRatio));
+
+  const avatarCenterY = formatY(
+    layout === "editorial" ? 0.49 : 0.305,
+    0.28,
+    0.39,
+  );
+  const nameY = formatY(layout === "editorial" ? 0.9 : 0.61, 0.5, 0.65);
+  const dividerY = formatY(
+    layout === "editorial" ? 0.965 : 0.65,
+    0.56,
+    0.72,
+  );
+  const myVibeY = formatY(
+    layout === "editorial" ? 1.064 : 0.78,
+    0.14,
+    0.22,
+  );
+  const scoreCenterY = formatY(
+    layout === "editorial" ? 1.26 : 1.01,
+    0.31,
+    0.43,
+  );
+  const scoreBaselineY = formatY(
+    layout === "editorial" ? 1.39 : 1.18,
+    0.43,
+    0.57,
+  );
+  const vibeScoreY = formatY(
+    layout === "editorial" ? 1.465 : 1.265,
+    0.51,
+    0.64,
+  );
+  const moodY = formatY(
+    showScore
+      ? layout === "editorial"
+        ? 1.57
+        : 1.41
+      : layout === "editorial"
+        ? 1.3
+        : 1.05,
+    showScore ? 0.6 : 0.34,
+    showScore ? 0.72 : 0.42,
+  );
+  const pillStartY = formatY(
+    showScore
+      ? layout === "editorial"
+        ? 1.635
+        : 1.485
+      : layout === "editorial"
+        ? 1.365
+        : 1.125,
+    showScore ? 0.68 : 0.64,
+    0.3,
+  );
+  const footerRuleY = formatY(
+    layout === "editorial" ? 1.82 : 1.845,
+    0.83,
+    0.83,
+  );
+  const footerContentY = formatY(
+    layout === "editorial" ? 1.95 : 1.98,
+    0.92,
+    0.92,
+  );
 
   const geom = {
     ctx,
@@ -138,7 +229,9 @@ export function drawCard({
     cx,
     u,
     layout,
+    avatarCenterX: identityCenterX,
     avatarCenterY,
+    scoreCenterX,
     scoreCenterY,
     footerRuleY,
   };
@@ -171,14 +264,14 @@ export function drawCard({
     p.markAlpha,
   );
 
-  const center = (text: string, cy: number) => {
+  const center = (text: string, cy: number, centerX = cx) => {
     ctx.textAlign = "center";
-    ctx.fillText(text, cx, cy);
+    ctx.fillText(text, centerX, cy);
     ctx.textAlign = "left";
   };
 
   // ---------------------------------------------------------------- avatar
-  const ar = u * (layout === "editorial" ? 0.295 : 0.17);
+  const ar = u * 0.225;
   let y = avatarCenterY;
 
   ctx.save();
@@ -186,74 +279,86 @@ export function drawCard({
   ctx.shadowBlur = u * 0.05;
   ctx.shadowOffsetY = u * 0.012;
   ctx.beginPath();
-  ctx.arc(cx, y, ar, 0, Math.PI * 2);
+  ctx.arc(identityCenterX, y, ar, 0, Math.PI * 2);
   ctx.fillStyle = "#FFFFFF";
   ctx.fill();
   ctx.restore();
 
   ctx.save();
   ctx.beginPath();
-  ctx.arc(cx, y, ar * 0.94, 0, Math.PI * 2);
+  ctx.arc(identityCenterX, y, ar * 0.94, 0, Math.PI * 2);
   ctx.clip();
   if (photo && photo.complete && photo.naturalWidth > 0) {
     const s = Math.max((ar * 2) / photo.naturalWidth, (ar * 2) / photo.naturalHeight);
     const iw = photo.naturalWidth * s;
     const ih = photo.naturalHeight * s;
-    ctx.drawImage(photo, cx - iw / 2, y - ih / 2, iw, ih);
+    ctx.drawImage(photo, identityCenterX - iw / 2, y - ih / 2, iw, ih);
   } else {
     const tint = p.avatarTint ?? data.avatarColor;
-    const ag = ctx.createLinearGradient(cx - ar, y - ar, cx + ar, y + ar);
+    const ag = ctx.createLinearGradient(
+      identityCenterX - ar,
+      y - ar,
+      identityCenterX + ar,
+      y + ar,
+    );
     ag.addColorStop(0, `${tint}2E`);
     ag.addColorStop(1, `${tint}17`);
     ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(cx - ar, y - ar, ar * 2, ar * 2);
+    ctx.fillRect(identityCenterX - ar, y - ar, ar * 2, ar * 2);
     ctx.fillStyle = ag;
-    ctx.fillRect(cx - ar, y - ar, ar * 2, ar * 2);
+    ctx.fillRect(identityCenterX - ar, y - ar, ar * 2, ar * 2);
     ctx.fillStyle = shade(tint, -22);
     ctx.font = serif(400, ar * 0.82);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(initialsOf(data.name), cx, y + ar * 0.04);
+    ctx.fillText(initialsOf(data.name), identityCenterX, y + ar * 0.04);
     ctx.textBaseline = "alphabetic";
     ctx.textAlign = "left";
   }
   ctx.restore();
 
   ctx.beginPath();
-  ctx.arc(cx, y, ar, 0, Math.PI * 2);
-  ctx.strokeStyle = paintOf(ctx, p.avatarRing, cx - ar, y - ar, cx + ar, y + ar);
+  ctx.arc(identityCenterX, y, ar, 0, Math.PI * 2);
+  ctx.strokeStyle = paintOf(
+    ctx,
+    p.avatarRing,
+    identityCenterX - ar,
+    y - ar,
+    identityCenterX + ar,
+    y + ar,
+  );
   ctx.lineWidth = u * (p.avatarRing.length > 1 ? 0.008 : 0.006);
   ctx.stroke();
 
   // ------------------------------------------------------------------ name
-  y = cardY + u * (layout === "editorial" ? 0.9 : 0.61);
+  y = nameY;
   ctx.fillStyle = p.ink;
   ctx.font =
     layout === "editorial" ? serif(400, u * 0.068) : sans(700, u * 0.068);
-  center(data.name, y);
+  center(data.name, y, identityCenterX);
 
   // --------------------------------------------------------------- divider
-  y = cardY + u * (layout === "editorial" ? 0.965 : 0.65);
+  y = dividerY;
   const dw = u * 0.1;
   ctx.strokeStyle = p.divider;
   ctx.lineWidth = u * 0.002;
   ctx.beginPath();
-  ctx.moveTo(cx - dw, y);
-  ctx.lineTo(cx - u * 0.022, y);
-  ctx.moveTo(cx + u * 0.022, y);
-  ctx.lineTo(cx + dw, y);
+  ctx.moveTo(identityCenterX - dw, y);
+  ctx.lineTo(identityCenterX - u * 0.022, y);
+  ctx.moveTo(identityCenterX + u * 0.022, y);
+  ctx.lineTo(identityCenterX + dw, y);
   ctx.stroke();
   ctx.beginPath();
-  ctx.arc(cx, y, u * 0.007, 0, Math.PI * 2);
+  ctx.arc(identityCenterX, y, u * 0.007, 0, Math.PI * 2);
   ctx.fillStyle = p.accent;
   ctx.fill();
 
   // -------------------------------------------------------------- MY VIBE
-  y = cardY + u * (layout === "editorial" ? 1.064 : 0.78);
+  y = myVibeY;
   ctx.fillStyle = p.accent;
   ctx.font = sans(600, u * (layout === "editorial" ? 0.038 : 0.04));
   ctx.letterSpacing = `${u * 0.0155}px`;
-  center("MY VIBE", y);
+  center("MY VIBE", y, scoreCenterX);
   ctx.letterSpacing = "0px";
 
   if (showScore) {
@@ -273,8 +378,14 @@ export function drawCard({
         ctx.globalAlpha = 0.28 + noise(i + 7) * 0.42;
         ctx.lineWidth = u * 0.003;
         ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a) * inner, scoreCy + Math.sin(a) * inner * 0.8);
-        ctx.lineTo(cx + Math.cos(a) * outer, scoreCy + Math.sin(a) * outer * 0.8);
+        ctx.moveTo(
+          scoreCenterX + Math.cos(a) * inner,
+          scoreCy + Math.sin(a) * inner * 0.8,
+        );
+        ctx.lineTo(
+          scoreCenterX + Math.cos(a) * outer,
+          scoreCy + Math.sin(a) * outer * 0.8,
+        );
         ctx.stroke();
       }
       for (let i = 0; i < count - 2; i++) {
@@ -287,7 +398,7 @@ export function drawCard({
         ctx.fillStyle = i % 3 === 0 ? embers[0] : embers[1];
         ctx.beginPath();
         ctx.arc(
-          cx + Math.cos(a) * dist,
+          scoreCenterX + Math.cos(a) * dist,
           sy,
           u * (0.0025 + noise(i + 300) * 0.003),
           0,
@@ -299,42 +410,34 @@ export function drawCard({
     }
 
     // ------------------------------------------------------------ score
-    y = cardY + u * (layout === "editorial" ? 1.39 : 1.18);
+    y = scoreBaselineY;
     ctx.font = serif(400, scoreSize);
     ctx.fillStyle = paintOf(
       ctx,
       p.score,
-      cx - u * 0.2,
+      scoreCenterX - u * 0.2,
       y - scoreSize,
-      cx + u * 0.2,
+      scoreCenterX + u * 0.2,
       y,
     );
-    center(String(data.score), y);
+    center(String(data.score), y, scoreCenterX);
 
     // ------------------------------------------------------- VIBE SCORE
     // Cleared of the numeral rather than tucked under it: Didot and its
     // fallbacks draw old-style figures, so 2, 5, 7 and 9 hang below the
     // baseline and would otherwise cross the label.
-    y = cardY + u * (layout === "editorial" ? 1.465 : 1.265);
+    y = vibeScoreY;
     ctx.fillStyle = p.accent;
     ctx.font = sans(600, u * 0.0365);
     ctx.letterSpacing = `${u * 0.0135}px`;
-    center("VIBE SCORE", y);
+    center("VIBE SCORE", y, scoreCenterX);
     ctx.letterSpacing = "0px";
   } else {
     y = cardY + u * (layout === "editorial" ? 1.15 : 0.88);
   }
 
   // -------------------------------------------------------------- mood line
-  y = cardY +
-    u *
-      (showScore
-        ? layout === "editorial"
-          ? 1.57
-          : 1.41
-        : layout === "editorial"
-          ? 1.3
-          : 1.05);
+  y = moodY;
   const moodText = !showScore
     ? d.card.seeMeAs
     : data.percentile && data.score >= 80
@@ -357,7 +460,7 @@ export function drawCard({
     ctx.font = sans(moodWeight, moodFont);
     mw = ctx.measureText(moodText).width;
   }
-  const moodStart = cx - (mw + glyphR * 2 + u * 0.022) / 2;
+  const moodStart = scoreCenterX - (mw + glyphR * 2 + u * 0.022) / 2;
 
   ctx.beginPath();
   ctx.arc(moodStart + glyphR, y - u * 0.013, glyphR, 0, Math.PI * 2);
@@ -377,16 +480,22 @@ export function drawCard({
   ctx.fillText(moodText, moodStart + glyphR * 2 + u * 0.022, y);
 
   // ------------------------------------------------------------ trait pills
-  y += u * (layout === "editorial" ? 0.065 : 0.075);
+  y = pillStartY;
   const pillH = u * (layout === "editorial" ? 0.098 : 0.118);
   const pillGap = u * (layout === "editorial" ? 0.018 : 0.025);
   const pillWeight = layout === "editorial" ? 500 : 600;
   let pillFont = u * (layout === "editorial" ? 0.036 : 0.041);
   // The calm reference keeps one restrained row; the celebratory reference
-  // expands to a deliberate two-column grid.
-  const chosen = data.tags.slice(0, layout === "editorial" ? 3 : 4);
+  // expands to a deliberate two-column grid. Non-story formats have room to
+  // retain all four tags: square spans them, wide gives them their own column.
+  const chosen = data.tags.slice(
+    0,
+    isStory ? (layout === "editorial" ? 3 : 4) : 4,
+  );
 
-  const limit = u * (layout === "editorial" ? 0.9 : 0.88);
+  const limit = isStory
+    ? u * (layout === "editorial" ? 0.9 : 0.88)
+    : u * (isSquare ? 1.75 : 0.95);
   ctx.font = sans(pillWeight, pillFont);
   const iconBox = () => pillFont * 1.18;
   const measureWidths = () =>
@@ -399,7 +508,7 @@ export function drawCard({
   let widths = measureWidths();
 
   const rows: number[][] =
-    layout === "editorial"
+    (isStory && layout === "editorial") || isSquare
       ? [chosen.map((_, i) => i)]
       : chosen.reduce<number[][]>((acc, _, i) => {
         if (i % 2 === 0) acc.push([i]);
@@ -423,7 +532,7 @@ export function drawCard({
 
   for (const r of rows) {
     const total = r.reduce((a, i) => a + widths[i], 0) + pillGap * (r.length - 1);
-    let x = cx - total / 2;
+    let x = traitCenterX - total / 2;
     for (const i of r) {
       const t = chosen[i];
       ctx.fillStyle = p.pillFill;
@@ -454,7 +563,7 @@ export function drawCard({
 
   // ------------------------------------------------------------ footer lines
   const footLineY = footerRuleY;
-  const footY = cardY + u * (layout === "editorial" ? 1.95 : 1.98);
+  const footY = footerContentY;
 
   // ----------------------------------------------------------- badge medals
   // A narrow, always-reserved strip keeps the badge toggle useful without

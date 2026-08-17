@@ -2,6 +2,7 @@ import type { Scene } from "@/components/card/scene";
 import {
   cornerWash,
   diamondDust,
+  edgeTwinkles,
   fineBurst,
   fineGlint,
   fineHalo,
@@ -66,7 +67,18 @@ export const fireworks: Scene = {
   },
 
   surface(g) {
-    const { ctx, cardX, cardY, cardW, cardH, avatarCenterY, scoreCenterY } = g;
+    const {
+      ctx,
+      cardX,
+      cardY,
+      cardW,
+      cardH,
+      avatarCenterX,
+      avatarCenterY,
+      scoreCenterX,
+      scoreCenterY,
+      u,
+    } = g;
     const ivory = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
     ivory.addColorStop(0, "#FFF7EE");
     ivory.addColorStop(0.48, "#FFFBF6");
@@ -111,20 +123,20 @@ export const fireworks: Scene = {
       reverse: true,
     });
 
-    bloom(ctx, cardX + cardW * 0.5, avatarCenterY, cardW * 0.31, "rgba(229,149,58,0.09)");
-    bloom(ctx, cardX + cardW * 0.5, scoreCenterY, cardW * 0.58, "rgba(226,91,66,0.1)");
+    bloom(ctx, avatarCenterX, avatarCenterY, u * 0.31, "rgba(229,149,58,0.09)");
+    bloom(ctx, scoreCenterX, scoreCenterY, u * 0.58, "rgba(226,91,66,0.1)");
     radialHairlines(
       ctx,
-      cardX + cardW * 0.5,
+      scoreCenterX,
       scoreCenterY,
-      cardW * 0.48,
-      cardW * 0.35,
+      u * 0.48,
+      u * 0.35,
       32,
       ["#DCA036", "#E86649", "#D73370"],
       0.2,
       521,
     );
-    fineHalo(ctx, cardX + cardW * 0.5, scoreCenterY, cardW * 0.42, cardW * 0.3, {
+    fineHalo(ctx, scoreCenterX, scoreCenterY, u * 0.42, u * 0.3, {
       colors: ["#DDA037", "#E86549", "#D72F74"],
       open: Math.PI * 0.36,
       rotation: -0.5,
@@ -141,7 +153,7 @@ export const fireworks: Scene = {
       [0.78, 0.94, 0.06, 0.43],
     ];
     bursts.forEach(([x, y, r, alpha], index) =>
-      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, {
+      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, u * r, {
         colors: ["#DFA33B", "#E96B4B", "#D83172", "#ED9A61"],
         spokes: 28 + (index % 3) * 3,
         alpha,
@@ -162,11 +174,17 @@ export const fireworks: Scene = {
         ctx,
         cardX + cardW * x,
         cardY + cardH * y,
-        cardW * r,
+        u * r,
         index % 2 === 0 ? "#DFA238" : "#D72F74",
         0.54,
       ),
     );
     paperGrain(g, "#7D584F", 260, 0.03, 557);
+    edgeTwinkles(g, {
+      count: 68,
+      colors: ["#FFF8E8", "#E0A13A", "#E65E4C", "#D52F74"],
+      seed: 991,
+      intensity: 1.14,
+    });
   },
 };

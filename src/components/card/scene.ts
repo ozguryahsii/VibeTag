@@ -36,7 +36,9 @@ export type SceneGeom = {
   /** Shared content profile selected from the score, never from user choice. */
   layout: CardLayoutKind;
   /** Stable anchors for artwork that needs to follow the shared composition. */
+  avatarCenterX: number;
   avatarCenterY: number;
+  scoreCenterX: number;
   scoreCenterY: number;
   footerRuleY: number;
 };

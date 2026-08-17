@@ -1,6 +1,7 @@
 import type { Scene } from "@/components/card/scene";
 import {
   diamondDust,
+  edgeTwinkles,
   fineBurst,
   fineGlint,
   flowField,
@@ -67,7 +68,7 @@ export const sunset: Scene = {
   },
 
   surface(g) {
-    const { ctx, cardX, cardY, cardW, cardH, scoreCenterY } = g;
+    const { ctx, cardX, cardY, cardW, cardH, scoreCenterX, scoreCenterY, u } = g;
     const wash = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
     wash.addColorStop(0, "#FFE5D2");
     wash.addColorStop(0.52, "#FFD1C0");
@@ -106,12 +107,12 @@ export const sunset: Scene = {
 
     bloom(
       ctx,
-      cardX + cardW * 0.5,
+      scoreCenterX,
       scoreCenterY,
-      cardW * 0.42,
+      u * 0.42,
       "rgba(226,143,69,0.055)",
     );
-    fineBurst(ctx, cardX + cardW * 0.12, cardY + cardH * 0.115, cardW * 0.07, {
+    fineBurst(ctx, cardX + cardW * 0.12, cardY + cardH * 0.115, u * 0.07, {
       colors: ["#DCA846", "#E17E55", "#D95D69"],
       spokes: 25,
       alpha: 0.34,
@@ -123,7 +124,7 @@ export const sunset: Scene = {
       ctx,
       cardX + cardW * 0.89,
       cardY + cardH * 0.31,
-      cardW * 0.009,
+      u * 0.009,
       "#DCA34A",
       0.42,
     );
@@ -131,10 +132,16 @@ export const sunset: Scene = {
       ctx,
       cardX + cardW * 0.1,
       cardY + cardH * 0.71,
-      cardW * 0.006,
+      u * 0.006,
       "#D75B6D",
       0.34,
     );
     paperGrain(g, "#806A5B", 210, 0.025, 199);
+    edgeTwinkles(g, {
+      count: 20,
+      colors: ["#FFF7E9", "#EFB452", "#E57859", "#D9586D"],
+      seed: 257,
+      intensity: 0.82,
+    });
   },
 };

@@ -20,7 +20,7 @@ type FlowFieldOptions = {
  * closed shapes, leaving the paper and content areas light.
  */
 export function flowField(
-  { ctx, cardX, cardY, cardW, cardH }: SceneGeom,
+  { ctx, cardX, cardY, cardW, cardH, u }: SceneGeom,
   {
     count,
     colors,
@@ -61,8 +61,7 @@ export function flowField(
       1,
       alpha * 1.38 * (0.45 + Math.sin(t * Math.PI) * 0.55),
     );
-    ctx.lineWidth =
-      cardW * lineWidth * 1.85 * (0.72 + noise(seed + i * 19 + 9) * 0.55);
+    ctx.lineWidth = u * lineWidth * 1.85 * (0.72 + noise(seed + i * 19 + 9) * 0.55);
     ctx.beginPath();
     ctx.moveTo(x0, yy[0]);
     ctx.bezierCurveTo(c1x, yy[1], c2x, yy[2], x3, yy[3]);
@@ -133,7 +132,7 @@ export function cornerWash(
 
 /** Deterministic pin-point paper grain; no bitmap texture or random flicker. */
 export function paperGrain(
-  { ctx, cardX, cardY, cardW, cardH }: SceneGeom,
+  { ctx, cardX, cardY, cardW, cardH, u }: SceneGeom,
   color: string,
   count = 170,
   alpha = 0.03,
@@ -149,15 +148,15 @@ export function paperGrain(
     const a = alpha * (0.3 + noise(seed + i * 31 + 11) * 0.7);
     ctx.globalAlpha = a;
     if (i % 4 === 0) {
-      const len = cardW * (0.0012 + noise(seed + i * 37) * 0.0024);
-      ctx.lineWidth = Math.max(0.55, cardW * 0.00055);
+      const len = u * (0.0012 + noise(seed + i * 37) * 0.0024);
+      ctx.lineWidth = Math.max(0.55, u * 0.00055);
       ctx.beginPath();
       ctx.moveTo(x - len, y);
       ctx.lineTo(x + len, y + len * 0.25);
       ctx.stroke();
     } else {
       ctx.beginPath();
-      ctx.arc(x, y, cardW * (0.00045 + noise(seed + i * 41) * 0.00055), 0, Math.PI * 2);
+      ctx.arc(x, y, u * (0.00045 + noise(seed + i * 41) * 0.00055), 0, Math.PI * 2);
       ctx.fill();
     }
   }
@@ -195,7 +194,7 @@ export function fineGlint(
 }
 
 export function diamondDust(
-  { ctx, cardX, cardY, cardW, cardH }: SceneGeom,
+  { ctx, cardX, cardY, cardW, cardH, u }: SceneGeom,
   count: number,
   colors: string[],
   seed = 0,
@@ -205,7 +204,7 @@ export function diamondDust(
   for (let i = 0; i < count; i++) {
     const x = cardX + cardW * (0.055 + noise(seed + i * 17) * 0.89);
     const y = cardY + cardH * (0.035 + noise(seed + i * 31 + 7) * 0.91);
-    const r = cardW * (0.0014 + noise(seed + i * 43 + 3) * 0.0025);
+    const r = u * (0.0014 + noise(seed + i * 43 + 3) * 0.0025);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(Math.PI / 4);
@@ -213,6 +212,82 @@ export function diamondDust(
     ctx.fillStyle = colors[i % colors.length];
     ctx.fillRect(-r, -r, r * 2, r * 2);
     ctx.restore();
+  }
+  ctx.restore();
+}
+
+type EdgeTwinkleOptions = {
+  count: number;
+  colors: string[];
+  seed: number;
+  /** Optical strength, intended to climb gently with the score band. */
+  intensity?: number;
+};
+
+/**
+ * Score-safe sparkle field. Twinkles stay in the slim side rails and the
+ * empty bottom-right corner, away from the centred name, score, mood, pills
+ * and footer copy. Scenes opt in with progressively larger counts.
+ */
+export function edgeTwinkles(
+  { ctx, cardX, cardY, cardW, cardH, u }: SceneGeom,
+  { count, colors, seed, intensity = 1 }: EdgeTwinkleOptions,
+): void {
+  ctx.save();
+  for (let i = 0; i < count; i++) {
+    const bottomCorner = i % 7 === 6;
+    const onLeft = !bottomCorner && i % 2 === 0;
+    const railNoise = noise(seed + i * 19);
+    // The rails keep their approved optical width when the surface expands
+    // horizontally. With u === cardW (Story) these resolve to the original
+    // percentages exactly; Square/Wide gain background width, not giant rails.
+    const x = bottomCorner
+      ? cardX + cardW - u * (0.16 - noise(seed + i * 17) * 0.1)
+      : onLeft
+        ? cardX + u * (0.035 + railNoise * 0.095)
+        : cardX + cardW - u * (0.13 - railNoise * 0.095);
+    let y = bottomCorner
+      ? cardY + cardH * (0.952 + noise(seed + i * 23) * 0.025)
+      : cardY + cardH * (0.055 + noise(seed + i * 23) * 0.55);
+
+    // Keep the brand fingerprint completely clean.
+    if (!onLeft && !bottomCorner && y < cardY + cardH * 0.14) {
+      y += cardH * 0.13;
+    }
+
+    const color = colors[i % colors.length];
+    const alpha = Math.min(
+      0.98,
+      (0.46 + noise(seed + i * 29) * 0.44) * intensity,
+    );
+    const size =
+      u *
+      (0.0028 + noise(seed + i * 31) * 0.0048) *
+      (0.88 + intensity * 0.12);
+
+    if (i % 4 === 0) {
+      fineGlint(ctx, x, y, size * 2.05, color, alpha);
+    } else if (i % 4 === 2) {
+      fineGlint(ctx, x, y, size * 1.32, color, alpha * 0.78);
+    } else if (i % 4 === 1) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(Math.PI / 4);
+      ctx.globalAlpha = alpha * 0.82;
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = size * 0.9;
+      ctx.fillRect(-size * 0.62, -size * 0.62, size * 1.24, size * 1.24);
+      ctx.restore();
+    } else {
+      ctx.globalAlpha = alpha * 0.78;
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = size * 0.8;
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(0.7, size * 0.48), 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
   ctx.restore();
 }

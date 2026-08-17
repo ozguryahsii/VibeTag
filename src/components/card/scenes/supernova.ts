@@ -1,5 +1,6 @@
 import type { Scene, SceneGeom } from "@/components/card/scene";
 import {
+  edgeTwinkles,
   fineBurst,
   fineGlint,
   fineHalo,
@@ -54,7 +55,7 @@ function ceremonialBaseWave(g: SceneGeom): void {
 
 /** Mirrored corner threads: ceremonial, balanced and deliberately hairline. */
 function mirroredThreadFans(g: SceneGeom): void {
-  const { ctx, cardX, cardY, cardW, cardH } = g;
+  const { ctx, cardX, cardY, cardW, cardH, u } = g;
   const colors = ["#DFA33B", "#E96D4C", "#D73A70"];
 
   ctx.save();
@@ -87,7 +88,7 @@ function mirroredThreadFans(g: SceneGeom): void {
       });
 
       ctx.globalAlpha = 0.075 + Math.sin(t * Math.PI) * 0.11;
-      ctx.lineWidth = Math.max(0.7, cardW * (0.00072 + noise(601 + i * 13) * 0.00028));
+      ctx.lineWidth = Math.max(0.7, u * (0.00072 + noise(601 + i * 13) * 0.00028));
       ctx.strokeStyle = topGradient;
       ctx.beginPath();
       ctx.moveTo(startX, topStartY);
@@ -166,12 +167,23 @@ export const supernova: Scene = {
   },
 
   surface(g) {
-    const { ctx, cardX, cardY, cardW, cardH, avatarCenterY, scoreCenterY } = g;
+    const {
+      ctx,
+      cardX,
+      cardY,
+      cardW,
+      cardH,
+      avatarCenterX,
+      avatarCenterY,
+      scoreCenterX,
+      scoreCenterY,
+      u,
+    } = g;
     const ivory = ctx.createRadialGradient(
-      cardX + cardW * 0.5,
+      scoreCenterX,
       scoreCenterY,
       cardW * 0.02,
-      cardX + cardW * 0.5,
+      scoreCenterX,
       scoreCenterY,
       cardW * 0.9,
     );
@@ -184,26 +196,26 @@ export const supernova: Scene = {
     ceremonialBaseWave(g);
 
     mirroredThreadFans(g);
-    bloom(ctx, cardX + cardW * 0.5, avatarCenterY, cardW * 0.3, "rgba(226,155,63,0.085)");
-    fineHalo(ctx, cardX + cardW * 0.5, avatarCenterY, cardW * 0.202, cardW * 0.202, {
+    bloom(ctx, avatarCenterX, avatarCenterY, u * 0.3, "rgba(226,155,63,0.085)");
+    fineHalo(ctx, avatarCenterX, avatarCenterY, u * 0.263, u * 0.263, {
       colors: ["#DDA039", "#E66B4D", "#D73970"],
       alpha: 0.3,
       lines: 2,
     });
 
-    bloom(ctx, cardX + cardW * 0.5, scoreCenterY, cardW * 0.62, "rgba(224,133,51,0.12)");
+    bloom(ctx, scoreCenterX, scoreCenterY, u * 0.62, "rgba(224,133,51,0.12)");
     radialHairlines(
       ctx,
-      cardX + cardW * 0.5,
+      scoreCenterX,
       scoreCenterY,
-      cardW * 0.52,
-      cardW * 0.38,
+      u * 0.52,
+      u * 0.38,
       64,
       ["#DCA037", "#E96A4A", "#D73870", "#E6B457"],
       0.29,
       617,
     );
-    fineHalo(ctx, cardX + cardW * 0.5, scoreCenterY, cardW * 0.415, cardW * 0.3, {
+    fineHalo(ctx, scoreCenterX, scoreCenterY, u * 0.415, u * 0.3, {
       colors: ["#D99C34", "#E96949", "#D73570"],
       alpha: 0.54,
       lines: 3,
@@ -216,7 +228,7 @@ export const supernova: Scene = {
       [0.925, 0.76, 0.043, 0.25, 647],
     ];
     bursts.forEach(([x, y, r, alpha, seed]) =>
-      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, {
+      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, u * r, {
         colors: ["#DDA13A", "#E86A4C", "#D73A70"],
         spokes: r > 0.05 ? 30 : 23,
         alpha,
@@ -232,16 +244,22 @@ export const supernova: Scene = {
     ];
     pairedGlints.forEach(([x, y, r], index) => {
       const color = index % 2 === 0 ? "#DDA039" : "#D73770";
-      fineGlint(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, color, 0.48);
+      fineGlint(ctx, cardX + cardW * x, cardY + cardH * y, u * r, color, 0.48);
       fineGlint(
         ctx,
         cardX + cardW * (1 - x),
         cardY + cardH * y,
-        cardW * r,
+        u * r,
         color,
         0.48,
       );
     });
     paperGrain(g, "#795A4D", 270, 0.028, 659);
+    edgeTwinkles(g, {
+      count: 82,
+      colors: ["#FFF9E8", "#DDA13A", "#E5684A", "#D43870"],
+      seed: 1009,
+      intensity: 1.2,
+    });
   },
 };

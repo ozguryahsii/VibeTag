@@ -54,7 +54,7 @@ export const sand: Scene = {
   },
 
   surface(geom) {
-    const { ctx, cardX, cardY, cardW, cardH } = geom;
+    const { ctx, cardX, cardY, cardW, cardH, u } = geom;
     const paper = ctx.createLinearGradient(cardX, cardY, cardX, cardY + cardH);
     paper.addColorStop(0, "#FFFBF5");
     paper.addColorStop(0.56, "#FFF4E9");
@@ -66,14 +66,14 @@ export const sand: Scene = {
       ctx,
       cardX + cardW * 0.14,
       cardY + cardH * 0.08,
-      cardW * 0.34,
+      u * 0.34,
       "rgba(232,176,100,0.08)",
     );
     bloom(
       ctx,
       cardX + cardW * 0.86,
       cardY + cardH * 0.73,
-      cardW * 0.52,
+      u * 0.52,
       "rgba(231,134,81,0.055)",
     );
 
@@ -106,7 +106,7 @@ export const sand: Scene = {
       [0.18, 0.85, 0.004, "#E2A56B", 0.4],
     ];
     for (const [x, y, r, color, alpha] of glints) {
-      fineGlint(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, color, alpha);
+      fineGlint(ctx, cardX + cardW * x, cardY + cardH * y, u * r, color, alpha);
     }
   },
 };

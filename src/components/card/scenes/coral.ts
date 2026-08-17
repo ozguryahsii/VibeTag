@@ -2,6 +2,7 @@ import type { Scene } from "@/components/card/scene";
 import { bloom } from "@/components/card/paint";
 import {
   diamondDust,
+  edgeTwinkles,
   fineGlint,
   flowField,
   paperGrain,
@@ -60,7 +61,7 @@ export const coral: Scene = {
   },
 
   surface(geom) {
-    const { ctx, cardX, cardY, cardW, cardH, cx, scoreCenterY, u } = geom;
+    const { ctx, cardX, cardY, cardW, cardH, scoreCenterX, scoreCenterY, u } = geom;
     const paper = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
     paper.addColorStop(0, "#FFF7ED");
     paper.addColorStop(0.5, "#FFE8D8");
@@ -68,12 +69,12 @@ export const coral: Scene = {
     ctx.fillStyle = paper;
     ctx.fillRect(cardX, cardY, cardW, cardH);
 
-    bloom(ctx, cx, scoreCenterY, u * 0.54, "rgba(245,139,86,0.09)");
+    bloom(ctx, scoreCenterX, scoreCenterY, u * 0.54, "rgba(245,139,86,0.09)");
     bloom(
       ctx,
       cardX + cardW * 0.88,
       cardY + cardH * 0.12,
-      cardW * 0.48,
+      u * 0.48,
       "rgba(247,173,90,0.07)",
     );
 
@@ -109,8 +110,14 @@ export const coral: Scene = {
       [0.27, 0.91, 0.004, "#E66E59", 0.4],
     ];
     for (const [x, y, r, color, alpha] of glints) {
-      fineGlint(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, color, alpha);
+      fineGlint(ctx, cardX + cardW * x, cardY + cardH * y, u * r, color, alpha);
     }
     diamondDust(geom, 4, ["#E9A33F", "#E87458"], 188, 0.52);
+    edgeTwinkles(geom, {
+      count: 12,
+      colors: ["#FFF9EF", "#F1BD62", "#EA8468", "#DF6673"],
+      seed: 239,
+      intensity: 0.72,
+    });
   },
 };

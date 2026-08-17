@@ -1,6 +1,7 @@
 import type { Scene } from "@/components/card/scene";
 import {
   diamondDust,
+  edgeTwinkles,
   fineBurst,
   fineGlint,
   fineHalo,
@@ -67,7 +68,18 @@ export const bloom: Scene = {
   },
 
   surface(g) {
-    const { ctx, cardX, cardY, cardW, cardH, avatarCenterY, scoreCenterY } = g;
+    const {
+      ctx,
+      cardX,
+      cardY,
+      cardW,
+      cardH,
+      avatarCenterX,
+      avatarCenterY,
+      scoreCenterX,
+      scoreCenterY,
+      u,
+    } = g;
     const wash = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
     wash.addColorStop(0, "#FFD9C3");
     wash.addColorStop(0.5, "#FFB9AD");
@@ -104,13 +116,13 @@ export const bloom: Scene = {
       seed: 221,
     });
 
-    glow(ctx, cardX + cardW * 0.5, avatarCenterY, cardW * 0.4, "rgba(228,156,77,0.1)");
-    fineHalo(ctx, cardX + cardW * 0.5, avatarCenterY, cardW * 0.322, cardW * 0.322, {
+    glow(ctx, avatarCenterX, avatarCenterY, u * 0.4, "rgba(228,156,77,0.1)");
+    fineHalo(ctx, avatarCenterX, avatarCenterY, u * 0.26, u * 0.26, {
       colors: ["#DBA743", "#E16D56", "#D44B76"],
       alpha: 0.33,
       lines: 2,
     });
-    glow(ctx, cardX + cardW * 0.5, scoreCenterY, cardW * 0.43, "rgba(217,91,90,0.05)");
+    glow(ctx, scoreCenterX, scoreCenterY, u * 0.43, "rgba(217,91,90,0.05)");
 
     const bursts: [number, number, number, number][] = [
       [0.105, 0.115, 0.072, 0.39],
@@ -118,7 +130,7 @@ export const bloom: Scene = {
       [0.12, 0.755, 0.047, 0.28],
     ];
     bursts.forEach(([x, y, r, alpha], index) =>
-      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, {
+      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, u * r, {
         colors: ["#DFA945", "#E57957", "#D64F73"],
         spokes: 24 + index * 2,
         alpha,
@@ -131,7 +143,7 @@ export const bloom: Scene = {
       ctx,
       cardX + cardW * 0.9,
       cardY + cardH * 0.66,
-      cardW * 0.009,
+      u * 0.009,
       "#D95174",
       0.38,
     );
@@ -139,10 +151,16 @@ export const bloom: Scene = {
       ctx,
       cardX + cardW * 0.12,
       cardY + cardH * 0.41,
-      cardW * 0.006,
+      u * 0.006,
       "#DFA645",
       0.42,
     );
     paperGrain(g, "#80635D", 220, 0.026, 229);
+    edgeTwinkles(g, {
+      count: 30,
+      colors: ["#FFF4E7", "#EDB14D", "#E7775E", "#D74A78"],
+      seed: 271,
+      intensity: 0.92,
+    });
   },
 };

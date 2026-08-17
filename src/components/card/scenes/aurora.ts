@@ -2,6 +2,7 @@ import type { Scene } from "@/components/card/scene";
 import {
   cornerWash,
   diamondDust,
+  edgeTwinkles,
   fineBurst,
   fineGlint,
   fineHalo,
@@ -72,8 +73,11 @@ export const aurora: Scene = {
       cardY,
       cardW,
       cardH,
+      avatarCenterX,
       avatarCenterY,
+      scoreCenterX,
       scoreCenterY,
+      u,
     } = g;
     const ivory = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
     ivory.addColorStop(0, "#FFF8EF");
@@ -126,19 +130,19 @@ export const aurora: Scene = {
       seed: 419,
     });
 
-    bloom(ctx, cardX + cardW * 0.5, avatarCenterY, cardW * 0.3, "rgba(229,157,75,0.08)");
-    fineHalo(ctx, cardX + cardW * 0.5, avatarCenterY, cardW * 0.2, cardW * 0.2, {
+    bloom(ctx, avatarCenterX, avatarCenterY, u * 0.3, "rgba(229,157,75,0.08)");
+    fineHalo(ctx, avatarCenterX, avatarCenterY, u * 0.258, u * 0.258, {
       colors: ["#E0A63C", "#E66C52", "#D83E73"],
       alpha: 0.32,
       lines: 2,
     });
-    bloom(ctx, cardX + cardW * 0.5, scoreCenterY, cardW * 0.53, "rgba(228,119,66,0.075)");
+    bloom(ctx, scoreCenterX, scoreCenterY, u * 0.53, "rgba(228,119,66,0.075)");
     radialHairlines(
       ctx,
-      cardX + cardW * 0.5,
+      scoreCenterX,
       scoreCenterY,
-      cardW * 0.45,
-      cardW * 0.33,
+      u * 0.45,
+      u * 0.33,
       26,
       ["#DFA43B", "#E8704D", "#D94370"],
       0.2,
@@ -153,7 +157,7 @@ export const aurora: Scene = {
       [0.17, 0.9, 0.06, 0.4],
     ];
     bursts.forEach(([x, y, r, alpha], index) =>
-      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, {
+      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, u * r, {
         colors: ["#E1AA42", "#E77350", "#D94370", "#EB9A67"],
         spokes: 27 + (index % 2) * 4,
         alpha,
@@ -173,11 +177,17 @@ export const aurora: Scene = {
         ctx,
         cardX + cardW * x,
         cardY + cardH * y,
-        cardW * r,
+        u * r,
         index % 2 === 0 ? "#E0A43D" : "#D94172",
         0.46,
       ),
     );
     paperGrain(g, "#805D56", 245, 0.028, 457);
+    edgeTwinkles(g, {
+      count: 54,
+      colors: ["#FFF9EA", "#E2AC45", "#E87558", "#D74375"],
+      seed: 967,
+      intensity: 1.08,
+    });
   },
 };

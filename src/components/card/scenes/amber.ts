@@ -55,7 +55,7 @@ export const amber: Scene = {
   },
 
   surface(geom) {
-    const { ctx, cardX, cardY, cardW, cardH, cx, scoreCenterY, u } = geom;
+    const { ctx, cardX, cardY, cardW, cardH, scoreCenterX, scoreCenterY, u } = geom;
     const paper = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
     paper.addColorStop(0, "#FFF9F0");
     paper.addColorStop(0.52, "#FFF1E2");
@@ -63,12 +63,12 @@ export const amber: Scene = {
     ctx.fillStyle = paper;
     ctx.fillRect(cardX, cardY, cardW, cardH);
 
-    bloom(ctx, cx, scoreCenterY, u * 0.5, "rgba(237,151,76,0.075)");
+    bloom(ctx, scoreCenterX, scoreCenterY, u * 0.5, "rgba(237,151,76,0.075)");
     bloom(
       ctx,
       cardX + cardW * 0.08,
       cardY + cardH * 0.7,
-      cardW * 0.56,
+      u * 0.56,
       "rgba(234,130,69,0.055)",
     );
 
@@ -101,7 +101,7 @@ export const amber: Scene = {
       [0.17, 0.83, 0.005, "#E9A465", 0.44],
     ];
     for (const [x, y, r, color, alpha] of glints) {
-      fineGlint(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, color, alpha);
+      fineGlint(ctx, cardX + cardW * x, cardY + cardH * y, u * r, color, alpha);
     }
   },
 };

@@ -2,6 +2,7 @@ import type { Scene } from "@/components/card/scene";
 import {
   cornerWash,
   diamondDust,
+  edgeTwinkles,
   fineBurst,
   fineGlint,
   flowField,
@@ -66,12 +67,12 @@ export const radiant: Scene = {
   },
 
   surface(g) {
-    const { ctx, cardX, cardY, cardW, cardH, scoreCenterY } = g;
+    const { ctx, cardX, cardY, cardW, cardH, scoreCenterX, scoreCenterY, u } = g;
     const ivory = ctx.createRadialGradient(
-      cardX + cardW * 0.5,
+      scoreCenterX,
       scoreCenterY,
       cardW * 0.04,
-      cardX + cardW * 0.5,
+      scoreCenterX,
       scoreCenterY,
       cardW * 0.76,
     );
@@ -116,13 +117,13 @@ export const radiant: Scene = {
       reverse: true,
     });
 
-    bloom(ctx, cardX + cardW * 0.5, scoreCenterY, cardW * 0.52, "rgba(231,154,56,0.08)");
+    bloom(ctx, scoreCenterX, scoreCenterY, u * 0.52, "rgba(231,154,56,0.08)");
     radialHairlines(
       ctx,
-      cardX + cardW * 0.5,
+      scoreCenterX,
       scoreCenterY,
-      cardW * 0.43,
-      cardW * 0.32,
+      u * 0.43,
+      u * 0.32,
       20,
       ["#DFA642", "#E6784E", "#D94D69"],
       0.27,
@@ -135,7 +136,7 @@ export const radiant: Scene = {
       [0.115, 0.805, 0.047, 0.27],
     ];
     bursts.forEach(([x, y, r, alpha], index) =>
-      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, cardW * r, {
+      fineBurst(ctx, cardX + cardW * x, cardY + cardH * y, u * r, {
         colors: ["#DFA846", "#E77850", "#D84C70"],
         spokes: 26 + index * 2,
         alpha,
@@ -148,7 +149,7 @@ export const radiant: Scene = {
       ctx,
       cardX + cardW * 0.89,
       cardY + cardH * 0.68,
-      cardW * 0.01,
+      u * 0.01,
       "#D94E70",
       0.42,
     );
@@ -156,10 +157,16 @@ export const radiant: Scene = {
       ctx,
       cardX + cardW * 0.1,
       cardY + cardH * 0.42,
-      cardW * 0.007,
+      u * 0.007,
       "#E0A843",
       0.44,
     );
     paperGrain(g, "#806258", 230, 0.027, 337);
+    edgeTwinkles(g, {
+      count: 42,
+      colors: ["#FFF8EA", "#F0BA50", "#E97553", "#D94373"],
+      seed: 349,
+      intensity: 1.02,
+    });
   },
 };

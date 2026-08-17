@@ -181,10 +181,42 @@ file onto a server.
 `NEXT_PUBLIC_APP_URL` and `NEXT_PUBLIC_VAPID_PUBLIC_KEY` are compiled into the
 build, not read at runtime. Changing either means rebuilding, not restarting.
 
-### 3. Start
+### 3. Is the proxy a container?
+
+Check before starting:
+
+```bash
+docker inspect <proxy-container> \
+  -f '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+```
+
+If the proxy runs under systemd on the host, skip this — the default setup
+publishes on 127.0.0.1 and the proxy reaches it there.
+
+If the proxy is a **container**, it cannot: inside it, `127.0.0.1` is itself.
+Widening the app's bind to `0.0.0.0` would work and would also expose it to
+the internet directly, past the proxy. Instead put `PROXY_NETWORK` in `.env`
+with the network above, and add the overlay to every compose command — the
+app joins that network, publishes no host port at all, and the proxy reaches
+it by container name.
+
+### 4. Build and start
+
+If the machine is tight on memory, give the build somewhere to spill first.
+A Next.js build wants 1–2 GB, and an out-of-memory kill on a shared box does
+not politely pick your container:
+
+```bash
+free -m                                    # under ~2 GB available?
+sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile
+sudo mkswap /swapfile && sudo swapon /swapfile
+```
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
+# proxy in a container? add the overlay to this and every later command:
+#   -f docker-compose.prod.yml -f docker-compose.proxy.yml
+
 docker compose -f docker-compose.prod.yml ps
 docker compose -f docker-compose.prod.yml logs -f app     # Ctrl-C to leave
 ```
@@ -192,13 +224,20 @@ docker compose -f docker-compose.prod.yml logs -f app     # Ctrl-C to leave
 Migrations run on start, before the server takes traffic.
 
 ```bash
-curl -s localhost:3100/api/health      # {"ok":true}
+# host-published setup
+curl -s localhost:3100/api/health                                  # {"ok":true}
+# proxy-network setup — ask from inside the proxy container
+docker exec <proxy-container> wget -qO- http://vibetag-app-1:3000/api/health
 ```
 
-Nothing is reachable from outside yet — that is the next step, and it is the
-only one that touches shared configuration.
+Swap can come back off once the build is done: `sudo swapoff /swapfile &&
+sudo rm /swapfile`. Leaving it costs nothing but 2 GB of disk, and saves the
+next build.
 
-### 4. Reverse proxy
+Nothing is reachable from outside yet — that is the next step, and the only
+one that touches shared configuration.
+
+### 5. Reverse proxy
 
 Add a new site. Do not edit the blocks serving your other apps.
 
@@ -232,6 +271,28 @@ sudo systemctl reload nginx
 sudo certbot --nginx -d vibetag.net
 ```
 
+**nginx in a container** — the config is wherever that container mounts it
+from, not `/etc/nginx` on the host. Find it with:
+
+```bash
+docker inspect <proxy-container> -f '{{range .Mounts}}{{.Source}} → {{.Destination}}
+{{end}}'
+```
+
+Same server block as above, with one change: `proxy_pass` goes to the
+container, since there is no host port.
+
+```nginx
+    proxy_pass http://vibetag-app-1:3000;
+```
+
+Reload without restarting, so the other sites never drop a request:
+
+```bash
+docker exec <proxy-container> nginx -t
+docker exec <proxy-container> nginx -s reload
+```
+
 **Caddy** — append to `/etc/caddy/Caddyfile`:
 
 ```
@@ -248,7 +309,7 @@ sudo systemctl reload caddy
 
 Caddy handles the certificate itself; with nginx, certbot does.
 
-### 5. Nightly fraud sweep
+### 6. Nightly fraud sweep
 
 As the `vibetag` user, `crontab -e` — not root's crontab, and not a file in
 `/etc/cron.d` that another app might also be editing:
@@ -257,7 +318,7 @@ As the `vibetag` user, `crontab -e` — not root's crontab, and not a file in
 0 3 * * * curl -fsS -X POST -H "Authorization: Bearer <CRON_SECRET>" https://vibetag.net/api/cron/fraud-sweep >/dev/null
 ```
 
-### 6. Backups
+### 7. Backups
 
 ```bash
 mkdir -p ~/backups
@@ -273,6 +334,31 @@ mkdir -p ~/backups
 Check the container name against `docker compose -f docker-compose.prod.yml ps`
 first, and copy the dumps somewhere that is not this server.
 
+### Behind Cloudflare
+
+If the DNS record is proxied — `dig +short yourdomain` returns Cloudflare
+addresses rather than your server — two things change.
+
+**Certificates.** Cloudflare terminates TLS at its edge, so what the browser
+sees is Cloudflare's certificate no matter what the origin has. The origin
+still needs one, and which one depends on the SSL/TLS mode:
+
+- **Full (strict)** — the right setting. The origin needs a real certificate.
+  Let's Encrypt's HTTP-01 challenge still works through the proxy, but the
+  simplest path is to turn the orange cloud grey for a few minutes, issue the
+  certificate, then turn it back on.
+- **Flexible** — Cloudflare talks to your origin over plain HTTP. Do not use
+  it: ratings and passwords would cross the last hop unencrypted.
+
+**The client's real address.** Every request arrives from a Cloudflare IP, so
+without `X-Forwarded-For` the app sees one visitor. The proxy config above
+forwards it; if your nginx also sets `real_ip_header CF-Connecting-IP` with
+`set_real_ip_from` for Cloudflare's ranges, better still.
+
+Also worth setting, in Cloudflare: **Rules → Configuration Rules**, or simply
+leave caching alone. Every route here is dynamic and none should be cached;
+Cloudflare will not cache HTML by default, so the default is already right.
+
 ### Updating later
 
 ```bash
@@ -281,7 +367,10 @@ git fetch --tags && git checkout <new-tag>
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-Migrations apply on start. Nothing else on the server is touched.
+Migrations apply on start. Nothing else on the server is touched. Docker
+keeps every old build layer, so on a tight disk run `docker image prune -f`
+after a few releases — it removes untagged layers only, never a running
+image.
 
 ### Removing it cleanly
 

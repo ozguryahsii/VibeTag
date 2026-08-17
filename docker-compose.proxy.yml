@@ -1,0 +1,28 @@
+# Overlay for a server whose reverse proxy is itself a container.
+#
+#   docker compose -f docker-compose.prod.yml -f docker-compose.proxy.yml up -d --build
+#
+# A containerised nginx cannot reach an app published on the host's
+# 127.0.0.1 — inside that container, 127.0.0.1 is the container. Rather than
+# widening the bind to 0.0.0.0 (which would expose the app to the whole
+# internet, bypassing the proxy) the app simply joins the network the proxy is
+# already on and is reached by name:
+#
+#   proxy_pass http://vibetag-app-1:3000;
+#
+# Set PROXY_NETWORK in .env to that network — `docker inspect <proxy> -f
+# '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'` will tell you.
+# The network is `external`, so this never creates or modifies it.
+
+services:
+  app:
+    # No host port at all: the only route in is through the proxy.
+    ports: !reset []
+    networks:
+      - default
+      - proxy
+
+networks:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:?set PROXY_NETWORK in .env}

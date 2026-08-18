@@ -17,6 +17,15 @@ import { groupLabel, tagLabel, traitLabel } from "@/lib/labels";
  * argument rather than an import.
  */
 
+/**
+ * Whose profile is being summarised.
+ *
+ * "self" is the owner reading their own page; "other" is anybody looking at
+ * somebody else's. The distinction is not cosmetic — the self copy says "you",
+ * and on Elif's page that told the reader Elif's ratings were theirs.
+ */
+export type Voice = "self" | "other";
+
 export type VibeSummary = {
   persona: string;
   headline: string;
@@ -37,12 +46,17 @@ export function generateVibeSummary(
   firstName: string,
   d: Dictionary,
   locale: Locale,
+  voice: Voice = "self",
 ): VibeSummary {
+  // One lookup for the handful of sentences that carry person. Everything
+  // else — persona names, trait labels, the score — reads the same either way.
+  const v = voice === "other" ? d.ai.other : d.ai;
+
   if (profile.ratingCount === 0) {
     return {
       persona: d.ai.emptyPersona,
-      headline: d.ai.emptyHeadline,
-      paragraph: d.ai.emptyParagraph,
+      headline: v.emptyHeadline,
+      paragraph: v.emptyParagraph,
       strengths: [],
       growth: [],
       socialRead: d.ai.emptySocial,
@@ -59,19 +73,20 @@ export function generateVibeSummary(
     d.ai.personaFallback;
 
   const headline = topTags.length
-    ? fill(d.ai.headlineTags, {
+    ? fill(v.headlineTags, {
+        name: firstName,
         tags: joinList(
           topTags.map((t) => tagLabel(t.key, locale)),
           locale === "tr" ? "ve" : "and",
         ),
       })
-    : fill(d.ai.headlineTrait, {
+    : fill(v.headlineTrait, {
         trait: traitLabel(top[0].key, locale).toLocaleLowerCase(locale),
       });
 
   const dominant = profile.groups[0];
   const groupLine = dominant
-    ? fill(d.ai.groupLine, {
+    ? fill(v.groupLine, {
         group: groupLabel(dominant.group, d).toLocaleLowerCase(locale),
         pct: Math.round(dominant.share * 100),
       })
@@ -79,10 +94,10 @@ export function generateVibeSummary(
 
   const spread =
     profile.groups.filter((g) => g.count > 0).length >= 3
-      ? d.ai.spreadStrong
-      : d.ai.spreadThin;
+      ? v.spreadStrong
+      : v.spreadThin;
 
-  const paragraph = fill(d.ai.paragraph, {
+  const paragraph = fill(v.paragraph, {
     name: firstName,
     n: profile.ratingCount,
     first: traitLabel(top[0].key, locale).toLocaleLowerCase(locale),

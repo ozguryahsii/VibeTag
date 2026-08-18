@@ -48,6 +48,12 @@ export function tierLabel(tier: BadgeTier, d: Dictionary): string {
   return d.badgeTiers[tier];
 }
 
+/** "Free", "Silver", "Gold" — from the same copy the pricing cards use. */
+export function planLabel(plan: string, d: Dictionary): string {
+  const key = plan.toLowerCase() as keyof Dictionary["settings"]["plans"];
+  return d.settings.plans[key]?.name ?? plan;
+}
+
 /**
  * What a tier asks for, as a sentence: "Reliability 85+ · 8 ratings".
  *

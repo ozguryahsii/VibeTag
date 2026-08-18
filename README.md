@@ -88,6 +88,9 @@ Planı uygulama içinden **Profil → Üyelik** ekranından anında değiştireb
 | Davet karşılama  | `/i/[code]`        | Public — davet edenin profiliyle açılır                     |
 | Bildirimler      | `/notifications`   | Yeni değerlendirme, davet kabulü, rozet                     |
 | Profil & Üyelik  | `/settings`        | Avatar, bio, plan, gizlilik, engellenenler, hesap silme     |
+| Yönetim paneli   | `/admin`           | Üye/plan/rozet sayıları, premium dağılımı — sadece admin    |
+| Üyeler           | `/admin/members`   | Ara, elle plan ver ya da geri al                            |
+| İndirim kodları  | `/admin/codes`     | Kod oluştur, kapat, kaç kere kimin kullandığını gör         |
 
 ---
 

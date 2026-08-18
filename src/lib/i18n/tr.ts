@@ -568,6 +568,8 @@ export const tr: Dictionary = {
     ratingHidden: "Profilinden bir değerlendirme kaldırıldı",
     ratingHiddenBody:
       "Aldığın bir değerlendirme kuralları ihlal ediyordu; artık Vibe Score'una sayılmıyor.",
+    planGranted: "Planın yükseltildi ✨",
+    planGrantedBody: "Premium özellikler hesabında açıldı. İyi kullanımlar.",
     badgeEarned: "Yeni bir rozet kazandın 🏅",
     badgeEarnedBody: "“{badge}” rozetinin {tierName} seviyesi artık My Vibe profilinde.",
     generic: "Profilinde bir gelişme var",
@@ -784,6 +786,118 @@ export const tr: Dictionary = {
     },
   },
 
+  admin: {
+    kicker: "YÖNETİM",
+    title: "Kontrol odası",
+    subtitle: "Üyeler, planlar, kodlar ve karar bekleyen her şey.",
+    open: "Yönetim paneli",
+    back: "← Yönetim paneli",
+    stats: {
+      members: "Üye",
+      newThisWeek: "bu hafta yeni",
+      emailVerified: "E-posta doğrulanmış",
+      suspended: "Askıya alınmış",
+      plans: "Planlar",
+      paidLine: "{paid} kişi ücretli planda · {timed} tanesi süreli",
+      ratings: "Değerlendirme",
+      ratingsThisWeek: "bu hafta",
+      openReports: "Açık bildirim",
+      errorsToday: "Hata, 24 saat",
+      activeCodes: "Aktif kod",
+      redemptions: "kullanım",
+      ofMembers: "üyelerin %{pct} kadarı",
+    },
+    links: {
+      members: "Üyeler",
+      membersBody: "Kimi ararsan bul, plan ver ya da geri al.",
+      codes: "İndirim kodları",
+      codesBody: "Kod oluştur, hangisini kim kullanmış gör.",
+      reports: "Bildirim kuyruğu",
+      reportsBody: "Karar bekleyen şikayetler.",
+      errors: "Hata kaydı",
+      errorsBody: "Sunucuda ne bozuldu, ne zaman.",
+    },
+    members: {
+      title: "Üyeler",
+      subtitle: "İsim, kullanıcı adı veya e-posta ile ara.",
+      search: "Ara",
+      searchPlaceholder: "isim, @kullanıcıadı veya e-posta",
+      all: "Hepsi",
+      empty: "Eşleşen kimse yok.",
+      joined: "{date} tarihinde katıldı",
+      planUntil: "{date} tarihine kadar",
+      planForever: "süresiz",
+      setPlan: "Plan ver",
+      days: "Gün",
+      daysHint: "Süresiz olsun istiyorsan boş bırak.",
+      save: "Kaydet",
+      saving: "Kaydediliyor…",
+      saved: "{name} artık {plan} planında.",
+      suspendedTag: "Askıda",
+      adminTag: "Yönetici",
+      verifiedTag: "Doğrulanmış",
+    },
+    codes: {
+      title: "İndirim kodları",
+      subtitle: "Kod, Ayarlar'dan girildiğinde plan açar.",
+      newTitle: "Yeni kod",
+      code: "Kod",
+      codePlaceholder: "boş = rastgele",
+      note: "Not",
+      notePlaceholder: "ne için verildi",
+      plan: "Verdiği plan",
+      days: "Gün",
+      daysHint: "Boş bırakırsan plan hiç bitmez.",
+      maxUses: "En fazla kullanım",
+      maxUsesHint: "Boş bırakırsan sınırsız.",
+      expiresAt: "Şu tarihe kadar geçerli",
+      create: "Kodu oluştur",
+      creating: "Oluşturuluyor…",
+      created: "{code} hazır.",
+      empty: "Henüz kod yok.",
+      usesOf: "{max} kullanımdan {used} tanesi",
+      usesUnlimited: "{used} kullanım",
+      grants: "{plan} verir",
+      forDays: "{n} günlüğüne",
+      forever: "süresiz olarak",
+      state: {
+        ACTIVE: "Aktif",
+        OFF: "Kapalı",
+        EXPIRED: "Süresi doldu",
+        USED_UP: "Kullanım hakkı bitti",
+      },
+      turnOff: "Kapat",
+      turnOn: "Aç",
+      recent: "Son kullananlar",
+      never: "Henüz kimse kullanmadı.",
+    },
+    redeem: {
+      title: "Kodun mu var?",
+      body: "Buraya gir, planın hemen açılsın.",
+      placeholder: "KOD",
+      submit: "Kullan",
+      submitting: "Kontrol ediliyor…",
+      done: "Tamam — artık {plan} planındasın.",
+      errors: {
+        UNKNOWN: "Böyle bir kod tanımıyoruz.",
+        OFF: "Bu kod artık kullanımda değil.",
+        EXPIRED: "Bu kodun süresi dolmuş.",
+        USED_UP: "Bu kodun kullanım hakkı bitmiş.",
+        ALREADY: "Bu kodu zaten kullandın.",
+        NOT_BETTER: "Mevcut planın bu kodun verdiğinden zaten daha iyi.",
+      },
+    },
+    errors: {
+      badPlan: "Geçerli bir plan seç.",
+      badDays: "Gün, 1 ile 3650 arasında bir sayı olmalı.",
+      badUses: "En fazla kullanım en az 1 olmalı.",
+      badDate: "Bu tarih okunamadı.",
+      badCode: "Kod 4–24 harf, rakam veya tire olmalı.",
+      codeTaken: "Bu kod zaten var.",
+      noMember: "Bu kullanıcı adında bir üye yok.",
+    },
+  },
+
   moderation: {
     kicker: "MODERASYON",
     title: "Bildirim kuyruğu",
@@ -977,6 +1091,29 @@ export const tr: Dictionary = {
     levelSolid: "güçlü ve tutarlı",
     levelGrowing: "gelişmeye açık",
     notEnough: "Analiz güvenilirliği için en az 3 değerlendirme öneriyoruz.",
+    /**
+     * Üçüncü şahıs — başkasının profili için.
+     *
+     * Kendi metni "sen" diyor; Elif'in sayfasında bu, Elif'in
+     * değerlendirmelerini okuyanın sanıyor. Zamir değiştirmek yerine ayrı
+     * blok: Türkçede şahıs eklerde taşınıyor, isme ek getirmek de her isimde
+     * doğru sonuç vermiyor — bu yüzden cümleler eksiz kurulacak şekilde
+     * yazıldı.
+     */
+    other: {
+      headlineTags: "İnsanlar {name} için {tags} diyor.",
+      headlineTrait: "İnsanların en çok gördüğü şey: {trait}.",
+      groupLine: "Gelen değerlendirmelerin çoğu {group} çevresinden (%{pct}).",
+      spreadStrong:
+        "Farklı çevrelerden gelen algı birbirini destekliyor — bu, tutarlı bir sosyal kimlik işareti.",
+      spreadThin:
+        "Farklı çevrelerden değerlendirme geldikçe bu resim daha da netleşecek.",
+      paragraph:
+        "{name}, {n} kişinin gözünden bakıldığında öne çıkan yönü {first}{second}. {group} {spread}",
+      emptyHeadline: "Henüz yeterli değerlendirme yok.",
+      emptyParagraph:
+        "Bu Vibe profili oluşmaya başladığında, insanların gördüğü özellikler burada görünecek. Analiz 3 değerlendirme sonrası açılır.",
+    },
     strengthNotes: {
       reliability: "Verdiğin sözü tutmanla tanınıyorsun.",
       leadership: "İnsanlar zor anlarda senden yön bekliyor.",

@@ -26,7 +26,8 @@ export type NotificationType =
   | "NEW_MESSAGE"
   | "REPORT_ACTIONED"
   | "REPORT_DISMISSED"
-  | "RATING_HIDDEN";
+  | "RATING_HIDDEN"
+  | "PLAN_GRANTED";
 
 export type NotificationVars = Record<string, string | number>;
 
@@ -112,6 +113,7 @@ export function renderNotification(
     REPORT_ACTIONED: { title: t.reportActioned, body: t.reportActionedBody },
     REPORT_DISMISSED: { title: t.reportDismissed, body: t.reportDismissedBody },
     RATING_HIDDEN: { title: t.ratingHidden, body: t.ratingHiddenBody },
+    PLAN_GRANTED: { title: t.planGranted, body: t.planGrantedBody },
   };
 
   const copy = map[n.type] ?? { title: t.generic, body: "" };

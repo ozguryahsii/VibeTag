@@ -37,6 +37,12 @@ model User {
   // FREE | SILVER (Vibe Insights) | GOLD (Vibe Identity)
   plan String @default("FREE")
 
+  /// When a granted plan runs out. Null means it does not — either the person
+  /// is on FREE, or an admin gave them something permanent. The nightly sweep
+  /// is what actually drops them back; a plan that expires only when somebody
+  /// happens to look at it is not an expiry.
+  planUntil DateTime?
+
   /// Trust signal used by fake-rating detection and shown as ✅ on profiles.
   /// True once any verification has been passed — today that means email.
   isVerified Boolean @default(false)
@@ -85,8 +91,9 @@ model User {
 
   sessions        Session[]
   otpCodes        OtpCode[]
-  ratingsReceived Rating[]  @relation("RatingsReceived")
-  ratingsGiven    Rating[]  @relation("RatingsGiven")
+  redemptions     DiscountRedemption[]
+  ratingsReceived Rating[]             @relation("RatingsReceived")
+  ratingsGiven    Rating[]             @relation("RatingsGiven")
 
   invites         Invite[]
   inviteClaim     InviteClaim?
@@ -539,4 +546,61 @@ model ErrorLog {
   userId  String?
 
   @@index([createdAt])
+}
+
+// ------------------------------------------------------------- discounts
+
+/// A code an admin hands out.
+///
+/// Today a code grants a plan directly, because there is no billing for it to
+/// discount yet — which makes it useful now for beta testers and partners
+/// rather than a feature waiting on another feature. `percentOff` is carried
+/// but unused; when checkout exists it is what the code will mean there.
+model DiscountCode {
+  id   String  @id @default(cuid())
+  /// Stored upper-cased so VIBE10 and vibe10 cannot both exist.
+  code String  @unique
+  /// What it is for, in the admin's own words.
+  note String?
+
+  /// FREE | SILVER | GOLD — what redeeming it grants.
+  plan       String @default("GOLD")
+  /// How long the grant lasts. Null means it does not expire.
+  days       Int?
+  /// For a future checkout. Not applied anywhere today.
+  percentOff Int?
+
+  /// Null means unlimited.
+  maxUses   Int?
+  expiresAt DateTime?
+  /// Switched off by an admin. Codes are never deleted — a redemption has to
+  /// keep pointing at something, and "who gave this person Gold" is a
+  /// question that gets asked long after the campaign ended.
+  active    Boolean   @default(true)
+
+  createdAt   DateTime @default(now())
+  createdById String?
+
+  redemptions DiscountRedemption[]
+
+  @@index([createdAt])
+}
+
+/// One person using one code, once.
+model DiscountRedemption {
+  id     String       @id @default(cuid())
+  codeId String
+  code   DiscountCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  userId String
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// What it actually granted, recorded at the time. The code can be edited
+  /// later; what somebody was given cannot.
+  grantedPlan  String
+  grantedUntil DateTime?
+  redeemedAt   DateTime  @default(now())
+
+  @@unique([codeId, userId])
+  @@index([codeId])
+  @@index([userId])
 }

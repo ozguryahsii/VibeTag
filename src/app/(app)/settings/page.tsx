@@ -6,6 +6,7 @@ import { setRatingPolicyAction, toggleBlockAction } from "@/lib/actions/safety";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { DeleteAccount } from "@/components/DeleteAccount";
 import { PushToggle } from "@/components/PushToggle";
+import { RedeemCode } from "@/components/RedeemCode";
 import { Avatar } from "@/components/Avatar";
 import { IconGlyph } from "@/components/Icon";
 import { ICONS } from "@/lib/icons";
@@ -150,6 +151,9 @@ export default async function SettingsPage() {
         <p className="text-[11.5px] text-muted mt-3 px-1 leading-relaxed">
           {d.settings.planNote}
         </p>
+        <div className="mt-3">
+          <RedeemCode />
+        </div>
       </div>
 
       {/* Only offered when push is actually configured for this deployment. */}
@@ -279,16 +283,22 @@ export default async function SettingsPage() {
 
       {user.isAdmin && (
         <div className="mt-7">
-          <SectionTitle>{d.nav.moderation}</SectionTitle>
-          <Link
-            href="/moderation"
-            className="card flex items-center justify-between !py-4"
-          >
-            <span className="text-[13.5px] font-bold">
-              {d.moderation.title}
-            </span>
-            <span className="text-orange font-bold text-[18px]">→</span>
-          </Link>
+          <SectionTitle>{d.admin.kicker}</SectionTitle>
+          <div className="grid gap-2.5">
+            {[
+              { href: "/admin", label: d.admin.open },
+              { href: "/moderation", label: d.moderation.title },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="card flex items-center justify-between !py-4"
+              >
+                <span className="text-[13.5px] font-bold">{item.label}</span>
+                <span className="text-orange font-bold text-[18px]">→</span>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 

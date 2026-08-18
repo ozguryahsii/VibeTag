@@ -40,7 +40,15 @@ export default async function PublicProfile({
   // Best tier per family: three Kind Hearts in a row would read as three
   // badges rather than one climbed.
   const badges = bestPerFamily(earnedBadges(profile));
-  const summary = generateVibeSummary(profile, firstName, d, locale);
+  // Third person: this page is about somebody else, and the self copy says
+  // "you" — which on this page would tell the reader these are their ratings.
+  const summary = generateVibeSummary(
+    profile,
+    firstName,
+    d,
+    locale,
+    isMe ? "self" : "other",
+  );
   const existing = isMe ? null : await getMyRatingOf(me.id, user.id);
   const daysLeft = existing ? cooldownDaysLeft(existing.lastUpdatedAt) : 0;
 

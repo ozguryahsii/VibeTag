@@ -4,6 +4,7 @@ import { recomputeAllRatings } from "@/lib/fraud";
 import { pruneRateLimits } from "@/lib/rate-limit";
 import { pruneOtpCodes } from "@/lib/otp";
 import { pruneErrors } from "@/lib/errors";
+import { expirePlans } from "@/lib/admin";
 
 /**
  * The nightly sweep.
@@ -41,8 +42,14 @@ export async function POST(request: Request) {
     pruneErrors(),
   ]);
 
+  // Plans granted for a fixed number of days end here rather than at read
+  // time — see `expirePlans` for why one nightly write beats a check in every
+  // screen that asks whether somebody is on Gold.
+  const expiredPlans = await expirePlans();
+
   return NextResponse.json({
     ...result,
+    expiredPlans,
     pruned: { sessions, rateLimits, otpCodes, errors },
   });
 }

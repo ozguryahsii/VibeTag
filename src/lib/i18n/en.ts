@@ -633,10 +633,8 @@ export const en = {
     saved: "Your profile was updated ✓",
     membership: "Membership",
     activePlan: "Your active plan",
-    switchTo: "Switch to {plan}",
-    backToFree: "Back to Free",
     planNote:
-      "In this demo, switching plans is instant and free — in the real product this connects to a payment provider.",
+      "Plans will be purchased through the App Store and Google Play. Until then, a discount code below is the way in.",
     privacy: "Privacy and safety",
     whoCanRate: "Who can rate you?",
     whoCanRateBody:

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { logoutAction, setPlanAction } from "@/lib/actions/auth";
+import { logoutAction } from "@/lib/actions/auth";
 import { setRatingPolicyAction, toggleBlockAction } from "@/lib/actions/safety";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { DeleteAccount } from "@/components/DeleteAccount";
@@ -127,22 +127,10 @@ export default async function SettingsPage() {
                   ))}
                 </ul>
 
-                {active ? (
+                {active && (
                   <p className="mt-4 text-[12.5px] font-bold text-orange">
                     {d.settings.activePlan}
                   </p>
-                ) : (
-                  <form action={setPlanAction} className="mt-4">
-                    <input type="hidden" name="plan" value={p.key} />
-                    <button
-                      type="submit"
-                      className="h-11 w-full rounded-full font-bold text-[14px] text-white active:scale-[0.98] transition-transform grad-score"
-                    >
-                      {p.key === "FREE"
-                        ? d.settings.backToFree
-                        : fill(d.settings.switchTo, { plan: plan.name })}
-                    </button>
-                  </form>
                 )}
               </div>
             );

@@ -16,7 +16,6 @@ import {
   hashPassword,
   requireUser,
   verifyPassword,
-  type Plan,
 } from "@/lib/auth";
 
 export type FormState = { error?: string; ok?: boolean };
@@ -138,16 +137,6 @@ export async function loginAction(
 export async function logoutAction(): Promise<void> {
   await destroySession();
   redirect("/");
-}
-
-/** Demo-only plan switcher — a real build wires this to billing. */
-export async function setPlanAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
-  const plan = String(formData.get("plan") ?? "FREE") as Plan;
-  if (!["FREE", "SILVER", "GOLD"].includes(plan)) return;
-
-  await prisma.user.update({ where: { id: user.id }, data: { plan } });
-  revalidatePath("/", "layout");
 }
 
 export async function updateProfileAction(

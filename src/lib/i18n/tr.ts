@@ -630,10 +630,8 @@ export const tr: Dictionary = {
     saved: "Profilin güncellendi ✓",
     membership: "Üyelik",
     activePlan: "Aktif planın",
-    switchTo: "{plan}'a geç",
-    backToFree: "Free'ye dön",
     planNote:
-      "Demo sürümünde plan değişimi anında ve ücretsizdir — gerçek üründe bu akış ödeme sağlayıcısına bağlanır.",
+      "Planlar App Store ve Google Play üzerinden satın alınacak. O zamana kadar aşağıya bir indirim kodu girerek geçebilirsin.",
     privacy: "Gizlilik ve güvenlik",
     whoCanRate: "Seni kimler değerlendirebilir?",
     whoCanRateBody:

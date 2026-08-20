@@ -404,7 +404,56 @@ As the `vibetag` user, `crontab -e` — not root's crontab, and not a file in
 0 3 * * * curl -fsS -X POST -H "Authorization: Bearer <CRON_SECRET>" https://vibetag.net/api/cron/fraud-sweep >/dev/null
 ```
 
-### 8. Backups
+### 8. Store billing (App Store / Google Play) — when the apps exist
+
+The server side is ready and dormant: three endpoints that refuse with 503
+until these variables are set. There is no web checkout on purpose — plans
+are bought in the mobile apps, and until those ship, discount codes and the
+admin panel are the ways onto a paid plan.
+
+What the mobile shell will do: finish the purchase with StoreKit / Play
+Billing, then `POST /api/store/verify` as the signed-in user with
+`{"platform":"APPLE"|"GOOGLE","token":"<originalTransactionId | purchaseToken>"}`.
+The server asks the store directly whether that purchase is real and writes
+`plan` + `planUntil`. "Restore purchases" is the same call again.
+
+In `.env` on the server:
+
+```bash
+# shared guard for both webhook URLs
+STORE_WEBHOOK_KEY="<openssl rand -hex 32>"
+
+# Apple — App Store Connect → Users and Access → Integrations → App Store Server API
+APPLE_ISSUER_ID="…"
+APPLE_KEY_ID="…"
+APPLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n…\n-----END PRIVATE KEY-----"
+APPLE_BUNDLE_ID="net.vibetag.app"
+
+# Google — a service account with the Android Publisher scope, invited in Play Console
+GOOGLE_PLAY_PACKAGE="net.vibetag.app"
+GOOGLE_PLAY_SA_EMAIL="…@….iam.gserviceaccount.com"
+GOOGLE_PLAY_SA_KEY="-----BEGIN PRIVATE KEY-----\n…\n-----END PRIVATE KEY-----"
+```
+
+In the store consoles:
+
+1. Create the subscriptions with **exactly** the product ids in
+   `src/lib/store-products.ts` (`net.vibetag.silver.monthly`,
+   `net.vibetag.silver.yearly`, `net.vibetag.gold.monthly`,
+   `net.vibetag.gold.yearly`) — on both platforms. A purchase with any other
+   id verifies fine and grants nothing.
+2. App Store Connect → App Information → App Store Server Notifications V2 →
+   `https://vibetag.net/api/store/apple?key=<STORE_WEBHOOK_KEY>`
+3. Play Console → Monetization setup → Real-time developer notifications →
+   a Pub/Sub topic whose push subscription points at
+   `https://vibetag.net/api/store/google?key=<STORE_WEBHOOK_KEY>`
+
+Webhooks are treated as pokes: on every event the store's server API is
+asked for the authoritative state, so a forged webhook can at worst make us
+re-check a subscription. Store-granted plans expire through the same nightly
+sweep as everything else.
+
+### 9. Backups
 
 ```bash
 mkdir -p ~/backups

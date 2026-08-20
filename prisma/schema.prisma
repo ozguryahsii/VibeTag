@@ -92,6 +92,7 @@ model User {
   sessions        Session[]
   otpCodes        OtpCode[]
   redemptions     DiscountRedemption[]
+  storePurchases  StorePurchase[]
   ratingsReceived Rating[]             @relation("RatingsReceived")
   ratingsGiven    Rating[]             @relation("RatingsGiven")
 
@@ -602,5 +603,42 @@ model DiscountRedemption {
 
   @@unique([codeId, userId])
   @@index([codeId])
+  @@index([userId])
+}
+
+// --------------------------------------------------------------- store
+
+/// One subscription bought through the App Store or Google Play.
+///
+/// The stores are the source of truth — this row is our mirror of what they
+/// last told us, so the admin screen and support questions ("why did my Gold
+/// disappear?") can be answered without calling Apple. Webhooks are treated
+/// as pokes, never as facts: on every event the store's server API is asked
+/// for the current state, and that answer is what lands here.
+model StorePurchase {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// APPLE | GOOGLE
+  platform  String
+  productId String
+  /// The store's stable handle for the subscription: Apple's
+  /// originalTransactionId, Google's purchaseToken. Unique so a token
+  /// replayed against /api/store/verify cannot grant a second account.
+  storeRef  String @unique
+
+  /// FREE | SILVER | GOLD — what productId mapped to when we last synced.
+  plan      String
+  /// ACTIVE | EXPIRED | REVOKED
+  status    String
+  expiresAt DateTime?
+
+  /// Sandbox | Production — sandbox purchases must be visible as such.
+  environment String @default("Production")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([userId])
 }

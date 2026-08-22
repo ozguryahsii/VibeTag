@@ -186,7 +186,7 @@ export const en = {
     youRated: "Rated",
     ratingsCount: "{n} ratings",
     addFriend: "Add friend",
-    requestSent: "Request sent",
+    requestSent: "Request sent · Cancel",
     accept: "Accept",
     decline: "Decline",
     removeFriend: "Remove friend",
@@ -202,6 +202,10 @@ export const en = {
       "We store your location roughly, never precisely, and only use it to sort this list. You can turn it off any time.",
     nearbyEnable: "Turn on nearby",
     nearbyDisable: "Turn off nearby",
+    nearbyLockedTitle: "Nearby members are a premium view",
+    nearbyLockedBody:
+      "Your location is on and premium members nearby can see you. Seeing the list yourself comes with Silver and Gold.",
+    nearbyLockedCta: "See the plans",
     nearbyAsking: "Getting your location…",
     nearbyDenied:
       "Location permission was refused. You can allow it from your browser settings.",
@@ -564,6 +568,8 @@ export const en = {
     friendRequestBody: "{name} wants to be friends.",
     friendAccepted: "You are now friends 🤝",
     friendAcceptedBody: "{name} accepted your friend request.",
+    friendsNow: "You and {name} are now friends 🤝",
+    friendsNowBody: "You accepted their request.",
     newMessage: "New message",
     newMessageBody: "You have a new message in your inbox.",
     reportActioned: "Your report was upheld",
@@ -581,6 +587,8 @@ export const en = {
     badgeEarnedBody: "“{badge}” at {tierName} is now on your My Vibe profile.",
     generic: "Something happened on your profile",
     kicker: "RECENT ACTIVITY",
+    fresh: "New",
+    earlier: "Earlier",
   },
 
   messages: {
@@ -690,6 +698,8 @@ export const en = {
           "My Vibe profile",
           "Vibe Score and Vibe Tags",
           "Vibe Card creation",
+          "Rate anyone, be rated by anyone",
+          "Sharing your location with Nearby",
         ],
       },
       silver: {
@@ -700,6 +710,7 @@ export const en = {
           "Which circles know you",
           "Strong sides and growth areas",
           "Anonymous rating details",
+          "Seeing nearby members",
           "Message people who rated you",
         ],
       },

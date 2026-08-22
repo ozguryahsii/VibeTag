@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { hasPlan, requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getDict } from "@/lib/i18n/server";
 import { fill, type Dictionary } from "@/lib/i18n";
 import { listFriendRequests, listFriends } from "@/lib/social";
 import { RemoveFriend } from "@/components/RemoveFriend";
 import {
+  cancelFriendRequestAction,
   openFriendThreadAction,
   requestFriendAction,
   respondFriendAction,
@@ -85,6 +86,11 @@ export default async function PeoplePage({
   const requestedIds = new Set(pendingOut.map((f) => f.addresseeId));
 
   const nearbyOn = !!me2?.shareLocation && me2.lat !== null && me2.lng !== null;
+  // Sharing your location is free — it is what makes you visible to others.
+  // Seeing the nearby list yourself is the paid half of the feature, so a
+  // Free viewer's rows simply never get a distance.
+  const canSeeNearby = hasPlan(me, "SILVER");
+  const nearbyVisible = nearbyOn && canSeeNearby;
 
   const rows = users
     .map((u) => ({
@@ -92,7 +98,7 @@ export default async function PeoplePage({
       // Only people who also opted in get a distance; everyone else simply
       // has none and falls to the bottom of the list.
       distance:
-        nearbyOn && u.shareLocation && u.lat !== null && u.lng !== null
+        nearbyVisible && u.shareLocation && u.lat !== null && u.lng !== null
           ? distanceKm(me2!.lat!, me2!.lng!, u.lat, u.lng)
           : null,
       profile: buildVibeProfile(
@@ -146,7 +152,7 @@ export default async function PeoplePage({
       >
         {searching
           ? fill(d.people.resultsFor, { q: query })
-          : nearbyOn
+          : nearbyVisible
             ? d.people.nearby
             : d.people.community}
       </SectionTitle>
@@ -210,9 +216,12 @@ export default async function PeoplePage({
                   </button>
                 </form>
               ) : requestedIds.has(u.id) ? (
-                <span className="shrink-0 text-[11px] font-bold text-muted">
-                  {d.people.requestSent}
-                </span>
+                <form action={cancelFriendRequestAction} className="shrink-0">
+                  <input type="hidden" name="username" value={u.username} />
+                  <button className="text-[11px] font-bold text-muted bg-white border border-line rounded-full px-3 py-2">
+                    {d.people.requestSent}
+                  </button>
+                </form>
               ) : (
                 <form action={requestFriendAction} className="shrink-0">
                   <input type="hidden" name="username" value={u.username} />
@@ -328,18 +337,36 @@ export default async function PeoplePage({
   );
 
   const nearbyControls = nearbyOn ? (
-    <div className="flex items-center justify-between gap-3 px-1">
-      <p className="text-[11.5px] text-muted leading-relaxed">
+    <div className="card p-5">
+      <p className="text-[13.5px] font-extrabold">{d.people.nearby}</p>
+      <p className="text-[12px] text-muted leading-relaxed mt-1">
         {d.people.nearbyBody}
       </p>
-      <form action={disableLocationAction} className="shrink-0">
-        <button className="text-[11.5px] font-bold text-muted underline underline-offset-2">
+      <form action={disableLocationAction}>
+        <button className="mt-3.5 h-11 w-full rounded-full grad-score text-white font-bold text-[13.5px] active:scale-[0.98] transition-transform">
           {d.people.nearbyDisable}
         </button>
       </form>
     </div>
   ) : (
     <NearbyToggle />
+  );
+
+  /* Location on, plan Free: they are visible to premium members but cannot
+     see the list themselves. Said plainly, next to the way in. */
+  const nearbyLocked = nearbyOn && !canSeeNearby && (
+    <div className="card p-5">
+      <p className="text-[13.5px] font-extrabold">{d.people.nearbyLockedTitle}</p>
+      <p className="text-[12px] text-muted leading-relaxed mt-1">
+        {d.people.nearbyLockedBody}
+      </p>
+      <Link
+        href="/settings"
+        className="mt-3.5 inline-flex h-10 items-center rounded-full grad-premium px-5 text-[12.5px] font-bold text-white"
+      >
+        {d.people.nearbyLockedCta}
+      </Link>
+    </div>
   );
 
   return (
@@ -378,6 +405,7 @@ export default async function PeoplePage({
             {friendList}
             <div className="grid gap-4">
               {nearbyControls}
+              {nearbyLocked}
               {list}
             </div>
           </>

@@ -183,7 +183,7 @@ export const tr: Dictionary = {
     youRated: "Değerlendirdin",
     ratingsCount: "{n} değerlendirme",
     addFriend: "Arkadaş ekle",
-    requestSent: "İstek gönderildi",
+    requestSent: "İstek gönderildi · Vazgeç",
     accept: "Kabul et",
     decline: "Reddet",
     removeFriend: "Arkadaşlıktan çıkar",
@@ -199,6 +199,10 @@ export const tr: Dictionary = {
       "Konumunu tam olarak değil, kabaca saklarız ve yalnızca bu listeyi sıralamak için kullanırız. İstediğin an kapatabilirsin.",
     nearbyEnable: "Yakındakileri aç",
     nearbyDisable: "Yakındakileri kapat",
+    nearbyLockedTitle: "Yakınındaki üyeler premium bir görünüm",
+    nearbyLockedBody:
+      "Konumun açık ve yakınındaki premium üyeler seni görebiliyor. Listeyi kendin görmek Silver ve Gold ile geliyor.",
+    nearbyLockedCta: "Planlara bak",
     nearbyAsking: "Konumun alınıyor…",
     nearbyDenied:
       "Konum izni reddedildi. Tarayıcı ayarlarından izin verebilirsin.",
@@ -561,6 +565,8 @@ export const tr: Dictionary = {
     friendRequestBody: "{name} arkadaş olmak istiyor.",
     friendAccepted: "Artık arkadaşsınız 🤝",
     friendAcceptedBody: "{name} arkadaşlık isteğini kabul etti.",
+    friendsNow: "{name} ile artık arkadaşsınız 🤝",
+    friendsNowBody: "İsteğini kabul ettin.",
     newMessage: "Yeni mesaj",
     newMessageBody: "Kutunda yeni bir mesajın var.",
     reportActioned: "Bildirimin haklı bulundu",
@@ -578,6 +584,8 @@ export const tr: Dictionary = {
     badgeEarnedBody: "“{badge}” rozetinin {tierName} seviyesi artık My Vibe profilinde.",
     generic: "Profilinde bir gelişme var",
     kicker: "SON HAREKETLER",
+    fresh: "Yeni",
+    earlier: "Daha önce",
   },
 
   messages: {
@@ -687,6 +695,8 @@ export const tr: Dictionary = {
           "My Vibe profili",
           "Vibe Score ve Vibe Tags",
           "Vibe Card oluşturma",
+          "Herkesi değerlendirme, herkesten değerlendirme",
+          "Yakındakilere konumunu açma",
         ],
       },
       silver: {
@@ -697,6 +707,7 @@ export const tr: Dictionary = {
           "Seni hangi çevrelerden tanıyorlar",
           "Güçlü yönler ve gelişim alanları",
           "Anonim oy detayları",
+          "Yakınındaki üyeleri görme",
           "Seni değerlendirenlere mesaj",
         ],
       },

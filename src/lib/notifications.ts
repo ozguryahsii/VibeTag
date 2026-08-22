@@ -23,6 +23,7 @@ export type NotificationType =
   | "BADGE_EARNED"
   | "FRIEND_REQUEST"
   | "FRIEND_ACCEPTED"
+  | "FRIENDS_NOW"
   | "NEW_MESSAGE"
   | "REPORT_ACTIONED"
   | "REPORT_DISMISSED"
@@ -109,6 +110,7 @@ export function renderNotification(
     BADGE_EARNED: { title: t.badgeEarned, body: t.badgeEarnedBody },
     FRIEND_REQUEST: { title: t.friendRequest, body: t.friendRequestBody },
     FRIEND_ACCEPTED: { title: t.friendAccepted, body: t.friendAcceptedBody },
+    FRIENDS_NOW: { title: t.friendsNow, body: t.friendsNowBody },
     NEW_MESSAGE: { title: t.newMessage, body: t.newMessageBody },
     REPORT_ACTIONED: { title: t.reportActioned, body: t.reportActionedBody },
     REPORT_DISMISSED: { title: t.reportDismissed, body: t.reportDismissedBody },

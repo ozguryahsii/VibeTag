@@ -31,6 +31,7 @@ const ICON_FOR: Record<string, keyof typeof ICONS> = {
   REPORT_ACTIONED: "shieldCheck",
   REPORT_DISMISSED: "shieldCheck",
   RATING_HIDDEN: "shieldCheck",
+  FRIENDS_NOW: "users",
   PLAN_GRANTED: "crown",
 };
 
@@ -101,15 +102,27 @@ export default async function NotificationsPage() {
       </h1>
       <p className="text-[13px] text-muted mt-1">{d.notifications.subtitle}</p>
 
-      <div className="mt-6 grid gap-2.5">
-        {items.length === 0 ? (
+      {items.length === 0 ? (
+        <div className="mt-6">
           <EmptyState
             emoji="✦"
             title={d.notifications.emptyTitle}
             body={d.notifications.emptyBody}
           />
-        ) : (
-          items.map((n) => {
+        </div>
+      ) : (
+        [
+          { header: d.notifications.fresh, rows: items.filter((n) => !n.readAt) },
+          { header: d.notifications.earlier, rows: items.filter((n) => !!n.readAt) },
+        ]
+          .filter((g) => g.rows.length > 0)
+          .map((group) => (
+            <div key={group.header} className="mt-6">
+              <p className="mb-2.5 px-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-muted">
+                {group.header}
+              </p>
+              <div className="grid gap-2.5">
+                {group.rows.map((n) => {
             const copy = renderNotification(n, d);
             const vars = varsOf(n.vars);
             const requestOpen =
@@ -130,18 +143,29 @@ export default async function NotificationsPage() {
               </span>
             );
 
+            const unread = !n.readAt;
             const body = (
               <Card
-                className={`flex gap-3.5 !py-4 ${n.readAt ? "opacity-75" : ""}`}
+                className={`relative flex gap-3.5 !py-4 ${
+                  unread
+                    ? "!border-orange/30 !bg-tagbg/60"
+                    : "opacity-70 saturate-[0.85]"
+                }`}
               >
+                {unread && (
+                  <span
+                    className="absolute right-3.5 top-3.5 h-2 w-2 rounded-full grad-score"
+                    aria-hidden="true"
+                  />
+                )}
                 <span
                   className="w-9 h-9 shrink-0 grid place-items-center rounded-full"
-                  style={{ background: "#FFF0E8" }}
+                  style={{ background: unread ? "#FFE7D8" : "#F4EDE4" }}
                 >
                   <IconGlyph
                     def={ICONS[ICON_FOR[n.type] ?? "sparkle"]}
                     size={18}
-                    color="#FF8A3D"
+                    color={unread ? "#FF8A3D" : "#B0A79B"}
                   />
                 </span>
                 <span className="min-w-0 flex-1">
@@ -194,9 +218,11 @@ export default async function NotificationsPage() {
             ) : (
               <div key={n.id}>{body}</div>
             );
-          })
-        )}
-      </div>
+                })}
+              </div>
+            </div>
+          ))
+      )}
     </main>
   );
 }

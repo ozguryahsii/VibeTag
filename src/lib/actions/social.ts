@@ -60,6 +60,26 @@ export async function requestFriendAction(formData: FormData): Promise<void> {
   revalidatePath(`/u/${username}`);
 }
 
+
+/**
+ * A friendship's paper trail dies with it — Instagram-style. The request,
+ * the acceptance and the "you are now friends" rows all carry the
+ * friendship id in vars, so one contains-query finds them on both sides.
+ */
+async function pruneFriendshipNotifications(
+  friendshipId: string,
+  userIds: string[],
+): Promise<void> {
+  if (!friendshipId) return;
+  await prisma.notification.deleteMany({
+    where: {
+      userId: { in: userIds },
+      type: { in: ["FRIEND_REQUEST", "FRIEND_ACCEPTED", "FRIENDS_NOW"] },
+      vars: { contains: friendshipId },
+    },
+  });
+}
+
 async function acceptFriendship(
   id: string,
   me: { id: string; name: string; username: string },
@@ -68,11 +88,33 @@ async function acceptFriendship(
     where: { id },
     data: { status: "ACCEPTED", acceptedAt: new Date() },
   });
-  await notify(
-    row.requesterId === me.id ? row.addresseeId : row.requesterId,
-    "FRIEND_ACCEPTED",
-    { vars: { name: me.name, username: me.username }, href: "/people" },
-  );
+  const otherId = row.requesterId === me.id ? row.addresseeId : row.requesterId;
+
+  // The request I just answered turns into the news of the friendship,
+  // in place — a second "new friend" row under a stale "wants to be
+  // friends" row would tell the story twice.
+  const other = await prisma.user.findUnique({
+    where: { id: otherId },
+    select: { name: true, username: true },
+  });
+  if (other) {
+    await prisma.notification.updateMany({
+      where: { userId: me.id, type: "FRIEND_REQUEST", vars: { contains: id } },
+      data: {
+        type: "FRIENDS_NOW",
+        vars: JSON.stringify({
+          name: other.name,
+          username: other.username,
+          friendshipId: id,
+        }),
+      },
+    });
+  }
+
+  await notify(otherId, "FRIEND_ACCEPTED", {
+    vars: { name: me.name, username: me.username, friendshipId: id },
+    href: "/people",
+  });
 }
 
 export async function respondFriendAction(formData: FormData): Promise<void> {
@@ -83,12 +125,42 @@ export async function respondFriendAction(formData: FormData): Promise<void> {
   const row = await prisma.friendship.findUnique({ where: { id } });
   if (!row || row.addresseeId !== me.id || row.status !== "PENDING") return;
 
-  if (accept) await acceptFriendship(id, me);
-  else await prisma.friendship.delete({ where: { id } });
+  if (accept) {
+    await acceptFriendship(id, me);
+  } else {
+    await prisma.friendship.delete({ where: { id } });
+    await pruneFriendshipNotifications(id, [me.id]);
+  }
 
   revalidatePath("/people");
   // The same form now also lives on the notification screen.
   revalidatePath("/notifications");
+}
+
+/** Take a pending request back, Instagram-style: no trace stays behind. */
+export async function cancelFriendRequestAction(
+  formData: FormData,
+): Promise<void> {
+  const me = await requireUser();
+  const username = String(formData.get("username") ?? "").toLowerCase();
+
+  const other = await prisma.user.findUnique({
+    where: { username },
+    select: { id: true },
+  });
+  if (!other) return;
+
+  const row = await prisma.friendship.findFirst({
+    where: { requesterId: me.id, addresseeId: other.id, status: "PENDING" },
+    select: { id: true },
+  });
+  if (!row) return;
+
+  await prisma.friendship.delete({ where: { id: row.id } });
+  await pruneFriendshipNotifications(row.id, [other.id]);
+
+  revalidatePath("/people");
+  revalidatePath(`/u/${username}`);
 }
 
 export async function removeFriendAction(formData: FormData): Promise<void> {
@@ -101,17 +173,25 @@ export async function removeFriendAction(formData: FormData): Promise<void> {
   });
   if (!other) return;
 
-  await prisma.friendship.deleteMany({
+  const rows = await prisma.friendship.findMany({
     where: {
       OR: [
         { requesterId: me.id, addresseeId: other.id },
         { requesterId: other.id, addresseeId: me.id },
       ],
     },
+    select: { id: true },
   });
+  await prisma.friendship.deleteMany({
+    where: { id: { in: rows.map((r) => r.id) } },
+  });
+  for (const r of rows) {
+    await pruneFriendshipNotifications(r.id, [me.id, other.id]);
+  }
 
   revalidatePath("/people");
   revalidatePath(`/u/${username}`);
+  revalidatePath("/notifications");
 }
 
 // ------------------------------------------------------------- messages

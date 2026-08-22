@@ -19,16 +19,20 @@ export function nextUpdateDate(lastUpdatedAt: Date | null): Date | null {
  * Who may write a free-text note when rating this person.
  *
  * Ratings themselves are open to everyone; the note is where harassment
- * actually happens, so it is the note the rated person controls. Unknown
- * policy values fall back to EVERYONE rather than throwing — a bad row must
- * not make a profile unratable.
+ * actually happens, so it is the note the rated person controls. Two
+ * choices only: open, or "my circle" — the people they invited and their
+ * friends, as one group. (INVITED and FRIENDS are the pre-merge spellings
+ * of that circle; rows are migrated, but a stray value must still deny the
+ * way its owner meant.) Unknown values fall back to EVERYONE rather than
+ * throwing — a bad row must not make a profile unratable.
  */
-export type CommentPolicy = "EVERYONE" | "INVITED" | "FRIENDS";
+export type CommentPolicy = "EVERYONE" | "CIRCLE";
 
 export function commentAllowed(
   policy: string,
   ctx: { invited: boolean; friends: boolean },
 ): boolean {
+  if (policy === "CIRCLE") return ctx.invited || ctx.friends;
   if (policy === "INVITED") return ctx.invited;
   if (policy === "FRIENDS") return ctx.friends;
   return true;

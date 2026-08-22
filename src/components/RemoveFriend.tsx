@@ -58,7 +58,7 @@ export function RemoveFriend({ name, username }: { name: string; username: strin
         onClick={() => setOpen(true)}
         aria-label={d.people.removeFriend}
         title={d.people.removeFriend}
-        className="text-[12px] font-bold text-muted bg-white border border-line rounded-full px-3 py-2 active:scale-95 transition-transform"
+        className="text-[12px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-3.5 py-2 active:scale-95 transition-transform"
       >
         −
       </button>

@@ -186,10 +186,10 @@ içeren notları gönderim anında reddeder. Bir kelime listesi taban seviyedir,
 
 ### 8. Gizlilik ayarı
 
-Puanlama herkese açıktır. `commentPolicy` yazılı notu kapılar: `EVERYONE`,
-`INVITED` (yalnızca kullanıcının davet linkiyle katılmış kişiler) veya
-`FRIENDS`. Taciz notta yaşar, puanda değil — o yüzden kapı notun üstündedir ve
-ayar notu yazanın değil, hakkında yazılanın elindedir.
+Puanlama herkese açıktır. `commentPolicy` yazılı notu kapılar ve iki değeri
+vardır: `EVERYONE` ya da `CIRCLE` (kullanıcının davet ettikleri ve arkadaşları,
+tek grup olarak). Taciz notta yaşar, puanda değil — o yüzden kapı notun
+üstündedir ve ayar notu yazanın değil, hakkında yazılanın elindedir.
 
 ### 9. Skor — `src/lib/vibe.ts`
 

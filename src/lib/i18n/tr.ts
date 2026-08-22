@@ -326,7 +326,7 @@ export const tr: Dictionary = {
     unlockWith: "{plan} ile aç",
     protectedNote:
       "🔒 Bu değerlendirmenin kimliği sistem tarafından korunuyor — Gold üyelikte de görünmez.",
-    reportRating: "Bu değerlendirmeyi bildir",
+    reportRating: "Değerlendirmeyi bildir",
     goldKicker: "GOLD · VIBE IDENTITY",
     goldTitle: "Kimlerin değerlendirdiğini gör",
     goldBody:
@@ -586,7 +586,7 @@ export const tr: Dictionary = {
     emptyTitle: "Kutun boş",
     emptyBody:
       "Arkadaşlarınla mesajlaşabilirsin. Premium üyeler kendilerini değerlendirenlere de yazabilir.",
-    newFromRating: "Seni değerlendiren kişiye yaz",
+    newFromRating: "Değerlendirene mesaj at",
     placeholder: "Bir mesaj yaz…",
     send: "Gönder",
     friendsOnly:
@@ -642,10 +642,8 @@ export const tr: Dictionary = {
       "Puanlama herkese açıktır. Bu ayar, değerlendirmeye kimlerin yazılı not ekleyebileceğini belirler.",
     everyone: "Herkes",
     everyoneHint: "Notlar açık",
-    invitedOnly: "Davet ettiklerim",
-    invitedOnlyHint: "Sadece davet linki",
-    friendsOnly: "Arkadaşlarım",
-    friendsOnlyHint: "Sadece arkadaşlar",
+    circleOnly: "Davet ettiklerim ve arkadaşlarım",
+    circleOnlyHint: "Sadece çevrem",
     blocked: "Engellediklerin",
     blockedEmpty: "Kimseyi engellemedin.",
     account: "Hesap",

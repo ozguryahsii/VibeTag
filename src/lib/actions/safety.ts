@@ -133,7 +133,7 @@ export async function reportAction(
 export async function setCommentPolicyAction(formData: FormData): Promise<void> {
   const me = await requireUser();
   const policy = String(formData.get("commentPolicy") ?? "EVERYONE");
-  if (!["EVERYONE", "INVITED", "FRIENDS"].includes(policy)) return;
+  if (!["EVERYONE", "CIRCLE"].includes(policy)) return;
 
   await prisma.user.update({
     where: { id: me.id },

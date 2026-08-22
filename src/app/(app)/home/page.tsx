@@ -8,13 +8,11 @@ import { badgeLabel, tagLabel, tierLabel, traitLabel } from "@/lib/labels";
 import { TIER_STYLE } from "@/lib/tier-style";
 import { LangToggle } from "@/components/LangToggle";
 import { getPercentile, getVibeProfile } from "@/lib/profile";
+import { VibeCardCanvas } from "@/components/card/VibeCardCanvas";
 import { bestPerFamily, computeBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ICONS, iconFor } from "@/lib/icons";
-import { PhotoLightbox } from "@/components/PhotoLightbox";
-import { ScoreDial } from "@/components/ScoreDial";
-import { VibeMark } from "@/components/Logo";
 import { Avatar, Button, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
 
 function greetingKey(): "greetingNight" | "greetingMorning" | "greetingDay" | "greetingEvening" {
@@ -55,6 +53,25 @@ export default async function HomePage() {
     .filter((b) => !b.earned && b.tier === "BRONZE")
     .sort((a, b) => b.progress - a.progress);
   const summary = generateVibeSummary(profile, user.name.split(" ")[0], d, locale);
+
+  const cardData = {
+    name: user.name,
+    username: user.username,
+    score: profile.score,
+    ratingCount: profile.ratingCount,
+    percentile,
+    avatarUrl: user.avatarUrl,
+    avatarColor: user.avatarColor,
+    tags: profile.tags
+      .slice(0, 4)
+      .map((t) => ({ key: t.key, label: tagLabel(t.key, locale) })),
+    badges: earned.slice(0, 3).map((b) => ({
+      key: b.key,
+      label: badgeLabel(b.key, d),
+      icon: b.icon,
+      tier: b.tier,
+    })),
+  };
 
   return (
     <main className="px-5 pt-12">
@@ -97,93 +114,28 @@ export default async function HomePage() {
         </div>
       </header>
 
-      {/* Vibe identity card */}
-      <section
-        className="relative mt-6 overflow-hidden rounded-[32px] border border-line/90 bg-warmwhite px-5 pb-5 pt-7 text-center pop"
-        style={{ boxShadow: "0 24px 56px rgba(83,60,40,0.14)" }}
-      >
-        <div
-          className="pointer-events-none absolute -left-20 -top-12 h-28 w-60 rotate-[-9deg] rounded-[50%] opacity-55"
-          style={{
-            background:
-              profile.score >= 85
-                ? "linear-gradient(135deg, rgba(245,173,60,.78), rgba(239,113,70,.56), rgba(231,61,118,.26))"
-                : "linear-gradient(135deg, rgba(228,215,200,.8), rgba(238,228,213,.24))",
-          }}
-          aria-hidden="true"
+      {/*
+        * The identity card is the real Vibe Card — the same scene the share
+        * studio draws, chosen by score band, so the home screen and the
+        * export can never disagree about what "your card" looks like. Square
+        * format: the story cut is far too tall for this slot.
+        */}
+      <section className="mt-6 reveal" style={{ animationDelay: "60ms" }}>
+        <VibeCardCanvas
+          data={cardData}
+          format="square"
+          className="w-full h-auto rounded-[32px] shadow-[0_24px_56px_rgba(83,60,40,0.18)]"
         />
-        <div
-          className="pointer-events-none absolute -bottom-16 -right-16 h-32 w-64 rotate-[-12deg] rounded-[50%] opacity-45"
-          style={{
-            background:
-              profile.score >= 85
-                ? "linear-gradient(135deg, rgba(242,160,63,.28), rgba(240,82,98,.64), rgba(231,61,118,.86))"
-                : "linear-gradient(135deg, rgba(238,228,213,.3), rgba(228,215,200,.8))",
-          }}
-          aria-hidden="true"
-        />
-        <div className="absolute right-5 top-5 opacity-90" aria-hidden="true">
-          <VibeMark size={43} id="home-card-mark" />
-        </div>
-
-        <div className="relative z-10 flex flex-col items-center">
-          <PhotoLightbox
-            name={user.name}
-            url={user.avatarUrl}
-            color={user.avatarColor}
-            size={82}
-            ring
-          />
-          <h2 className="mt-3 font-display text-[25px] font-semibold tracking-[-0.035em] text-ink">
-            {user.name}
-          </h2>
-          <div className="mt-2 flex items-center gap-1.5" aria-hidden="true">
-            <span className="h-px w-8 bg-line" />
-            <span className="h-1.5 w-1.5 rounded-full bg-coral" />
-            <span className="h-px w-8 bg-line" />
+        {profile.tags.length > 0 && (
+          <div className="mt-3 text-center">
+            <Link
+              href="/card"
+              className="inline-block rounded-full border border-orange/35 bg-warmwhite/80 px-4 py-2 text-[12px] font-semibold text-coral shadow-[0_5px_14px_rgba(221,105,55,0.1)]"
+            >
+              {d.home.shareCard}
+            </Link>
           </div>
-
-          <ScoreDial
-            score={profile.score}
-            caption={
-              percentile
-                ? fill(d.home.topPercent, { n: percentile })
-                : profile.ratingCount > 0
-                  ? fill(d.home.ratedCount, { n: profile.ratingCount })
-                  : d.home.awaitingFirst
-            }
-          />
-
-          {profile.tags.length > 0 && (
-            <div className="w-full">
-              <p className="mb-3 text-[10.5px] font-bold uppercase tracking-[0.22em] text-muted">
-                {d.home.seeYouAs}
-              </p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {profile.tags.slice(0, 4).map((t) => (
-                  <TagPill key={t.key} tagKey={t.key} label={tagLabel(t.key, locale)} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-6 flex w-full items-center justify-between border-t border-line/80 pt-4 text-left">
-            <p className="text-[12px] leading-tight text-muted">
-              {d.common.ratedBy}
-              <span className="mt-0.5 block text-[16px] font-semibold text-ink">
-                {profile.ratingCount} {d.common.people}
-              </span>
-            </p>
-            {profile.tags.length > 0 && (
-              <Link
-                href="/card"
-                className="rounded-full border border-orange/35 bg-warmwhite/80 px-4 py-2 text-[12px] font-semibold text-coral shadow-[0_5px_14px_rgba(221,105,55,0.1)]"
-              >
-                {d.home.shareCard}
-              </Link>
-            )}
-          </div>
-        </div>
+        )}
       </section>
 
       {profile.tags.length === 0 && (

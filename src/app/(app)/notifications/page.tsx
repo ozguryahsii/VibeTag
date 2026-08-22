@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import {
   listNotifications,
   markAllRead,
   renderNotification,
 } from "@/lib/notifications";
+import { respondFriendAction } from "@/lib/actions/social";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n";
 import { LangToggle } from "@/components/LangToggle";
+import { BackButton } from "@/components/BackButton";
 import { ICONS } from "@/lib/icons";
 import { IconGlyph } from "@/components/Icon";
 import { Card, EmptyState } from "@/components/ui";
@@ -28,6 +31,7 @@ const ICON_FOR: Record<string, keyof typeof ICONS> = {
   REPORT_ACTIONED: "shieldCheck",
   REPORT_DISMISSED: "shieldCheck",
   RATING_HIDDEN: "shieldCheck",
+  PLAN_GRANTED: "crown",
 };
 
 function ago(date: Date, d: Dictionary, locale: Locale): string {
@@ -45,6 +49,29 @@ function ago(date: Date, d: Dictionary, locale: Locale): string {
   }).format(date);
 }
 
+/** The typed vars a notification may carry. Old rows simply lack keys. */
+function varsOf(raw: string): { username?: string; friendshipId?: string } {
+  try {
+    const v = JSON.parse(raw) as Record<string, unknown>;
+    return {
+      username: typeof v.username === "string" ? v.username : undefined,
+      friendshipId:
+        typeof v.friendshipId === "string" ? v.friendshipId : undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * A sheet, not a tab: slides in from the right and backs out top-left, so
+ * notifications feel like a drawer over whatever screen summoned them.
+ *
+ * The list acts, not just points. A friend request is answered right here,
+ * and a name opens its profile — going to People first is a detour nobody
+ * chose. Older notifications, written before identity travelled in vars,
+ * fall back to being plain links.
+ */
 export default async function NotificationsPage() {
   const user = await requireUser();
   const d = await getDict();
@@ -52,19 +79,26 @@ export default async function NotificationsPage() {
   const items = await listNotifications(user.id);
   await markAllRead(user.id);
 
+  // Which friend requests are still live? A request answered from People
+  // must not keep offering buttons here.
+  const pending = await prisma.friendship.findMany({
+    where: { addresseeId: user.id, status: "PENDING" },
+    select: { id: true },
+  });
+  const pendingIds = new Set(pending.map((f) => f.id));
+
   return (
-    <main className="px-5 pt-10">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-[10px] font-extrabold tracking-[0.25em] text-coral mb-2">
-            {d.notifications.kicker}
-          </p>
-          <h1 className="vt-page-title text-[31px] tracking-[-0.02em]">
-            {d.notifications.title}
-          </h1>
-        </div>
-        <LangToggle className="mt-1 shrink-0" />
+    <main className="vt-sheet px-5 pt-10">
+      <div className="flex items-center justify-between gap-3">
+        <BackButton />
+        <LangToggle className="shrink-0" />
       </div>
+      <p className="mt-6 text-[10px] font-extrabold tracking-[0.25em] text-coral">
+        {d.notifications.kicker}
+      </p>
+      <h1 className="vt-page-title mt-2 text-[31px] tracking-[-0.02em]">
+        {d.notifications.title}
+      </h1>
       <p className="text-[13px] text-muted mt-1">{d.notifications.subtitle}</p>
 
       <div className="mt-6 grid gap-2.5">
@@ -77,6 +111,25 @@ export default async function NotificationsPage() {
         ) : (
           items.map((n) => {
             const copy = renderNotification(n, d);
+            const vars = varsOf(n.vars);
+            const requestOpen =
+              n.type === "FRIEND_REQUEST" &&
+              !!vars.friendshipId &&
+              pendingIds.has(vars.friendshipId);
+
+            const title = vars.username ? (
+              <Link
+                href={`/u/${vars.username}`}
+                className="block text-[13.5px] font-extrabold"
+              >
+                {copy.title}
+              </Link>
+            ) : (
+              <span className="block text-[13.5px] font-extrabold">
+                {copy.title}
+              </span>
+            );
+
             const body = (
               <Card
                 className={`flex gap-3.5 !py-4 ${n.readAt ? "opacity-75" : ""}`}
@@ -91,10 +144,8 @@ export default async function NotificationsPage() {
                     color="#FF8A3D"
                   />
                 </span>
-                <span className="min-w-0">
-                  <span className="block text-[13.5px] font-extrabold">
-                    {copy.title}
-                  </span>
+                <span className="min-w-0 flex-1">
+                  {title}
                   {copy.body && (
                     <span className="block text-[12.5px] text-muted leading-relaxed mt-0.5">
                       {copy.body}
@@ -103,10 +154,40 @@ export default async function NotificationsPage() {
                   <span className="block text-[11px] text-muted mt-1">
                     {ago(n.createdAt, d, locale)}
                   </span>
+                  {requestOpen && (
+                    <span className="mt-2.5 flex gap-2">
+                      <form action={respondFriendAction}>
+                        <input
+                          type="hidden"
+                          name="friendshipId"
+                          value={vars.friendshipId}
+                        />
+                        <input type="hidden" name="decision" value="accept" />
+                        <button className="text-[12px] font-bold text-white grad-score rounded-full px-3.5 py-2">
+                          {d.people.accept}
+                        </button>
+                      </form>
+                      <form action={respondFriendAction}>
+                        <input
+                          type="hidden"
+                          name="friendshipId"
+                          value={vars.friendshipId}
+                        />
+                        <input type="hidden" name="decision" value="decline" />
+                        <button className="text-[12px] font-bold text-muted bg-white border border-line rounded-full px-3.5 py-2">
+                          {d.people.decline}
+                        </button>
+                      </form>
+                    </span>
+                  )}
                 </span>
               </Card>
             );
-            return n.href ? (
+
+            // A card with its own links or buttons must not also be one big
+            // link — nested interactive elements fight over every tap.
+            const interactive = requestOpen || !!vars.username;
+            return !interactive && n.href ? (
               <Link key={n.id} href={n.href}>
                 {body}
               </Link>

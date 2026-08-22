@@ -54,7 +54,10 @@ docker exec vibetag-db-1 pg_dump -U vibetag vibetag | gzip \
 # 2 · the tag
 su vibetag -s /bin/bash -c 'cd /home/vibetag/app && git fetch --tags && git checkout vX.Y && git log --oneline -1'
 
-# 3 · build (≈4 min; check `free -m` for swap first on this 3.8 GB box)
+# 3 · build (≈4 min). First check swap (`free -m`) AND disk (`df -h /`) —
+#     builds eat ~2 GB of cache each; under 3 GB free, run
+#     `docker builder prune -af` first. A full disk here once took the
+#     database down with it.
 cd /home/vibetag/app
 docker compose -f docker-compose.prod.yml -f docker-compose.proxy.yml up -d --build
 
@@ -74,7 +77,7 @@ mid-flight it feels: a server should never be running a commit that has no
 name, because "roll back to the previous one" then has no answer either.
 
 Version numbering: minor bump (`v1.2` → `v1.3`) for a normal feature package,
-patch (`v1.2.1`) for a fix on its own. Current: **v2.3**.
+patch (`v1.2.1`) for a fix on its own. Current: **v2.4**.
 
 ## Language
 

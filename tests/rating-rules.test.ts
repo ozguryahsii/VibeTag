@@ -83,16 +83,19 @@ describe("who may write a note", () => {
     expect(commentAllowed("EVERYONE", nobody)).toBe(true);
   });
 
-  it("gates on the invite grant in INVITED mode", () => {
-    expect(commentAllowed("INVITED", nobody)).toBe(false);
-    expect(commentAllowed("INVITED", { invited: true, friends: false })).toBe(true);
-    // Being a friend is not the same permission as holding an invite.
-    expect(commentAllowed("INVITED", { invited: false, friends: true })).toBe(false);
+  it("lets either half of the circle through in CIRCLE mode", () => {
+    expect(commentAllowed("CIRCLE", nobody)).toBe(false);
+    expect(commentAllowed("CIRCLE", { invited: true, friends: false })).toBe(true);
+    expect(commentAllowed("CIRCLE", { invited: false, friends: true })).toBe(true);
   });
 
-  it("gates on friendship in FRIENDS mode", () => {
-    expect(commentAllowed("FRIENDS", nobody)).toBe(false);
+  // Pre-merge spellings. Rows are migrated, but a stray value must still
+  // deny the way its owner meant, not fall open.
+  it("honours the legacy INVITED and FRIENDS values", () => {
+    expect(commentAllowed("INVITED", { invited: true, friends: false })).toBe(true);
+    expect(commentAllowed("INVITED", { invited: false, friends: true })).toBe(false);
     expect(commentAllowed("FRIENDS", { invited: false, friends: true })).toBe(true);
+    expect(commentAllowed("FRIENDS", nobody)).toBe(false);
   });
 
   it("falls back to open on an unknown value rather than locking a profile", () => {

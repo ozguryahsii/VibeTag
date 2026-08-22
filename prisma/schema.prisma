@@ -68,10 +68,10 @@ model User {
   /// cannot sign in or rate; the row and its history stay intact.
   suspendedAt DateTime?
 
-  /// Who may write a note when rating this person: EVERYONE | INVITED (only
-  /// people who came in through one of their invite links) | FRIENDS.
-  /// Ratings themselves are open to everyone — this gates only the free-text
-  /// note, which is where harassment actually happens.
+  /// Who may write a note when rating this person: EVERYONE | CIRCLE (the
+  /// people they invited and their friends, as one group). Ratings
+  /// themselves are open to everyone — this gates only the free-text note,
+  /// which is where harassment actually happens.
   commentPolicy String @default("EVERYONE")
 
   /// Last language this person chose. The UI reads a cookie; a push

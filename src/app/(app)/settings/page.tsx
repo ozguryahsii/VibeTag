@@ -165,7 +165,7 @@ export default async function SettingsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             {[
               {
                 key: "EVERYONE",
@@ -173,14 +173,9 @@ export default async function SettingsPage() {
                 hint: d.settings.everyoneHint,
               },
               {
-                key: "INVITED",
-                label: d.settings.invitedOnly,
-                hint: d.settings.invitedOnlyHint,
-              },
-              {
-                key: "FRIENDS",
-                label: d.settings.friendsOnly,
-                hint: d.settings.friendsOnlyHint,
+                key: "CIRCLE",
+                label: d.settings.circleOnly,
+                hint: d.settings.circleOnlyHint,
               },
             ].map((opt) => {
               const active = user.commentPolicy === opt.key;

@@ -205,7 +205,7 @@ export default async function PeoplePage({
               {friendIds.has(u.id) ? (
                 <form action={openFriendThreadAction} className="shrink-0">
                   <input type="hidden" name="username" value={u.username} />
-                  <button className="text-[12px] font-bold text-muted bg-white border border-line rounded-full px-3.5 py-2">
+                  <button className="text-[12px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-3.5 py-2">
                     {d.people.message}
                   </button>
                 </form>
@@ -299,10 +299,12 @@ export default async function PeoplePage({
                 </p>
               </Link>
               <div className="flex items-center gap-2 shrink-0">
+                {/* One family of pills — the same box, ink and type as the
+                    "+" in the list below, so the two sections read as one. */}
                 <form action={openFriendThreadAction}>
                   <input type="hidden" name="username" value={f.username} />
                   <button
-                    className="text-[12px] font-bold text-muted bg-white border border-line rounded-full px-3.5 py-2"
+                    className="text-[12px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-3.5 py-2"
                     aria-label={d.people.message}
                   >
                     {d.people.message}
@@ -311,12 +313,11 @@ export default async function PeoplePage({
                 {!ratedByMe.has(f.id) && (
                   <Link
                     href={`/rate/${f.username}`}
-                    className="text-[12px] font-bold text-white grad-score rounded-full px-3.5 py-2"
+                    className="text-[12px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-3.5 py-2"
                   >
                     {d.rate.rateCta}
                   </Link>
                 )}
-                {/* The mirror of "+": same geometry, opens a confirm first. */}
                 <RemoveFriend name={f.name} username={f.username} />
               </div>
             </Card>

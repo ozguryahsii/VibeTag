@@ -19,6 +19,7 @@ export type IconDef = {
 };
 
 export const ICONS: Record<string, IconDef> = {
+  arrowLeft: { paths: ["M19 12H5.5", "m11.5 5.5-6.5 6.5 6.5 6.5"] },
   bolt: { paths: ["M13.2 2.5 5 13.8h5.6L10 21.5l8.4-11.6h-5.7z"] },
   heart: {
     paths: [

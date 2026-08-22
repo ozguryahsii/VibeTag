@@ -207,7 +207,7 @@ const trTerms: LegalDoc = {
     {
       heading: "Notlar ve mesajlar",
       body: [
-        "Hakaret, taciz, nefret söylemi, tehdit, başkasının kişisel verisini ifşa ve spam yasaktır. Notlarda telefon numarası, e-posta ve bağlantı paylaşılamaz. Herkes herkesi puanlayabilir; profil sahibi, değerlendirmesine kimlerin yazılı not ekleyebileceğini seçer (herkes, davet ettikleri veya arkadaşları).",
+        "Hakaret, taciz, nefret söylemi, tehdit, başkasının kişisel verisini ifşa ve spam yasaktır. Notlarda telefon numarası, e-posta ve bağlantı paylaşılamaz. Herkes herkesi puanlayabilir; profil sahibi, değerlendirmesine kimlerin yazılı not ekleyebileceğini seçer (herkes ya da yalnızca davet ettikleri ve arkadaşları).",
         "Doğrudan mesajlar yalnızca arkadaşlar arasında açıktır. Premium üyeler kendilerini değerlendirenlere yazabilir; değerlendiren kişi ancak kendisine yazıldıktan sonra cevap verebilir.",
       ],
     },
@@ -427,7 +427,7 @@ const enTerms: LegalDoc = {
     {
       heading: "Notes and messages",
       body: [
-        "Insults, harassment, hate speech, threats, exposing someone's personal data, and spam are prohibited. Notes may not contain phone numbers, email addresses or links. Anyone may rate anyone; each profile owner chooses who may add a written note to a rating (everyone, people they invited, or their friends).",
+        "Insults, harassment, hate speech, threats, exposing someone's personal data, and spam are prohibited. Notes may not contain phone numbers, email addresses or links. Anyone may rate anyone; each profile owner chooses who may add a written note to a rating (everyone, or only the people they invited and their friends).",
         "Direct messages are open between friends. Premium members may write to people who rated them; the rater may only reply once written to.",
       ],
     },

@@ -42,14 +42,16 @@ export async function requestFriendAction(formData: FormData): Promise<void> {
   if (existing) {
     // They already asked us — treat this tap as accepting.
     if (existing.status === "PENDING" && existing.addresseeId === me.id) {
-      await acceptFriendship(existing.id, me.id, me.name);
+      await acceptFriendship(existing.id, me);
     }
   } else {
-    await prisma.friendship.create({
+    const row = await prisma.friendship.create({
       data: { requesterId: me.id, addresseeId: other.id },
     });
+    // The username makes the name tappable on the notification screen; the
+    // friendship id is what lets Accept live right on the notification.
     await notify(other.id, "FRIEND_REQUEST", {
-      vars: { name: me.name },
+      vars: { name: me.name, username: me.username, friendshipId: row.id },
       href: "/people",
     });
   }
@@ -58,15 +60,18 @@ export async function requestFriendAction(formData: FormData): Promise<void> {
   revalidatePath(`/u/${username}`);
 }
 
-async function acceptFriendship(id: string, meId: string, myName: string) {
+async function acceptFriendship(
+  id: string,
+  me: { id: string; name: string; username: string },
+) {
   const row = await prisma.friendship.update({
     where: { id },
     data: { status: "ACCEPTED", acceptedAt: new Date() },
   });
   await notify(
-    row.requesterId === meId ? row.addresseeId : row.requesterId,
+    row.requesterId === me.id ? row.addresseeId : row.requesterId,
     "FRIEND_ACCEPTED",
-    { vars: { name: myName }, href: "/people" },
+    { vars: { name: me.name, username: me.username }, href: "/people" },
   );
 }
 
@@ -78,10 +83,12 @@ export async function respondFriendAction(formData: FormData): Promise<void> {
   const row = await prisma.friendship.findUnique({ where: { id } });
   if (!row || row.addresseeId !== me.id || row.status !== "PENDING") return;
 
-  if (accept) await acceptFriendship(id, me.id, me.name);
+  if (accept) await acceptFriendship(id, me);
   else await prisma.friendship.delete({ where: { id } });
 
   revalidatePath("/people");
+  // The same form now also lives on the notification screen.
+  revalidatePath("/notifications");
 }
 
 export async function removeFriendAction(formData: FormData): Promise<void> {

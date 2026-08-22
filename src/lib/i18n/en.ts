@@ -329,7 +329,7 @@ export const en = {
     unlockWith: "Unlock with {plan}",
     protectedNote:
       "🔒 This rating's identity is protected by the system — invisible even on Gold.",
-    reportRating: "Report this rating",
+    reportRating: "Report the rating",
     goldKicker: "GOLD · VIBE IDENTITY",
     goldTitle: "See who rated you",
     goldBody:
@@ -589,7 +589,7 @@ export const en = {
     emptyTitle: "Your inbox is empty",
     emptyBody:
       "You can message your friends. Premium members can also write to people who rated them.",
-    newFromRating: "Message the person who rated you",
+    newFromRating: "Message the rater",
     placeholder: "Write a message…",
     send: "Send",
     friendsOnly:
@@ -645,10 +645,8 @@ export const en = {
       "Anyone can rate you — scores are open. This decides who may add a written note to their rating.",
     everyone: "Everyone",
     everyoneHint: "Open notes",
-    invitedOnly: "People I invited",
-    invitedOnlyHint: "Invite link only",
-    friendsOnly: "My friends",
-    friendsOnlyHint: "Friends only",
+    circleOnly: "People I invited and my friends",
+    circleOnlyHint: "My circle only",
     blocked: "People you blocked",
     blockedEmpty: "You have not blocked anyone.",
     account: "Account",

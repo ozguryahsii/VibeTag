@@ -4,7 +4,7 @@ import {
   verificationCount,
   verificationState,
 } from "@/lib/verification";
-import { LIMITS } from "@/lib/limits";
+import { LIMITS, resendGapSeconds } from "@/lib/limits";
 
 const nobody = {
   emailVerifiedAt: null,
@@ -66,5 +66,17 @@ describe("rate limits", () => {
   it("keep sending codes more expensive than checking them", () => {
     // Every send costs an email. Checking one costs a database read.
     expect(LIMITS.otpSend.max).toBeLessThanOrEqual(LIMITS.otpCheck.max);
+  });
+});
+
+describe("otp resend schedule", () => {
+  it("lets the first send through immediately", () => {
+    expect(resendGapSeconds(0)).toBe(0);
+  });
+
+  it("asks for a minute after the first, five after the second", () => {
+    expect(resendGapSeconds(1)).toBe(60);
+    expect(resendGapSeconds(2)).toBe(300);
+    expect(resendGapSeconds(7)).toBe(300);
   });
 });

@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash, randomInt, timingSafeEqual } from "node:crypto";
 import { prisma } from "@/lib/db";
+import { resendGapSeconds } from "@/lib/limits";
 import { emailConfigured, otpEmail, sendEmail } from "@/lib/email";
 import type { Dictionary } from "@/lib/i18n";
 
@@ -104,6 +105,13 @@ export async function checkOtp(
   userId: string,
   purpose: OtpPurpose,
   code: string,
+  /**
+   * `peek` verifies without spending. The animated code card needs two
+   * beats — "is it right?" before the seal plays, and the real consumption
+   * after — and burning the code on the first beat would make the second
+   * one fail against its own success.
+   */
+  opts: { peek?: boolean } = {},
 ): Promise<CheckOutcome> {
   const row = await prisma.otpCode.findFirst({
     where: { userId, purpose, consumedAt: null },
@@ -129,10 +137,12 @@ export async function checkOtp(
     };
   }
 
-  await prisma.otpCode.update({
-    where: { id: row.id },
-    data: { consumedAt: new Date() },
-  });
+  if (!opts.peek) {
+    await prisma.otpCode.update({
+      where: { id: row.id },
+      data: { consumedAt: new Date() },
+    });
+  }
   return { ok: true };
 }
 
@@ -154,4 +164,24 @@ export async function pruneOtpCodes(): Promise<number> {
     where: { expiresAt: { lt: new Date(Date.now() - 86_400_000) } },
   });
   return count;
+}
+
+/**
+ * Seconds until this account may be sent another code for this purpose.
+ * Zero means "go ahead". Mint times are read from the OtpCode rows
+ * themselves — invalidated codes keep their createdAt, which is exactly
+ * the send history this needs.
+ */
+export async function resendWaitSeconds(
+  userId: string,
+  purpose: OtpPurpose,
+): Promise<number> {
+  const rows = await prisma.otpCode.findMany({
+    where: { userId, purpose, createdAt: { gte: new Date(Date.now() - 3_600_000) } },
+    orderBy: { createdAt: "desc" },
+    select: { createdAt: true },
+  });
+  if (rows.length === 0) return 0;
+  const since = (Date.now() - rows[0].createdAt.getTime()) / 1000;
+  return Math.max(0, Math.ceil(resendGapSeconds(rows.length) - since));
 }

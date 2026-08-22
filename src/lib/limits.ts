@@ -17,3 +17,14 @@ export const LIMITS = {
 } as const;
 
 export type LimitKey = keyof typeof LIMITS;
+
+/**
+ * Escalating wait between OTP sends: the first re-ask waits a minute, every
+ * one after that five. Counted per user+purpose over the last hour, so the
+ * mail button cannot be turned into a spam cannon — and the schedule is
+ * pure so the test can pin it down.
+ */
+export function resendGapSeconds(sendsInLastHour: number): number {
+  if (sendsInLastHour <= 0) return 0;
+  return sendsInLastHour === 1 ? 60 : 300;
+}

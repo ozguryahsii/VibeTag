@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { confirmEmailCodeAction, resendCodeAction } from "@/lib/actions/verify";
+import {
+  confirmEmailCodeAction,
+  finishEmailVerifyAction,
+  resendCodeAction,
+} from "@/lib/actions/verify";
 import { logoutAction } from "@/lib/actions/auth";
 import { fill, useD } from "@/components/LocaleProvider";
 import { AuthShell } from "@/components/AuthShell";
@@ -65,6 +69,7 @@ export function VerifyForm({
       <div className="mt-8">
         <OtpCard
           verify={confirmEmailCodeAction}
+          finish={finishEmailVerifyAction}
           onSuccess={(redirect) => {
             router.push(redirect ?? "/home");
             router.refresh();

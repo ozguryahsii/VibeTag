@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import { redeemInviteFor } from "@/lib/invite";
 import { loginWhere } from "@/lib/identity";
 import { guard } from "@/lib/rate-limit";
-import { sendOtp } from "@/lib/otp";
+import { resendWaitSeconds, sendOtp } from "@/lib/otp";
 import { getDict } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 import { SUPPORT_EMAIL } from "@/lib/support";
@@ -136,8 +136,11 @@ export async function loginAction(
 
   // The password is step one of two. No session yet — a ticket cookie
   // carries who passed, and the code sent to their inbox finishes it on
-  // /verify-login.
-  await sendOtp(user, "LOGIN", d);
+  // /verify-login. Re-entering the password inside the resend window does
+  // not mint another mail — the code already in the inbox still works.
+  if ((await resendWaitSeconds(user.id, "LOGIN")) === 0) {
+    await sendOtp(user, "LOGIN", d);
+  }
   await openPendingLogin(user);
   redirect("/verify-login");
 }

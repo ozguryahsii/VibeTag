@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import {
+  finishLoginAction,
   loginOtpCheckAction,
   resendLoginCodeAction,
 } from "@/lib/actions/verify";
@@ -43,6 +44,7 @@ export function LoginOtpForm({ email }: { email: string }) {
       <div className="mt-8">
         <OtpCard
           verify={loginOtpCheckAction}
+          finish={finishLoginAction}
           onSuccess={(redirect) => {
             router.push(redirect ?? "/home");
             router.refresh();

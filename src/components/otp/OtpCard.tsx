@@ -40,9 +40,20 @@ declare global {
  */
 export function OtpCard({
   verify,
+  finish,
   onSuccess,
 }: {
+  /** Beat one: only answers "is it right?" — must not write cookies. */
   verify: (
+    code: string,
+  ) => Promise<{ ok: boolean; message?: string; redirect?: string }>;
+  /**
+   * Beat two, after the seal animation: the real, cookie-writing work.
+   * Split because a Server Action that sets a cookie makes Next refresh
+   * the route, and the refresh runs the page's redirect guards — which
+   * used to cut the ring off mid-spin.
+   */
+  finish: (
     code: string,
   ) => Promise<{ ok: boolean; message?: string; redirect?: string }>;
   onSuccess: (redirect?: string) => void;
@@ -50,17 +61,26 @@ export function OtpCard({
   const d = useD();
   const cardRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<OtpHandle | null>(null);
+  const codeRef = useRef("");
   const verifyRef = useRef(verify);
+  const finishRef = useRef(finish);
   const successRef = useRef(onSuccess);
   verifyRef.current = verify;
+  finishRef.current = finish;
   successRef.current = onSuccess;
 
   const mount = useCallback(() => {
     if (!cardRef.current || handleRef.current || !window.OtpAnimation) return;
     handleRef.current = window.OtpAnimation.mount(cardRef.current, {
       length: 6,
-      verify: (code) => verifyRef.current(code),
-      onSuccess: (result) => successRef.current(result.redirect),
+      verify: (code) => {
+        codeRef.current = code;
+        return verifyRef.current(code);
+      },
+      onSuccess: async () => {
+        const done = await finishRef.current(codeRef.current);
+        successRef.current(done.ok ? done.redirect : undefined);
+      },
       messages: {
         checking: d.otp.anim.checking,
         wrong: d.otp.anim.wrong,

@@ -414,6 +414,7 @@ export const en = {
   otp: {
     tooMany: "Too many attempts. Try again in {n} minutes.",
     sendFailed: "We could not send the code just now. Try again in a moment.",
+    resendWait: "Wait {n} seconds before asking for another code.",
     loginExpired: "This sign-in attempt expired. Enter your password again.",
     loginKicker: "TWO-STEP SIGN-IN",
     loginTitle: "Enter your sign-in code",

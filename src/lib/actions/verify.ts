@@ -7,7 +7,7 @@ import { getDict } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 import { loginWhere } from "@/lib/identity";
 import { guard } from "@/lib/rate-limit";
-import { checkOtp, markEmailVerified, sendOtp } from "@/lib/otp";
+import { checkOtp, markEmailVerified, resendWaitSeconds, sendOtp } from "@/lib/otp";
 import {
   clearPendingLogin,
   createSession,
@@ -40,8 +40,11 @@ export async function resendCodeAction(): Promise<FormState> {
   if (!limit.ok) {
     return { error: fill(d.otp.tooMany, { n: Math.ceil(limit.retryAfter / 60) }) };
   }
+  const purpose = user.mustVerifyEmail ? ("REGISTER" as const) : ("VERIFY" as const);
+  const wait = await resendWaitSeconds(user.id, purpose);
+  if (wait > 0) return { error: fill(d.otp.resendWait, { n: wait }) };
 
-  const sent = await sendOtp(user, user.mustVerifyEmail ? "REGISTER" : "VERIFY", d);
+  const sent = await sendOtp(user, purpose, d);
   return sent.sent ? { ok: true } : { error: d.otp.sendFailed };
 }
 
@@ -160,11 +163,17 @@ export type CodeCheck =
   | { ok: true; redirect: string }
   | { ok: false; message: string };
 
-/**
- * Confirm the signed-in account's email — the imperative twin of
- * `confirmEmailAction`, for the animated card: the client decides when to
- * navigate, because the seal animation plays before the redirect.
+/*
+ * The animated card needs each check split in two. Anything that writes a
+ * cookie (a session, a verified layout) makes Next refresh the route, and
+ * the refresh runs the page's own guards — which navigate away while the
+ * ring is mid-spin. So the `verify` hook only PEEKS (no cookies, no
+ * consumption, nothing to refresh), the curl-spin-screw-seal plays out in
+ * peace, and the finish action afterwards does the real, cookie-writing
+ * work as the navigation begins.
  */
+
+/** Beat one: is the email code right? Touches nothing. */
 export async function confirmEmailCodeAction(code: string): Promise<CodeCheck> {
   const d = await getDict();
   const user = await requireUser();
@@ -177,6 +186,19 @@ export async function confirmEmailCodeAction(code: string): Promise<CodeCheck> {
     };
   }
 
+  let result = await checkOtp(user.id, "REGISTER", code.trim(), { peek: true });
+  if (!result.ok && result.reason !== "wrong" && result.reason !== "burned") {
+    result = await checkOtp(user.id, "VERIFY", code.trim(), { peek: true });
+  }
+  if (!result.ok) return { ok: false, message: d.otp.errors[result.reason] };
+  return { ok: true, redirect: "/home" };
+}
+
+/** Beat two: spend the code and mark the email verified. */
+export async function finishEmailVerifyAction(code: string): Promise<CodeCheck> {
+  const d = await getDict();
+  const user = await requireUser();
+
   let result = await checkOtp(user.id, "REGISTER", code.trim());
   if (!result.ok && result.reason !== "wrong" && result.reason !== "burned") {
     result = await checkOtp(user.id, "VERIFY", code.trim());
@@ -188,7 +210,7 @@ export async function confirmEmailCodeAction(code: string): Promise<CodeCheck> {
   return { ok: true, redirect: "/home" };
 }
 
-/** Step two of sign-in: the code lands, the session opens. */
+/** Beat one of sign-in step two: is the code right? Touches nothing. */
 export async function loginOtpCheckAction(code: string): Promise<CodeCheck> {
   const d = await getDict();
   const user = await readPendingLogin();
@@ -201,6 +223,17 @@ export async function loginOtpCheckAction(code: string): Promise<CodeCheck> {
       message: fill(d.otp.tooMany, { n: Math.ceil(limit.retryAfter / 60) }),
     };
   }
+
+  const result = await checkOtp(user.id, "LOGIN", code.trim(), { peek: true });
+  if (!result.ok) return { ok: false, message: d.otp.errors[result.reason] };
+  return { ok: true, redirect: "/home" };
+}
+
+/** Beat two of sign-in: spend the code, open the session. */
+export async function finishLoginAction(code: string): Promise<CodeCheck> {
+  const d = await getDict();
+  const user = await readPendingLogin();
+  if (!user) return { ok: false, message: d.otp.loginExpired };
 
   const result = await checkOtp(user.id, "LOGIN", code.trim());
   if (!result.ok) return { ok: false, message: d.otp.errors[result.reason] };
@@ -223,6 +256,9 @@ export async function resendLoginCodeAction(): Promise<FormState> {
   if (!limit.ok) {
     return { error: fill(d.otp.tooMany, { n: Math.ceil(limit.retryAfter / 60) }) };
   }
+  const wait = await resendWaitSeconds(user.id, "LOGIN");
+  if (wait > 0) return { error: fill(d.otp.resendWait, { n: wait }) };
+
   const sent = await sendOtp(user, "LOGIN", d);
   return sent.sent ? { ok: true } : { error: d.otp.sendFailed };
 }

@@ -411,6 +411,7 @@ export const tr: Dictionary = {
   otp: {
     tooMany: "Çok fazla deneme. {n} dakika sonra tekrar dene.",
     sendFailed: "Kodu şu an gönderemedik. Birazdan tekrar dene.",
+    resendWait: "Yeni bir kod istemek için {n} saniye beklemelisin.",
     loginExpired: "Bu giriş denemesinin süresi doldu. Şifreni yeniden gir.",
     loginKicker: "İKİ ADIMLI GİRİŞ",
     loginTitle: "Giriş kodunu gir",

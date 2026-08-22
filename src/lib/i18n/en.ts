@@ -16,6 +16,8 @@ export const en = {
     send: "Send",
     sending: "Sending…",
     remove: "Remove",
+    yes: "Yes, remove",
+    no: "No, keep",
     anonymous: "Anonymous",
     people: "people",
     ratedBy: "Rated by",
@@ -188,6 +190,8 @@ export const en = {
     accept: "Accept",
     decline: "Decline",
     removeFriend: "Remove friend",
+    removeTitle: "Remove this friend?",
+    removeBody: "{name} will be removed from your friends list. Are you sure?",
     friendsEmpty:
       "No friends yet. Add the people you know — they show up here first so rating them is one tap.",
     incoming: "wants to be friends",
@@ -252,14 +256,14 @@ export const en = {
     tagsBody: "Pick up to {max} Vibe Tags. <b>{n}</b> selected.",
     noteKicker: "A NOTE",
     noteTitle: "Anything to add?",
-    noteBody: "Optional. Your note is always shown anonymously.",
+    noteBody: "Optional. A few honest words carry further than a score.",
     notePlaceholder:
       "e.g. Delivered what they promised on time, communicated very clearly.",
-    hideIdentity: "Hide my identity completely",
-    hideIdentityBody:
-      "Nobody, not even Gold members, can attribute this rating to you.",
+    noteLocked: "Notes are closed on this profile",
+    noteLockedBody:
+      "{name} accepts written notes only from certain people. Your scores and Vibe Tags still count in full.",
     privacyNote:
-      "🔒 Your scores are never shown attributed to a person. You may revise your rating <b>once a month</b>.",
+      "🔒 Ratings are shown anonymously by default. If {name} is a Gold member, they can see who rated them. You may revise your rating <b>once a month</b>.",
     alreadyRated: "You have already rated this person.",
     alreadyRatedBody:
       "You may revise it once a month — you can edit again in <b>{n} days</b>.",
@@ -636,13 +640,15 @@ export const en = {
     planNote:
       "Plans will be purchased through the App Store and Google Play. Until then, a discount code below is the way in.",
     privacy: "Privacy and safety",
-    whoCanRate: "Who can rate you?",
-    whoCanRateBody:
-      "In closed mode only people who joined through your invite link can rate you.",
+    whoCanComment: "Who can write you a note?",
+    whoCanCommentBody:
+      "Anyone can rate you — scores are open. This decides who may add a written note to their rating.",
     everyone: "Everyone",
-    everyoneHint: "Open profile",
+    everyoneHint: "Open notes",
     invitedOnly: "People I invited",
-    invitedOnlyHint: "Closed circle",
+    invitedOnlyHint: "Invite link only",
+    friendsOnly: "My friends",
+    friendsOnlyHint: "Friends only",
     blocked: "People you blocked",
     blockedEmpty: "You have not blocked anyone.",
     account: "Account",
@@ -657,8 +663,8 @@ export const en = {
     deleteMismatch: "Type your username to confirm: {username}",
     privacyPoints: [
       {
-        title: "All ratings are anonymous",
-        body: "Who wrote what never appears on your profile.",
+        title: "Ratings are anonymous by default",
+        body: "Who wrote what never appears on profiles. Only Gold members can see who rated them.",
       },
       {
         title: "Protected ratings",
@@ -780,8 +786,8 @@ export const en = {
       youBlocked:
         "You blocked this person. Remove the block to rate them.",
       theyBlocked: "You cannot rate this person right now.",
-      inviteOnly:
-        "{name} only accepts ratings from people they invited. You will need a valid invite link from them.",
+      commentNotAllowed:
+        "{name} does not accept written notes from you. Clear the note — your scores still count.",
       notAllowedTrait: "“{label}” cannot be rated in this relationship.",
       notAllowedTag: "“{label}” cannot be given in this relationship.",
     },

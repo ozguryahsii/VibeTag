@@ -132,9 +132,12 @@ Güncelleme 30 günde bir. Her güncellemede eski sürümün tam anlık görünt
 Frontend'de kim ne verdi görünmez; veritabanında her şey kayıtlıdır. Gold üyelik
 kimliği açar, **ama**:
 
-- değerlendiren "kimliğimi gizle" dediyse → her zaman anonim,
 - sahte oy dedektörü oyu korumaya aldıysa → her zaman anonim,
-- yorum sahibi hiçbir planda gösterilmez.
+- "kimliğimi gizle" seçeneği kaldırıldı; o seçenek varken gizlenmiş eski
+  değerlendirmeler verildikleri sözü korur → her zaman anonim.
+
+Kimliğin görünürlüğü artık değerlendirenin değil, değerlendirilenin planına
+bağlıdır.
 
 ### 5. Sahte oy tespiti — `src/lib/fraud.ts`
 
@@ -183,8 +186,10 @@ içeren notları gönderim anında reddeder. Bir kelime listesi taban seviyedir,
 
 ### 8. Gizlilik ayarı
 
-`ratingPolicy = INVITED` seçildiğinde yalnızca kullanıcının kendi davet linkiyle
-katılmış kişiler değerlendirme yapabilir.
+Puanlama herkese açıktır. `commentPolicy` yazılı notu kapılar: `EVERYONE`,
+`INVITED` (yalnızca kullanıcının davet linkiyle katılmış kişiler) veya
+`FRIENDS`. Taciz notta yaşar, puanda değil — o yüzden kapı notun üstündedir ve
+ayar notu yazanın değil, hakkında yazılanın elindedir.
 
 ### 9. Skor — `src/lib/vibe.ts`
 

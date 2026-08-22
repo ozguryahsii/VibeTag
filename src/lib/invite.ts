@@ -89,7 +89,7 @@ export async function inviteByCode(code: string) {
           bio: true,
           avatarUrl: true,
           avatarColor: true,
-          ratingPolicy: true,
+          commentPolicy: true,
         },
       },
     },

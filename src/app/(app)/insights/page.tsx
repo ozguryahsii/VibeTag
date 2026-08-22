@@ -307,10 +307,10 @@ export default async function InsightsPage() {
                         </p>
                       )}
 
-                      <div className="mt-3 flex items-center justify-between gap-3">
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
                         <form action={openRatingThreadAction}>
                           <input type="hidden" name="ratingId" value={row.id} />
-                          <button className="text-[11.5px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-3 py-1.5">
+                          <button className="h-9 whitespace-nowrap rounded-full px-3.5 text-[11px] font-bold text-orange bg-tagbg border border-orange/25 active:scale-[0.97] transition-transform">
                             {d.messages.newFromRating}
                           </button>
                         </form>
@@ -318,6 +318,7 @@ export default async function InsightsPage() {
                           ratingId={row.id}
                           label={d.insights.reportRating}
                           compact
+                          tone="danger"
                         />
                       </div>
 

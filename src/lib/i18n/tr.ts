@@ -13,6 +13,8 @@ export const tr: Dictionary = {
     send: "Gönder",
     sending: "Gönderiliyor…",
     remove: "Kaldır",
+    yes: "Evet, çıkar",
+    no: "Hayır, kalsın",
     anonymous: "Anonim",
     people: "kişi",
     ratedBy: "Değerlendiren",
@@ -185,6 +187,8 @@ export const tr: Dictionary = {
     accept: "Kabul et",
     decline: "Reddet",
     removeFriend: "Arkadaşlıktan çıkar",
+    removeTitle: "Arkadaşlıktan çıkarılsın mı?",
+    removeBody: "{name} arkadaş listenden çıkarılacak. Emin misin?",
     friendsEmpty:
       "Henüz arkadaşın yok. Tanıdığın kişileri ekle — en üstte çıkarlar, değerlendirmek tek dokunuş olur.",
     incoming: "arkadaş olmak istiyor",
@@ -249,14 +253,14 @@ export const tr: Dictionary = {
     tagsBody: "En fazla {max} Vibe Tag seç. <b>{n}</b> seçildi.",
     noteKicker: "NOT",
     noteTitle: "Eklemek istediğin bir şey var mı?",
-    noteBody: "İsteğe bağlı. Notun her zaman anonim gösterilir.",
+    noteBody: "İsteğe bağlı. Birkaç dürüst cümle, puandan daha çok şey anlatır.",
     notePlaceholder:
       "Örn. Söz verdiği işi zamanında teslim etti, iletişimi çok netti.",
-    hideIdentity: "Kimliğimi tamamen gizle",
-    hideIdentityBody:
-      "Gold üyeler dahil hiç kimse bu değerlendirmeyi sana bağlayamaz.",
+    noteLocked: "Bu profilde not yazma kapalı",
+    noteLockedBody:
+      "{name} yazılı notları yalnızca belirli kişilerden kabul ediyor. Puanların ve Vibe Tag'lerin yine tam olarak sayılır.",
     privacyNote:
-      "🔒 Verdiğin puanlar hiçbir zaman kişiye bağlanarak gösterilmez. Değerlendirmeni <b>ayda bir kez</b> güncelleyebilirsin.",
+      "🔒 Değerlendirmeler varsayılan olarak anonim gösterilir. {name} Gold üyeyse kendisini değerlendirenleri görebilir. Değerlendirmeni <b>ayda bir kez</b> güncelleyebilirsin.",
     alreadyRated: "Bu kişiyi zaten değerlendirdin.",
     alreadyRatedBody:
       "Ayda bir kez güncelleyebilirsin — <b>{n} gün</b> sonra tekrar düzenleyebilirsin.",
@@ -633,13 +637,15 @@ export const tr: Dictionary = {
     planNote:
       "Planlar App Store ve Google Play üzerinden satın alınacak. O zamana kadar aşağıya bir indirim kodu girerek geçebilirsin.",
     privacy: "Gizlilik ve güvenlik",
-    whoCanRate: "Seni kimler değerlendirebilir?",
-    whoCanRateBody:
-      "Kapalı moda geçersen yalnızca senin davet linkinle katılmış kişiler değerlendirme yapabilir.",
+    whoCanComment: "Sana kimler yorum yapabilir?",
+    whoCanCommentBody:
+      "Puanlama herkese açıktır. Bu ayar, değerlendirmeye kimlerin yazılı not ekleyebileceğini belirler.",
     everyone: "Herkes",
-    everyoneHint: "Açık profil",
+    everyoneHint: "Notlar açık",
     invitedOnly: "Davet ettiklerim",
-    invitedOnlyHint: "Kapalı çevre",
+    invitedOnlyHint: "Sadece davet linki",
+    friendsOnly: "Arkadaşlarım",
+    friendsOnlyHint: "Sadece arkadaşlar",
     blocked: "Engellediklerin",
     blockedEmpty: "Kimseyi engellemedin.",
     account: "Hesap",
@@ -654,8 +660,8 @@ export const tr: Dictionary = {
     deleteMismatch: "Onaylamak için kullanıcı adını yaz: {username}",
     privacyPoints: [
       {
-        title: "Tüm oylar anonimdir",
-        body: "Kimin ne yazdığı profilinde asla görünmez.",
+        title: "Değerlendirmeler varsayılan olarak anonimdir",
+        body: "Kimin ne yazdığı profillerde görünmez. Yalnızca Gold üyeler kendilerini değerlendirenleri görebilir.",
       },
       {
         title: "Korunan değerlendirmeler",
@@ -777,8 +783,8 @@ export const tr: Dictionary = {
       youBlocked:
         "Bu kişiyi engellemişsin. Değerlendirmek için engeli kaldırman gerek.",
       theyBlocked: "Bu kişiyi şu anda değerlendiremezsin.",
-      inviteOnly:
-        "{name} yalnızca davet ettiği kişilerden değerlendirme alıyor. Ondan geçerli bir davet linki istemen gerek.",
+      commentNotAllowed:
+        "{name} senden yazılı not kabul etmiyor. Notu boş bırak — puanların yine sayılır.",
       notAllowedTrait: "“{label}” bu tanışıklık türünde değerlendirilemez.",
       notAllowedTag: "“{label}” etiketi bu tanışıklık türünde verilemez.",
     },

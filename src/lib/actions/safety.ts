@@ -130,14 +130,14 @@ export async function reportAction(
 
 // ------------------------------------------------------------ privacy
 
-export async function setRatingPolicyAction(formData: FormData): Promise<void> {
+export async function setCommentPolicyAction(formData: FormData): Promise<void> {
   const me = await requireUser();
-  const policy = String(formData.get("ratingPolicy") ?? "EVERYONE");
-  if (!["EVERYONE", "INVITED"].includes(policy)) return;
+  const policy = String(formData.get("commentPolicy") ?? "EVERYONE");
+  if (!["EVERYONE", "INVITED", "FRIENDS"].includes(policy)) return;
 
   await prisma.user.update({
     where: { id: me.id },
-    data: { ratingPolicy: policy },
+    data: { commentPolicy: policy },
   });
   revalidatePath("/settings");
 }

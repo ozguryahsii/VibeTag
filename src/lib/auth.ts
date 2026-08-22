@@ -69,7 +69,7 @@ export type SessionUser = {
   /// false, so nobody who already had an account is locked out of it.
   mustVerifyEmail: boolean;
   isAdmin: boolean;
-  ratingPolicy: string;
+  commentPolicy: string;
 };
 
 export type Plan = "FREE" | "SILVER" | "GOLD";
@@ -106,7 +106,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     idVerifiedAt: u.idVerifiedAt,
     mustVerifyEmail: u.mustVerifyEmail,
     isAdmin: u.isAdmin,
-    ratingPolicy: u.ratingPolicy,
+    commentPolicy: u.commentPolicy,
   };
 });
 

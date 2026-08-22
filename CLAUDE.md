@@ -74,7 +74,7 @@ mid-flight it feels: a server should never be running a commit that has no
 name, because "roll back to the previous one" then has no answer either.
 
 Version numbering: minor bump (`v1.2` → `v1.3`) for a normal feature package,
-patch (`v1.2.1`) for a fix on its own. Current: **v2.2**.
+patch (`v1.2.1`) for a fix on its own. Current: **v2.3**.
 
 ## Language
 
@@ -115,7 +115,7 @@ If a change touches either of these, add or update a test:
 1. **The context lock.** "How do you know this person?" decides what may be
    said about them. A market cashier is never rated on leadership.
 2. **Anonymity (§15).** Ratings are never attributed in the UI. Gold reveals
-   raters, but a self-hidden rater and a fraud-protected rating outrank the
-   plan, always.
+   raters, but a fraud-protected rating — and any rating self-hidden back
+   when that option existed — outrank the plan, always.
 
 Both break silently — nothing on screen looks wrong when they stop holding.

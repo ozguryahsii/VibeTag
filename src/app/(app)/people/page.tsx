@@ -4,9 +4,9 @@ import { prisma } from "@/lib/db";
 import { getDict } from "@/lib/i18n/server";
 import { fill, type Dictionary } from "@/lib/i18n";
 import { listFriendRequests, listFriends } from "@/lib/social";
+import { RemoveFriend } from "@/components/RemoveFriend";
 import {
   openFriendThreadAction,
-  removeFriendAction,
   requestFriendAction,
   respondFriendAction,
 } from "@/lib/actions/social";
@@ -298,40 +298,26 @@ export default async function PeoplePage({
                   @{f.username}
                 </p>
               </Link>
-              <div className="flex flex-col items-end gap-1.5 shrink-0">
-                <div className="flex gap-2">
-                  <form action={openFriendThreadAction}>
-                    <input type="hidden" name="username" value={f.username} />
-                    <button
-                      className="text-[12px] font-bold text-muted bg-white border border-line rounded-full px-3.5 py-2"
-                      aria-label={d.people.message}
-                    >
-                      {d.people.message}
-                    </button>
-                  </form>
-                  {!ratedByMe.has(f.id) && (
-                    <Link
-                      href={`/rate/${f.username}`}
-                      className="text-[12px] font-bold text-white grad-score rounded-full px-3.5 py-2"
-                    >
-                      {d.rate.rateCta}
-                    </Link>
-                  )}
-                </div>
-                {/*
-                 * Unfriending sits below the primary actions and stays quiet:
-                 * it is rare, it is destructive, and it should not compete for
-                 * the thumb with "Message".
-                 */}
-                <form action={removeFriendAction}>
+              <div className="flex items-center gap-2 shrink-0">
+                <form action={openFriendThreadAction}>
                   <input type="hidden" name="username" value={f.username} />
                   <button
-                    className="text-[10.5px] font-semibold text-muted/70 px-1"
-                    title={d.people.removeFriend}
+                    className="text-[12px] font-bold text-muted bg-white border border-line rounded-full px-3.5 py-2"
+                    aria-label={d.people.message}
                   >
-                    {d.common.remove}
+                    {d.people.message}
                   </button>
                 </form>
+                {!ratedByMe.has(f.id) && (
+                  <Link
+                    href={`/rate/${f.username}`}
+                    className="text-[12px] font-bold text-white grad-score rounded-full px-3.5 py-2"
+                  >
+                    {d.rate.rateCta}
+                  </Link>
+                )}
+                {/* The mirror of "+": same geometry, opens a confirm first. */}
+                <RemoveFriend name={f.name} username={f.username} />
               </div>
             </Card>
           ))}

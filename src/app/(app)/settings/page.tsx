@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { logoutAction } from "@/lib/actions/auth";
-import { setRatingPolicyAction, toggleBlockAction } from "@/lib/actions/safety";
+import { setCommentPolicyAction, toggleBlockAction } from "@/lib/actions/safety";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { DeleteAccount } from "@/components/DeleteAccount";
 import { PushToggle } from "@/components/PushToggle";
@@ -158,14 +158,14 @@ export default async function SettingsPage() {
         <Card className="grid gap-3">
           <div>
             <p className="text-[13.5px] font-extrabold">
-              {d.settings.whoCanRate}
+              {d.settings.whoCanComment}
             </p>
             <p className="text-[12px] text-muted leading-relaxed mt-0.5">
-              {d.settings.whoCanRateBody}
+              {d.settings.whoCanCommentBody}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-3 gap-2">
             {[
               {
                 key: "EVERYONE",
@@ -177,14 +177,19 @@ export default async function SettingsPage() {
                 label: d.settings.invitedOnly,
                 hint: d.settings.invitedOnlyHint,
               },
+              {
+                key: "FRIENDS",
+                label: d.settings.friendsOnly,
+                hint: d.settings.friendsOnlyHint,
+              },
             ].map((opt) => {
-              const active = user.ratingPolicy === opt.key;
+              const active = user.commentPolicy === opt.key;
               return (
-                <form key={opt.key} action={setRatingPolicyAction}>
-                  <input type="hidden" name="ratingPolicy" value={opt.key} />
+                <form key={opt.key} action={setCommentPolicyAction}>
+                  <input type="hidden" name="commentPolicy" value={opt.key} />
                   <button
                     type="submit"
-                    className={`w-full rounded-[20px] p-3.5 text-left ${
+                    className={`w-full h-full rounded-[20px] p-3 text-left ${
                       active ? "grad-ring" : "bg-cream border border-line"
                     }`}
                   >

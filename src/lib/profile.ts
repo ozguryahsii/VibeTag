@@ -13,6 +13,7 @@ export type PublicUser = {
   avatarColor: string;
   plan: string;
   isVerified: boolean;
+  commentPolicy: string;
   createdAt: Date;
 };
 
@@ -30,6 +31,7 @@ export async function getUserByUsername(
       avatarColor: true,
       plan: true,
       isVerified: true,
+      commentPolicy: true,
       createdAt: true,
     },
   });

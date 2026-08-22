@@ -66,7 +66,7 @@ const trPrivacy: LegalDoc = {
       heading: "Değerlendirmeler ve anonimlik",
       body: [
         "Değerlendirmeler arayüzde hiçbir zaman kişiye bağlanarak gösterilmez. Veritabanında kimin kimi değerlendirdiği kayıtlıdır — sahtecilik tespiti, itiraz ve kötüye kullanım incelemesi bunu gerektirir.",
-        "Gold üyelik, kendisini değerlendirenlerin kimliğini görme imkânı verir. Bunun iki istisnası vardır ve ikisi de üyelikten üstündür: değerlendiren kişi kimliğini gizlemeyi seçmişse, ya da sahtecilik tespiti değerlendirmeyi korumaya almışsa, kimlik hiçbir üyelikte görünmez.",
+        "Gold üyelik, kendisini değerlendirenlerin kimliğini görme imkânı verir. Değerlendiren kişi bunu engelleyemez; kimliğin görünürlüğü değerlendirilen kişinin üyeliğine bağlıdır. İstisna: sahtecilik tespitinin korumaya aldığı değerlendirmeler — ve geçmişte “kimliğimi gizle” seçeneği varken o seçenekle verilmiş değerlendirmeler — hiçbir üyelikte görünmez.",
       ],
     },
     {
@@ -207,7 +207,7 @@ const trTerms: LegalDoc = {
     {
       heading: "Notlar ve mesajlar",
       body: [
-        "Hakaret, taciz, nefret söylemi, tehdit, başkasının kişisel verisini ifşa ve spam yasaktır. Notlarda telefon numarası, e-posta ve bağlantı paylaşılamaz.",
+        "Hakaret, taciz, nefret söylemi, tehdit, başkasının kişisel verisini ifşa ve spam yasaktır. Notlarda telefon numarası, e-posta ve bağlantı paylaşılamaz. Herkes herkesi puanlayabilir; profil sahibi, değerlendirmesine kimlerin yazılı not ekleyebileceğini seçer (herkes, davet ettikleri veya arkadaşları).",
         "Doğrudan mesajlar yalnızca arkadaşlar arasında açıktır. Premium üyeler kendilerini değerlendirenlere yazabilir; değerlendiren kişi ancak kendisine yazıldıktan sonra cevap verebilir.",
       ],
     },
@@ -290,7 +290,7 @@ const enPrivacy: LegalDoc = {
       heading: "Ratings and anonymity",
       body: [
         "Ratings are never shown attributed to a person in the interface. The database does record who rated whom — fraud detection, appeals and abuse review all require it.",
-        "Gold membership reveals who rated you. Two things override that, always: a rater who chose to hide their identity, and a rating the fraud detector has protected. Neither is visible on any plan.",
+        "Gold membership reveals who rated you. The rater cannot prevent that — visibility follows the rated person's plan. The exceptions: ratings the fraud detector has protected, and ratings written back when a “hide my identity” option existed. Neither is visible on any plan.",
       ],
     },
     {
@@ -427,7 +427,7 @@ const enTerms: LegalDoc = {
     {
       heading: "Notes and messages",
       body: [
-        "Insults, harassment, hate speech, threats, exposing someone's personal data, and spam are prohibited. Notes may not contain phone numbers, email addresses or links.",
+        "Insults, harassment, hate speech, threats, exposing someone's personal data, and spam are prohibited. Notes may not contain phone numbers, email addresses or links. Anyone may rate anyone; each profile owner chooses who may add a written note to a rating (everyone, people they invited, or their friends).",
         "Direct messages are open between friends. Premium members may write to people who rated them; the rater may only reply once written to.",
       ],
     },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canSeeRaterIdentity, cooldownDaysLeft, nextUpdateDate } from "@/lib/rating-rules";
+import { canSeeRaterIdentity, commentAllowed, cooldownDaysLeft, nextUpdateDate } from "@/lib/rating-rules";
 import { RATING_UPDATE_COOLDOWN_DAYS } from "@/lib/taxonomy";
 
 const DAY = 86_400_000;
@@ -61,7 +61,9 @@ describe("rater identity visibility", () => {
     expect(canSeeRaterIdentity("GOLD", plain)).toBe(true);
   });
 
-  it("stays hidden on Gold when the rater asked to be hidden", () => {
+  // The self-hide option is gone from the rate flow, but ratings written
+  // while it existed keep the promise they were written under.
+  it("stays hidden on Gold for a legacy self-hidden rating", () => {
     expect(
       canSeeRaterIdentity("GOLD", { isProtected: false, hideIdentity: true }),
     ).toBe(false);
@@ -71,5 +73,29 @@ describe("rater identity visibility", () => {
     expect(
       canSeeRaterIdentity("GOLD", { isProtected: true, hideIdentity: false }),
     ).toBe(false);
+  });
+});
+
+describe("who may write a note", () => {
+  const nobody = { invited: false, friends: false };
+
+  it("is open to everyone by default", () => {
+    expect(commentAllowed("EVERYONE", nobody)).toBe(true);
+  });
+
+  it("gates on the invite grant in INVITED mode", () => {
+    expect(commentAllowed("INVITED", nobody)).toBe(false);
+    expect(commentAllowed("INVITED", { invited: true, friends: false })).toBe(true);
+    // Being a friend is not the same permission as holding an invite.
+    expect(commentAllowed("INVITED", { invited: false, friends: true })).toBe(false);
+  });
+
+  it("gates on friendship in FRIENDS mode", () => {
+    expect(commentAllowed("FRIENDS", nobody)).toBe(false);
+    expect(commentAllowed("FRIENDS", { invited: false, friends: true })).toBe(true);
+  });
+
+  it("falls back to open on an unknown value rather than locking a profile", () => {
+    expect(commentAllowed("WHATEVER", nobody)).toBe(true);
   });
 });

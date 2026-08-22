@@ -661,22 +661,22 @@ model StorePurchase {
   @@index([userId])
 }
 
-/// One picture in somebody's vault.
+/// One picture somebody uploaded.
 ///
-/// The vault holds ten; which one is the main photo lives on `User.avatarUrl`
-/// so every existing read keeps working. `showcase` marks the ones that ride
-/// beside the main photo on the profile — how many of those are allowed is a
-/// plan question, answered in `lib/photos.ts`, not here.
+/// How many a plan may hold is answered in `lib/photos.ts`, not here. Which
+/// one is the profile picture lives on `User.avatarUrl`, so every existing
+/// read of an avatar keeps working; the rest are side circles automatically,
+/// which is why there is no second flag on this row.
 model ProfilePhoto {
   id     String @id @default(cuid())
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   /// JPEG data URL today, object-storage URL when photos move out of the DB.
-  url      String
-  showcase Boolean @default(false)
-  /// Left-to-right order of the showcase circles.
-  position Int     @default(0)
+  url String
+  /// Upload order. The profile picture is whichever url User.avatarUrl holds;
+  /// every other photo is a side circle, oldest first.
+  position Int @default(0)
 
   createdAt DateTime @default(now())
 

@@ -8,7 +8,7 @@ import { useD } from "@/components/LocaleProvider";
 /**
  * The main photo with its side circles.
  *
- * Half the showcase sits left, half right, so the main photo stays the
+ * Half the side photos sit left, half right, so the main photo stays the
  * centre of the row whatever the count — an odd number puts the extra on the
  * right, which reads as "and more" rather than as a lopsided pair. Tapping
  * any of them opens that picture full size in the app, never in a new tab:

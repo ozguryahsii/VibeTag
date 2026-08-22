@@ -23,9 +23,6 @@ export type FormState = { error?: string; ok?: boolean };
 
 const AVATAR_COLORS = ["#FF8A3D", "#FF5C77", "#FF7AA2", "#8B5CF6", "#E8845C"];
 
-/** Uploaded photos are inlined as data URLs in dev; object storage in prod. */
-const MAX_AVATAR_BYTES = 400_000;
-
 function pick<T>(arr: T[], seed: string): T {
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
@@ -159,30 +156,18 @@ export async function updateProfileAction(
   const name = String(formData.get("name") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
   const avatarColor = String(formData.get("avatarColor") ?? "#FF8A3D");
-  const rawAvatar = String(formData.get("avatarUrl") ?? "").trim();
 
   if (name.length < 2) return { error: d.auth.errors.nameShort };
   if (bio.length > 160) return { error: d.auth.errors.bioLong };
 
-  let avatarUrl: string | null = null;
-  if (rawAvatar) {
-    // JPEG only: the cropper converts whatever was picked before it leaves the
-    // device, so anything else arriving here did not come from our own form.
-    if (!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(rawAvatar)) {
-      return { error: d.auth.errors.imageFormat };
-    }
-    if (rawAvatar.length > MAX_AVATAR_BYTES) {
-      return { error: d.auth.errors.imageLarge };
-    }
-    avatarUrl = rawAvatar;
-  }
-
+  // The profile picture is not edited here. It is chosen in the photo box,
+  // which owns `avatarUrl` — writing it from this form too would mean two
+  // places quietly overwriting each other.
   await prisma.user.update({
     where: { id: user.id },
     data: {
       name,
       bio: bio || null,
-      avatarUrl,
       avatarColor: /^#[0-9a-fA-F]{6}$/.test(avatarColor)
         ? avatarColor
         : "#FF8A3D",

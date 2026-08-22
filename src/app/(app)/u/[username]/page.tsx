@@ -16,7 +16,7 @@ import { RELATIONSHIPS } from "@/lib/taxonomy";
 import { groupIconFor, iconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { PhotoRing } from "@/components/PhotoRing";
-import { allowedShowcase } from "@/lib/photos";
+import { sidePhotos } from "@/lib/photos";
 import { ScoreDial } from "@/components/ScoreDial";
 import { VibeMark } from "@/components/Logo";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
@@ -36,19 +36,18 @@ export default async function PublicProfile({
 
   const isMe = user.id === me.id;
 
-  // The circles beside the photo: the owner's showcase, trimmed to what
-  // their plan allows so a downgrade stops publishing extras immediately
-  // without deleting anything.
-  const sidePhotos = allowedShowcase(
-    (
-      await prisma.profilePhoto.findMany({
-        where: { userId: user.id, showcase: true },
-        orderBy: { position: "asc" },
-        select: { url: true },
-      })
-    ).map((p) => p.url),
+  // The circles beside the photo: everything this person uploaded except
+  // the profile picture itself, trimmed to what their plan allows so a
+  // downgrade stops publishing extras without deleting anything.
+  const side = sidePhotos(
+    await prisma.profilePhoto.findMany({
+      where: { userId: user.id },
+      orderBy: { position: "asc" },
+      select: { id: true, url: true },
+    }),
+    user.avatarUrl,
     user.plan,
-  );
+  ).map((p) => p.url);
   const firstName = user.name.split(" ")[0];
   const profile = await getVibeProfile(user.id);
   const percentile = await getPercentile(user.id, profile.score);
@@ -121,7 +120,7 @@ export default async function PublicProfile({
             mainUrl={user.avatarUrl}
             color={user.avatarColor}
             size={84}
-            side={sidePhotos}
+            side={side}
             ring
           />
           <div className="mt-3 flex items-center justify-center gap-1.5">

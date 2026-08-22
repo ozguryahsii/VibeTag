@@ -7,20 +7,37 @@ import { useD } from "@/components/LocaleProvider";
 /**
  * Choose which part of a photo becomes the profile picture.
  *
- * Drag to move, pinch or use the slider to zoom, and the circle shows exactly
- * what will be kept. The old behaviour — silently centre-cropping whatever was
- * picked — is right about half the time and infuriating the other half, since
- * faces are rarely in the middle of a photograph.
+ * The photo lies still and **the ring moves over it** — drag the circle to
+ * whatever the picture is actually about, and that is the crop. The earlier
+ * version moved the photo under a fixed hole, which is the same geometry
+ * upside down and reads as fighting the picture rather than framing it.
+ *
+ * The slider starts in the middle: at the centre the whole photo is on the
+ * stage, left of it the photo shrinks (so the ring can take in more than the
+ * frame first showed), right of it the photo grows for a tighter face crop.
  *
  * The result is always a 512px JPEG, whatever went in. HEIC from a phone, a
  * 12-megapixel PNG, a screenshot: all of them leave here as the same modest
  * square, which is what keeps the row in the database small.
  */
 
-const OUT = 512;
+const OUT = 512; // exported pixels
+const STAGE = 512; // canvas working units (drawn at 300 CSS px)
+const RING = STAGE * 0.3; // radius of the selection circle
 const QUALITY = 0.82;
 
-type Transform = { scale: number; x: number; y: number };
+/**
+ * Slider ends, as powers of two.
+ *
+ * The bar has to *start in the middle*, and zoom is multiplicative: halving
+ * and doubling are the same distance from 1 only on a log scale. So the
+ * slider carries the exponent — −1.3 … +1.3, zero in the centre — and the
+ * zoom is 2^exponent, which lands 1 exactly halfway. A plain 0.4 … 2.6
+ * linear range would put 1 at 27 % of the track.
+ */
+const ZOOM_EXP = 1.3;
+const MIN_ZOOM = 2 ** -ZOOM_EXP;
+const MAX_ZOOM = 2 ** ZOOM_EXP;
 
 export function PhotoCropper({
   file,
@@ -36,12 +53,14 @@ export function PhotoCropper({
   const bitmapRef = useRef<ImageBitmap | null>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [t, setT] = useState<Transform>({ scale: 1, x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  // Ring centre, in stage units.
+  const [ring, setRing] = useState({ x: STAGE / 2, y: STAGE / 2 });
 
-  // Drag state lives in a ref: it changes on every pointer move and re-rendering
-  // for each frame would make the drag feel worse, not better.
+  // Drag state lives in a ref: it changes on every pointer move and
+  // re-rendering for each frame would make the drag feel worse, not better.
   const drag = useRef<{ id: number; x: number; y: number } | null>(null);
-  const pinch = useRef<{ distance: number; scale: number } | null>(null);
+  const pinch = useRef<{ distance: number; zoom: number } | null>(null);
   const points = useRef(new Map<number, { x: number; y: number }>());
 
   useEffect(() => {
@@ -53,7 +72,8 @@ export function PhotoCropper({
           return;
         }
         bitmapRef.current = bitmap;
-        setT({ scale: 1, x: 0, y: 0 });
+        setZoom(1);
+        setRing({ x: STAGE / 2, y: STAGE / 2 });
         setReady(true);
       })
       .catch(() => setFailed(true));
@@ -64,66 +84,111 @@ export function PhotoCropper({
     };
   }, [file]);
 
+  /** Where the photo sits on the stage at the current zoom. */
+  const frame = useCallback(() => {
+    const bitmap = bitmapRef.current;
+    if (!bitmap) return null;
+    // `contain`, not `cover`: at zoom 1 the entire photo is visible, which is
+    // what makes zooming *out* mean something.
+    const fit = Math.min(STAGE / bitmap.width, STAGE / bitmap.height);
+    const scale = fit * zoom;
+    const w = bitmap.width * scale;
+    const h = bitmap.height * scale;
+    return { x: (STAGE - w) / 2, y: (STAGE - h) / 2, w, h, scale };
+  }, [zoom]);
+
   /**
-   * Paint the preview.
+   * Keep the ring on the photo.
    *
-   * `cover` is the scale at which the photo exactly fills the square, so
-   * scale 1 is "no gaps" and everything above it is zoom. The offset is
-   * clamped to the same rule — you can never drag empty space into frame.
+   * Nothing outside the picture may be cropped, so the centre is held within
+   * the photo's rectangle inset by the ring's radius. When the photo is
+   * narrower than the ring in some axis — a very zoomed-out panorama — the
+   * ring locks to the middle of that axis instead of jittering.
    */
+  const clampRing = useCallback(
+    (next: { x: number; y: number }) => {
+      const f = frame();
+      if (!f) return next;
+      const clampAxis = (v: number, start: number, size: number) =>
+        size <= RING * 2
+          ? start + size / 2
+          : Math.max(start + RING, Math.min(start + size - RING, v));
+      return {
+        x: clampAxis(next.x, f.x, f.w),
+        y: clampAxis(next.y, f.y, f.h),
+      };
+    },
+    [frame],
+  );
+
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     const bitmap = bitmapRef.current;
-    if (!canvas || !bitmap) return;
+    const f = frame();
+    if (!canvas || !bitmap || !f) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = OUT;
-    canvas.height = OUT;
+    canvas.width = STAGE;
+    canvas.height = STAGE;
 
-    const cover = Math.max(OUT / bitmap.width, OUT / bitmap.height);
-    const scale = cover * t.scale;
-    const w = bitmap.width * scale;
-    const h = bitmap.height * scale;
-    const maxX = Math.max(0, (w - OUT) / 2);
-    const maxY = Math.max(0, (h - OUT) / 2);
-    const x = Math.max(-maxX, Math.min(maxX, t.x));
-    const y = Math.max(-maxY, Math.min(maxY, t.y));
+    ctx.fillStyle = "#F4EDE4";
+    ctx.fillRect(0, 0, STAGE, STAGE);
+    ctx.drawImage(bitmap, f.x, f.y, f.w, f.h);
 
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, OUT, OUT);
-    ctx.drawImage(bitmap, (OUT - w) / 2 + x, (OUT - h) / 2 + y, w, h);
-  }, [t]);
+    // Everything outside the ring dims; the ring itself is drawn on top so
+    // the edge of the selection is unmistakable.
+    const c = clampRing(ring);
+    ctx.save();
+    ctx.fillStyle = "rgba(45,33,28,0.5)";
+    ctx.beginPath();
+    ctx.rect(0, 0, STAGE, STAGE);
+    ctx.arc(c.x, c.y, RING, 0, Math.PI * 2, true);
+    ctx.fill("evenodd");
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, RING, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(255,255,255,0.95)";
+    ctx.lineWidth = 6;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, RING + 5, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(240,82,98,0.85)";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }, [frame, clampRing, ring]);
 
   useEffect(() => {
     if (ready) draw();
   }, [ready, draw]);
 
-  function clampOffsets(next: Transform): Transform {
-    const bitmap = bitmapRef.current;
-    if (!bitmap) return next;
-    const cover = Math.max(OUT / bitmap.width, OUT / bitmap.height);
-    const scale = cover * next.scale;
-    const maxX = Math.max(0, (bitmap.width * scale - OUT) / 2);
-    const maxY = Math.max(0, (bitmap.height * scale - OUT) / 2);
-    return {
-      scale: next.scale,
-      x: Math.max(-maxX, Math.min(maxX, next.x)),
-      y: Math.max(-maxY, Math.min(maxY, next.y)),
-    };
+  // Zooming must not strand the ring off the photo.
+  useEffect(() => {
+    if (ready) setRing((r) => clampRing(r));
+  }, [zoom, ready, clampRing]);
+
+  /** Pointer position in stage units. */
+  function toStage(e: React.PointerEvent<HTMLCanvasElement>) {
+    const box = canvasRef.current?.getBoundingClientRect();
+    if (!box) return { x: STAGE / 2, y: STAGE / 2 };
+    const ratio = STAGE / box.width;
+    return { x: (e.clientX - box.left) * ratio, y: (e.clientY - box.top) * ratio };
   }
 
   function onPointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     points.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
     if (points.current.size === 1) {
+      // Tapping anywhere moves the ring there — the fastest way to frame a
+      // face is to point at it, not to drag the ring across the picture.
+      const p = toStage(e);
+      setRing(clampRing(p));
       drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
     } else if (points.current.size === 2) {
       const [a, b] = [...points.current.values()];
-      pinch.current = {
-        distance: Math.hypot(a.x - b.x, a.y - b.y),
-        scale: t.scale,
-      };
+      pinch.current = { distance: Math.hypot(a.x - b.x, a.y - b.y), zoom };
       drag.current = null;
     }
   }
@@ -135,23 +200,13 @@ export function PhotoCropper({
     if (pinch.current && points.current.size === 2) {
       const [a, b] = [...points.current.values()];
       const distance = Math.hypot(a.x - b.x, a.y - b.y);
-      const next = (pinch.current.scale * distance) / pinch.current.distance;
-      setT((prev) =>
-        clampOffsets({ ...prev, scale: Math.max(1, Math.min(4, next)) }),
-      );
+      const next = (pinch.current.zoom * distance) / pinch.current.distance;
+      setZoom(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, next)));
       return;
     }
 
-    const start = drag.current;
-    if (!start || start.id !== e.pointerId) return;
-    // The canvas is drawn at 512 but displayed smaller; move by what the
-    // finger did in canvas units, or dragging feels sluggish on a phone.
-    const box = canvasRef.current?.getBoundingClientRect();
-    const ratio = box ? OUT / box.width : 1;
-    const dx = (e.clientX - start.x) * ratio;
-    const dy = (e.clientY - start.y) * ratio;
-    drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
-    setT((prev) => clampOffsets({ ...prev, x: prev.x + dx, y: prev.y + dy }));
+    if (drag.current?.id !== e.pointerId) return;
+    setRing(clampRing(toStage(e)));
   }
 
   function onPointerUp(e: React.PointerEvent<HTMLCanvasElement>) {
@@ -160,10 +215,26 @@ export function PhotoCropper({
     if (drag.current?.id === e.pointerId) drag.current = null;
   }
 
+  /** Cut the square under the ring out of the original bitmap. */
   function use() {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    onDone(canvas.toDataURL("image/jpeg", QUALITY));
+    const bitmap = bitmapRef.current;
+    const f = frame();
+    if (!bitmap || !f) return;
+
+    const c = clampRing(ring);
+    const side = (RING * 2) / f.scale;
+    const sx = (c.x - RING - f.x) / f.scale;
+    const sy = (c.y - RING - f.y) / f.scale;
+
+    const out = document.createElement("canvas");
+    out.width = OUT;
+    out.height = OUT;
+    const ctx = out.getContext("2d");
+    if (!ctx) return;
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, OUT, OUT);
+    ctx.drawImage(bitmap, sx, sy, side, side, 0, 0, OUT, OUT);
+    onDone(out.toDataURL("image/jpeg", QUALITY));
   }
 
   // Through a portal for the same reason as the lightbox: a transformed
@@ -183,47 +254,29 @@ export function PhotoCropper({
         </p>
 
         <div className="mt-4 grid place-items-center">
-          <div className="relative">
-            <canvas
-              ref={canvasRef}
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerUp}
-              onPointerCancel={onPointerUp}
-              className="w-[260px] h-[260px] rounded-[24px] touch-none select-none cursor-grab active:cursor-grabbing bg-cream"
-            />
-            {/* The circle is not decoration: it is the crop. */}
-            <div
-              className="pointer-events-none absolute inset-0 rounded-[24px]"
-              style={{
-                boxShadow:
-                  "inset 0 0 0 2px rgba(255,255,255,0.9), inset 0 0 0 999px rgba(45,33,28,0.34)",
-                clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-                WebkitMaskImage:
-                  "radial-gradient(circle at 50% 50%, transparent 0 49%, #000 49.5%)",
-                maskImage:
-                  "radial-gradient(circle at 50% 50%, transparent 0 49%, #000 49.5%)",
-              }}
-              aria-hidden="true"
-            />
-          </div>
+          <canvas
+            ref={canvasRef}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+            className="h-[300px] w-[300px] touch-none select-none rounded-[24px] bg-cream cursor-grab active:cursor-grabbing"
+          />
         </div>
 
         <label className="mt-4 block">
-          <span className="block text-[11px] font-extrabold tracking-[0.12em] uppercase text-muted mb-2 ml-1">
-            {d.photo.zoom}
+          <span className="mb-2 ml-1 flex items-center justify-between text-[11px] font-extrabold uppercase tracking-[0.12em] text-muted">
+            <span>{d.photo.zoomOut}</span>
+            <span>{d.photo.zoom}</span>
+            <span>{d.photo.zoomIn}</span>
           </span>
           <input
             type="range"
-            min={1}
-            max={4}
+            min={-ZOOM_EXP}
+            max={ZOOM_EXP}
             step={0.01}
-            value={t.scale}
-            onChange={(e) =>
-              setT((prev) =>
-                clampOffsets({ ...prev, scale: Number(e.target.value) }),
-              )
-            }
+            value={Math.log2(zoom)}
+            onChange={(e) => setZoom(2 ** Number(e.target.value))}
             className="w-full accent-[#F05262]"
           />
         </label>
@@ -232,7 +285,7 @@ export function PhotoCropper({
           <button
             type="button"
             onClick={onCancel}
-            className="h-12 rounded-full bg-cream border border-line font-bold text-[14.5px] active:scale-[0.98] transition-transform"
+            className="h-12 rounded-full border border-line bg-cream text-[14.5px] font-bold transition-transform active:scale-[0.98]"
           >
             {d.common.cancel}
           </button>
@@ -240,7 +293,7 @@ export function PhotoCropper({
             type="button"
             onClick={use}
             disabled={!ready}
-            className="h-12 rounded-full grad-score text-white font-bold text-[14.5px] active:scale-[0.98] transition-transform disabled:opacity-50"
+            className="h-12 rounded-full grad-score text-[14.5px] font-bold text-white transition-transform active:scale-[0.98] disabled:opacity-50"
           >
             {d.photo.use}
           </button>

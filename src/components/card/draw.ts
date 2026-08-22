@@ -207,23 +207,26 @@ export function drawCard({
   const pillStartY = formatY(
     showScore
       ? layout === "editorial"
-        ? 1.635
-        : 1.485
+        ? 1.6
+        : 1.45
       : layout === "editorial"
-        ? 1.365
-        : 1.125,
-    showScore ? 0.68 : 0.64,
-    0.3,
+        ? 1.34
+        : 1.1,
+    showScore ? 0.665 : 0.62,
+    0.29,
   );
+  // The rater footer is the least interesting thing on the card, so it gives
+  // way: the rule drops and the block shrinks, and every unit it releases
+  // goes to the tags and the medals, which are what people actually read.
   const footerRuleY = formatY(
-    layout === "editorial" ? 1.82 : 1.845,
-    0.83,
-    0.83,
+    layout === "editorial" ? 1.9 : 1.915,
+    0.875,
+    0.865,
   );
   const footerContentY = formatY(
-    layout === "editorial" ? 1.95 : 1.98,
-    0.92,
-    0.92,
+    layout === "editorial" ? 2.0 : 2.02,
+    0.945,
+    0.94,
   );
 
   const geom = {
@@ -490,10 +493,10 @@ export function drawCard({
 
   // ------------------------------------------------------------ trait pills
   y = pillStartY;
-  let pillH = u * (layout === "editorial" ? 0.098 : 0.118);
+  let pillH = u * (layout === "editorial" ? 0.112 : 0.13);
   const pillGap = u * (layout === "editorial" ? 0.018 : 0.025);
   const pillWeight = layout === "editorial" ? 500 : 600;
-  let pillFont = u * (layout === "editorial" ? 0.036 : 0.041);
+  let pillFont = u * (layout === "editorial" ? 0.042 : 0.046);
   // The calm reference keeps one restrained row; the celebratory reference
   // expands to a deliberate two-column grid. Non-story formats have room to
   // retain all four tags: square spans them, wide gives them their own column.
@@ -548,7 +551,7 @@ export function drawCard({
    * gap to the footer rule. Rather than let the strip land on top of the
    * pills, the pills give way: height and type scale by exactly the shortfall.
    */
-  const medalBand = medals.length > 0 ? u * 0.075 : u * 0.015;
+  const medalBand = medals.length > 0 ? u * 0.105 : u * 0.015;
   const available = footerRuleY - pillStartY - medalBand;
   const required = rows.length * pillH + (rows.length - 1) * pillGap;
   if (required > available && available > 0) {
@@ -599,9 +602,9 @@ export function drawCard({
   // A narrow, always-reserved strip keeps the badge toggle useful without
   // changing the composition or introducing a second large hierarchy.
   if (medals.length > 0) {
-    const medalR = u * 0.0215;
+    const medalR = u * 0.031;
     const gap = u * 0.018;
-    const labelFont = u * 0.019;
+    const labelFont = u * 0.024;
     const maxRow = cardW - u * 0.16;
 
     /*
@@ -691,7 +694,7 @@ export function drawCard({
 
   // Stand-in avatars: raters are anonymous by design, so these are decorative
   // silhouettes — never the actual people who rated you.
-  const stackR = u * 0.056;
+  const stackR = u * 0.044;
   const shown = Math.min(3, data.ratingCount);
   let sx = cardX + u * 0.075 + stackR;
 
@@ -772,15 +775,15 @@ export function drawCard({
 
   ctx.textBaseline = "middle";
   const textX = shown > 0 ? sx + stackR * 0.62 : cardX + u * 0.09;
-  ctx.font = sans(500, u * (layout === "editorial" ? 0.032 : 0.036));
+  ctx.font = sans(500, u * (layout === "editorial" ? 0.026 : 0.029));
   ctx.fillStyle = p.inkSoft;
-  ctx.fillText(d.common.ratedBy, textX, footY - u * 0.022);
-  ctx.font = sans(500, u * (layout === "editorial" ? 0.043 : 0.047));
+  ctx.fillText(d.common.ratedBy, textX, footY - u * 0.019);
+  ctx.font = sans(500, u * (layout === "editorial" ? 0.035 : 0.038));
   ctx.fillStyle = p.ink;
   ctx.fillText(
     `${data.ratingCount} ${d.common.people}`,
     textX,
-    footY + u * 0.03,
+    footY + u * 0.026,
     cardX + cardW - u * 0.07 - textX,
   );
   ctx.textBaseline = "alphabetic";

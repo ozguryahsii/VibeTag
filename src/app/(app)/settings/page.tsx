@@ -5,7 +5,7 @@ import { logoutAction } from "@/lib/actions/auth";
 import { setCommentPolicyAction, toggleBlockAction } from "@/lib/actions/safety";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { PhotoVault } from "@/components/PhotoVault";
-import { SHOWCASE_LIMIT, VAULT_SIZE } from "@/lib/photos";
+import { mainPhotoId, photoLimit } from "@/lib/photos";
 import { DeleteAccount } from "@/components/DeleteAccount";
 import { PushToggle } from "@/components/PushToggle";
 import { RedeemCode } from "@/components/RedeemCode";
@@ -85,22 +85,19 @@ export default async function SettingsPage() {
 
       <div className="mt-6">
         <SectionTitle>{d.settings.editProfile}</SectionTitle>
-        <ProfileEditor
-          name={user.name}
-          bio={user.bio ?? ""}
-          avatarUrl={user.avatarUrl}
-          avatarColor={user.avatarColor}
+        <PhotoVault
+          photos={vault.map((p) => ({
+            id: p.id,
+            url: p.url,
+            isMain: p.id === mainPhotoId(vault, user.avatarUrl),
+          }))}
+          limit={photoLimit(user.plan)}
         />
         <div className="mt-2.5">
-          <PhotoVault
-            photos={vault.map((p) => ({
-              id: p.id,
-              url: p.url,
-              showcase: p.showcase,
-              isMain: p.url === user.avatarUrl,
-            }))}
-            vaultSize={VAULT_SIZE}
-            showcaseLimit={SHOWCASE_LIMIT[user.plan] ?? 0}
+          <ProfileEditor
+            name={user.name}
+            bio={user.bio ?? ""}
+            avatarColor={user.avatarColor}
           />
         </div>
       </div>

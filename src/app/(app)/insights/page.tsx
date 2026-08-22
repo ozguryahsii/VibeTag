@@ -307,10 +307,14 @@ export default async function InsightsPage() {
                         </p>
                       )}
 
+                      {/* Two halves that can actually shrink: min-w-0 on the
+                          cell, truncate on the label. Without both, a long
+                          Turkish label pushes its own pill wider than the
+                          grid and spills over the card edge on a phone. */}
                       <div className="mt-3 grid grid-cols-2 gap-2">
-                        <form action={openRatingThreadAction}>
+                        <form action={openRatingThreadAction} className="min-w-0">
                           <input type="hidden" name="ratingId" value={row.id} />
-                          <button className="h-9 w-full whitespace-nowrap rounded-full px-3 text-[11px] font-bold text-orange bg-tagbg border border-orange/25 active:scale-[0.97] transition-transform">
+                          <button className="h-9 w-full min-w-0 truncate rounded-full px-2.5 text-[11px] font-bold text-orange bg-tagbg border border-orange/25 active:scale-[0.97] transition-transform">
                             {d.messages.newFromRating}
                           </button>
                         </form>

@@ -98,6 +98,7 @@ model User {
 
   sessions        Session[]
   otpCodes        OtpCode[]
+  photos          ProfilePhoto[]
   redemptions     DiscountRedemption[]
   storePurchases  StorePurchase[]
   ratingsReceived Rating[]             @relation("RatingsReceived")
@@ -470,6 +471,16 @@ model Conversation {
   createdAt     DateTime @default(now())
   lastMessageAt DateTime @default(now())
 
+  /// Per-side shelf and bin. A thread is two people's, so neither may act for
+  /// the other: archiving hides it from your list only, and "deleting" hides
+  /// it from yours while the other side keeps the conversation they were part
+  /// of. A new message clears your own deletion — somebody writing to you is
+  /// exactly the event that should bring a thread back.
+  archivedAAt DateTime?
+  archivedBAt DateTime?
+  deletedAAt  DateTime?
+  deletedBAt  DateTime?
+
   messages Message[]
 
   @@unique([userAId, userBId])
@@ -648,4 +659,26 @@ model StorePurchase {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+/// One picture in somebody's vault.
+///
+/// The vault holds ten; which one is the main photo lives on `User.avatarUrl`
+/// so every existing read keeps working. `showcase` marks the ones that ride
+/// beside the main photo on the profile — how many of those are allowed is a
+/// plan question, answered in `lib/photos.ts`, not here.
+model ProfilePhoto {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// JPEG data URL today, object-storage URL when photos move out of the DB.
+  url      String
+  showcase Boolean @default(false)
+  /// Left-to-right order of the showcase circles.
+  position Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, position])
 }

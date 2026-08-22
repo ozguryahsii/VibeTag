@@ -128,7 +128,7 @@ export function RegisterForm() {
         <Field
           label={d.auth.username}
           name="username"
-          placeholder="ozguryahsi"
+          placeholder={d.auth.usernamePlaceholder}
           required
         />
         <Field

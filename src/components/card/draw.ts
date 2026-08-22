@@ -27,8 +27,17 @@ export type CardData = {
   ratingCount: number;
   percentile: number | null;
   tags: { key: string; label: string }[];
-  /** Best tier per family, best first — already trimmed by the page. */
-  badges: { key: string; label: string; icon: string; tier: BadgeTier }[];
+  /**
+   * What rides on the card: the hardest badges held, plus the verification
+   * chip when the account is verified. "VERIFIED" is not a tier — it is the
+   * one medal that is not a badge, and it wears green rather than metal.
+   */
+  badges: {
+    key: string;
+    label: string;
+    icon: string;
+    tier: BadgeTier | "VERIFIED";
+  }[];
   avatarUrl: string | null;
   avatarColor: string;
 };
@@ -128,7 +137,7 @@ export function drawCard({
 
   // Badges occupy a permanent compact strip above the footer. Toggling them
   // never resizes or shifts the card, so exports remain directly comparable.
-  const medals = showBadges ? data.badges.slice(0, 3) : [];
+  const medals = showBadges ? data.badges.slice(0, 5) : [];
   const layout: CardLayoutKind = data.score >= 93 ? "celebratory" : "editorial";
   const isStory = format === "story";
   const isSquare = format === "square";
@@ -481,20 +490,20 @@ export function drawCard({
 
   // ------------------------------------------------------------ trait pills
   y = pillStartY;
-  const pillH = u * (layout === "editorial" ? 0.098 : 0.118);
+  let pillH = u * (layout === "editorial" ? 0.098 : 0.118);
   const pillGap = u * (layout === "editorial" ? 0.018 : 0.025);
   const pillWeight = layout === "editorial" ? 500 : 600;
   let pillFont = u * (layout === "editorial" ? 0.036 : 0.041);
   // The calm reference keeps one restrained row; the celebratory reference
   // expands to a deliberate two-column grid. Non-story formats have room to
   // retain all four tags: square spans them, wide gives them their own column.
-  const chosen = data.tags.slice(
-    0,
-    isStory ? (layout === "editorial" ? 3 : 4) : 4,
-  );
+  // Five, whatever the format. The count used to depend on the cut, which
+  // meant the same person's card said different things about them depending
+  // on where they shared it.
+  const chosen = data.tags.slice(0, 5);
 
   const limit = isStory
-    ? u * (layout === "editorial" ? 0.9 : 0.88)
+    ? u * (layout === "editorial" ? 0.92 : 0.9)
     : u * (isSquare ? 1.75 : 0.95);
   ctx.font = sans(pillWeight, pillFont);
   const iconBox = () => pillFont * 1.18;
@@ -507,14 +516,15 @@ export function drawCard({
     );
   let widths = measureWidths();
 
-  const rows: number[][] =
-    (isStory && layout === "editorial") || isSquare
-      ? [chosen.map((_, i) => i)]
-      : chosen.reduce<number[][]>((acc, _, i) => {
-        if (i % 2 === 0) acc.push([i]);
-        else acc[acc.length - 1].push(i);
-        return acc;
-      }, []);
+  // Two rows, never three: the band between the score and the footer rule
+  // has room for two, and a third silently lands on top of the footer. Five
+  // tags therefore split 3 + 2, centred on the same axis.
+  const perRow = Math.ceil(chosen.length / 2);
+  const rows: number[][] = chosen.reduce<number[][]>((acc, _, i) => {
+    if (i % perRow === 0) acc.push([i]);
+    else acc[acc.length - 1].push(i);
+    return acc;
+  }, []);
 
   if (rows.length > 0) {
     const widest = Math.max(
@@ -528,6 +538,25 @@ export function drawCard({
       ctx.font = sans(pillWeight, pillFont);
       widths = measureWidths();
     }
+  }
+
+  /*
+   * Make the rows fit the band they live in.
+   *
+   * The vertical slots were drawn for one row of pills; five tags need two,
+   * and on the story cut two rows plus the medal strip are taller than the
+   * gap to the footer rule. Rather than let the strip land on top of the
+   * pills, the pills give way: height and type scale by exactly the shortfall.
+   */
+  const medalBand = medals.length > 0 ? u * 0.075 : u * 0.015;
+  const available = footerRuleY - pillStartY - medalBand;
+  const required = rows.length * pillH + (rows.length - 1) * pillGap;
+  if (required > available && available > 0) {
+    const k = available / required;
+    pillH *= k;
+    pillFont *= k;
+    ctx.font = sans(pillWeight, pillFont);
+    widths = measureWidths();
   }
 
   for (const r of rows) {
@@ -560,6 +589,7 @@ export function drawCard({
     }
     y += pillH + pillGap;
   }
+  const pillsBottom = y - pillGap;
 
   // ------------------------------------------------------------ footer lines
   const footLineY = footerRuleY;
@@ -571,15 +601,46 @@ export function drawCard({
   if (medals.length > 0) {
     const medalR = u * 0.0215;
     const gap = u * 0.018;
-    const cellW = u * 0.245;
-    const total = cellW * medals.length + gap * (medals.length - 1);
-    const startX = cx - total / 2;
-    const my = footLineY - u * 0.055;
+    const labelFont = u * 0.019;
+    const maxRow = cardW - u * 0.16;
 
+    /*
+     * One row, always. The strip lives in a fixed band between the tag pills
+     * and the footer rule, so it may never wrap — a second row climbs into
+     * the pills. Up to three medals carry their names; beyond that the names
+     * are dropped and the medals stand as their own glyphs, which is what
+     * makes five of them fit and stay centred.
+     */
+    ctx.font = sans(700, labelFont);
+    const labelled = medals.length <= 3;
+    const cells = medals.map((m) =>
+      labelled
+        ? Math.min(u * 0.3, medalR * 2 + u * 0.012 + ctx.measureText(m.label).width)
+        : medalR * 2,
+    );
+    const spread = Math.min(
+      gap,
+      (maxRow - cells.reduce((a, c) => a + c, 0)) / Math.max(1, medals.length - 1),
+    );
+    const total =
+      cells.reduce((a, c) => a + c, 0) + spread * (medals.length - 1);
+    // Centred in whatever gap the pills left, never overlapping either
+    // neighbour: five tags push the pill block down, and a medal strip
+    // pinned to a fixed offset would end up drawn on top of it.
+    const pad = medalR + u * 0.012;
+    const my = Math.min(
+      Math.max((pillsBottom + footLineY) / 2, pillsBottom + pad),
+      footLineY - pad,
+    );
+
+    let cellX = cx - total / 2;
     for (let i = 0; i < medals.length; i++) {
       const m = medals[i];
-      const [from, to] = TIER_STYLE[m.tier].canvas;
-      const cellX = startX + i * (cellW + gap);
+      const cellW = cells[i];
+      const [from, to] =
+        m.tier === "VERIFIED"
+          ? (["#5FC08A", "#2F8C5E"] as const)
+          : TIER_STYLE[m.tier].canvas;
       const mx = cellX + medalR;
 
       const mg = ctx.createLinearGradient(
@@ -602,17 +663,21 @@ export function drawCard({
       // The glyph never changes between tiers — only the metal does.
       icon(ctx, iconFor(m.icon), mx, my, medalR * 1.12, "#FFFFFF");
 
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
-      ctx.font = sans(700, u * 0.019);
-      ctx.fillStyle = p.ink;
-      ctx.fillText(
-        m.label,
-        cellX + medalR * 2 + u * 0.01,
-        my,
-        cellW - medalR * 2 - u * 0.012,
-      );
-      ctx.textBaseline = "alphabetic";
+      if (labelled) {
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.font = sans(700, labelFont);
+        ctx.fillStyle = p.ink;
+        ctx.fillText(
+          m.label,
+          cellX + medalR * 2 + u * 0.01,
+          my,
+          cellW - medalR * 2 - u * 0.012,
+        );
+        ctx.textBaseline = "alphabetic";
+      }
+
+      cellX += cellW + spread;
     }
   }
 

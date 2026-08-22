@@ -9,7 +9,7 @@ import { TIER_STYLE } from "@/lib/tier-style";
 import { LangToggle } from "@/components/LangToggle";
 import { getPercentile, getVibeProfile } from "@/lib/profile";
 import { VibeCardCanvas } from "@/components/card/VibeCardCanvas";
-import { bestPerFamily, computeBadges } from "@/lib/badges";
+import { bestPerFamily, computeBadges, hardestBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ICONS, iconFor } from "@/lib/icons";
@@ -63,14 +63,26 @@ export default async function HomePage() {
     avatarUrl: user.avatarUrl,
     avatarColor: user.avatarColor,
     tags: profile.tags
-      .slice(0, 4)
+      .slice(0, 5)
       .map((t) => ({ key: t.key, label: tagLabel(t.key, locale) })),
-    badges: earned.slice(0, 3).map((b) => ({
-      key: b.key,
-      label: badgeLabel(b.key, d),
-      icon: b.icon,
-      tier: b.tier,
-    })),
+    badges: [
+      ...hardestBadges(earned, 4).map((b) => ({
+        key: b.key,
+        label: badgeLabel(b.key, d),
+        icon: b.icon,
+        tier: b.tier as "BRONZE" | "SILVER" | "GOLD" | "VERIFIED",
+      })),
+      ...(user.emailVerifiedAt
+        ? [
+            {
+              key: "verifiedEmail",
+              label: d.verifications.email.label,
+              icon: "shieldCheck",
+              tier: "VERIFIED" as const,
+            },
+          ]
+        : []),
+    ],
   };
 
   return (

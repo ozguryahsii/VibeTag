@@ -16,6 +16,7 @@ export const en = {
     send: "Send",
     sending: "Sending…",
     remove: "Remove",
+    delete: "Delete",
     yes: "Yes, remove",
     no: "No, keep",
     anonymous: "Anonymous",
@@ -52,6 +53,7 @@ export const en = {
   },
 
   welcome: {
+    sampleName: "Your name",
     kicker: "YOUR SOCIAL SIGNATURE",
     titleA: "Discover how",
     titleB: "people",
@@ -109,6 +111,7 @@ export const en = {
     registerKicker: "CREATE YOUR SIGNATURE",
     emailPlaceholder: "you@example.com",
     namePlaceholder: "Alex Morgan",
+    usernamePlaceholder: "yourname",
     loginTitle: "Welcome back 👋",
     loginBody: "Your Vibe profile is waiting.",
     registerTitle: "Create your My Vibe",
@@ -337,7 +340,7 @@ export const en = {
     unlockWith: "Unlock with {plan}",
     protectedNote:
       "🔒 This rating's identity is protected by the system — invisible even on Gold.",
-    reportRating: "Report the rating",
+    reportRating: "Report !",
     goldKicker: "GOLD · VIBE IDENTITY",
     goldTitle: "See who rated you",
     goldBody:
@@ -386,7 +389,7 @@ export const en = {
     showScore: "Show the score",
     showScoreBody: "Turn it off to share only your tags.",
     showBadges: "Show my badges",
-    showBadgesBody: "Your best three go on the card, in their tier colours.",
+    showBadgesBody: "Your four hardest-won badges and your verification badge are added to the card.",
     share: "Share",
     download: "Download PNG ({w}×{h})",
     downloaded: "Card downloaded 🎉",
@@ -401,6 +404,23 @@ export const en = {
     moodRoom: "Room to grow",
   },
 
+  photos: {
+    title: "Photo vault",
+    body: "Keep up to {n} pictures. One is your main photo; the rest can ride beside it as small circles on your profile.",
+    add: "Add a photo",
+    adding: "Uploading…",
+    added: "Photo added to your vault.",
+    vaultFull: "Your vault holds {n} photos. Delete one to add another.",
+    main: "Main",
+    setMain: "Make main",
+    showcase: "Beside my photo",
+    showcaseOn: "Shown",
+    showcaseOff: "Hidden",
+    showcaseCount: "{used} of {max} side photos",
+    freeNote: "Side photos come with Silver and Gold. On Free you keep the vault and choose the main photo.",
+    empty: "No photos yet.",
+    deletePhoto: "Delete",
+  },
   photo: {
     cropTitle: "Choose your crop",
     cropHint:
@@ -615,12 +635,20 @@ export const en = {
   },
 
   messages: {
+    archive: "Archive",
+    unarchive: "Unarchive",
+    archived: "Archived",
+    archiveBody: "Threads you put aside. Swipe one back to your inbox any time.",
+    swipeHint: "Swipe a thread right to archive it, left to delete it.",
+    deleteTitle: "Delete this conversation?",
+    deleteBody: "The thread with {name} disappears from your inbox. Their copy stays with them, and a new message brings it back.",
+    deleteConfirm: "Yes, delete",
     title: "Messages",
     subtitle: "Direct messages stay between you and the other person.",
     emptyTitle: "Your inbox is empty",
     emptyBody:
       "You can message your friends. Premium members can also write to people who rated them.",
-    newFromRating: "Message the rater",
+    newFromRating: "Send message",
     placeholder: "Write a message…",
     send: "Send",
     friendsOnly:
@@ -692,20 +720,20 @@ export const en = {
     deleteMismatch: "Type your username to confirm: {username}",
     privacyPoints: [
       {
-        title: "Ratings are anonymous by default",
+        title: "Anonymous Ratings",
         body: "Who wrote what never appears on profiles. Only Gold members can see who rated them.",
       },
       {
-        title: "Protected ratings",
-        body: "Ratings flagged as suspicious stay anonymous even on Gold.",
+        title: "Protected Ratings",
+        body: "Votes found to be suspicious do not count towards the score.",
       },
       {
-        title: "Revision history",
-        body: "When a rating is updated its previous version is archived.",
+        title: "Rating Updates",
+        body: "A rating can be revised and changed over time.",
       },
       {
-        title: "Context lock",
-        body: "Nobody can rate you in an area they do not know you from.",
+        title: "Context Lock",
+        body: "People can only rate you in the context they actually know you from.",
       },
       {
         title: "Blocking",

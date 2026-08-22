@@ -2,16 +2,25 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { getDict } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
-import { listConversations } from "@/lib/social";
+import { archivedCount, listConversations } from "@/lib/social";
+import { SwipeThread } from "@/components/SwipeThread";
 import { Avatar } from "@/components/Avatar";
 import { Card, EmptyState } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
-export default async function MessagesPage() {
+export default async function MessagesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ box?: string }>;
+}) {
   const me = await requireUser();
   const d = await getDict();
-  const threads = await listConversations(me.id);
+  const box = (await searchParams).box === "archive" ? "archive" : "inbox";
+  const [threads, archived] = await Promise.all([
+    listConversations(me.id, box),
+    archivedCount(me.id),
+  ]);
 
   return (
     <main className="px-5 pt-10">
@@ -22,8 +31,19 @@ export default async function MessagesPage() {
         {d.messages.title}
       </h1>
       <p className="text-[13px] text-muted mt-1.5 leading-relaxed">
-        {d.messages.subtitle}
+        {box === "archive" ? d.messages.archiveBody : d.messages.subtitle}
       </p>
+      <p className="mt-2 text-[12.5px]">
+        <Link
+          href={box === "archive" ? "/messages" : "/messages?box=archive"}
+          className="font-bold text-coral"
+        >
+          {box === "archive"
+            ? `← ${d.messages.title}`
+            : `${d.messages.archived} · ${archived}`}
+        </Link>
+      </p>
+      <p className="mt-1 text-[11.5px] text-muted">{d.messages.swipeHint}</p>
 
       <div className="mt-6 grid gap-2.5">
         {threads.length === 0 ? (
@@ -34,8 +54,14 @@ export default async function MessagesPage() {
           />
         ) : (
           threads.map((t) => (
-            <Link key={t.id} href={`/messages/${t.id}`}>
-              <Card className="flex items-center gap-3.5 !py-4">
+            <SwipeThread
+              key={t.id}
+              conversationId={t.id}
+              name={t.otherIsAnonymous ? d.messages.anonymousPartner : t.other.name}
+              archived={t.archived}
+            >
+              <Link href={`/messages/${t.id}`}>
+                <Card className="flex items-center gap-3.5 !py-4">
                 {t.otherIsAnonymous ? (
                   <span className="w-11 h-11 shrink-0 grid place-items-center rounded-full bg-line text-[16px]">
                     🕶️
@@ -67,8 +93,9 @@ export default async function MessagesPage() {
                     {t.unread}
                   </span>
                 )}
-              </Card>
-            </Link>
+                </Card>
+              </Link>
+            </SwipeThread>
           ))
         )}
       </div>

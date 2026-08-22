@@ -147,9 +147,33 @@ export async function findConversation(meId: string, otherId: string) {
   return prisma.conversation.findUnique({ where: { userAId_userBId: { userAId, userBId } } });
 }
 
-export async function listConversations(userId: string) {
+/**
+ * Threads for one person's inbox.
+ *
+ * `box` picks the shelf: the main list hides what this user archived or
+ * deleted, the archive shows only what they archived. Both are per-side —
+ * the other participant's list is untouched by either action.
+ */
+export async function listConversations(
+  userId: string,
+  box: "inbox" | "archive" = "inbox",
+) {
+  const mine = (side: "A" | "B") =>
+    side === "A"
+      ? { userAId: userId, deletedAAt: null }
+      : { userBId: userId, deletedBAt: null };
+  const archived = (side: "A" | "B", yes: boolean) =>
+    side === "A"
+      ? { archivedAAt: yes ? { not: null } : null }
+      : { archivedBAt: yes ? { not: null } : null };
+
   const rows = await prisma.conversation.findMany({
-    where: { OR: [{ userAId: userId }, { userBId: userId }] },
+    where: {
+      OR: (["A", "B"] as const).map((side) => ({
+        ...mine(side),
+        ...archived(side, box === "archive"),
+      })),
+    },
     include: {
       userA: { select: { id: true, name: true, username: true, avatarUrl: true, avatarColor: true } },
       userB: { select: { id: true, name: true, username: true, avatarUrl: true, avatarColor: true } },
@@ -179,7 +203,20 @@ export async function listConversations(userId: string) {
       lastMessage: c.messages[0] ?? null,
       unread: c._count.messages,
       lastMessageAt: c.lastMessageAt,
+      archived: iAmA ? !!c.archivedAAt : !!c.archivedBAt,
     };
+  });
+}
+
+/** How many threads sit on the archive shelf. */
+export async function archivedCount(userId: string): Promise<number> {
+  return prisma.conversation.count({
+    where: {
+      OR: [
+        { userAId: userId, deletedAAt: null, archivedAAt: { not: null } },
+        { userBId: userId, deletedBAt: null, archivedBAt: { not: null } },
+      ],
+    },
   });
 }
 
@@ -188,7 +225,12 @@ export async function unreadMessageCount(userId: string): Promise<number> {
     where: {
       readAt: null,
       senderId: { not: userId },
-      conversation: { OR: [{ userAId: userId }, { userBId: userId }] },
+      conversation: {
+        OR: [
+          { userAId: userId, deletedAAt: null },
+          { userBId: userId, deletedBAt: null },
+        ],
+      },
     },
   });
 }

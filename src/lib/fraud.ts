@@ -6,9 +6,14 @@ import { FRAUD_FLAGS, type FraudFlagKey } from "@/lib/fraud-flags";
 /**
  * Fake-rating detection (§11).
  *
- * Suspicious ratings are never deleted and never shown to the rated user
- * as "someone tried to cheat" — they are simply down-weighted and marked
- * protected, which also removes them from Gold's identity view (§15).
+ * Suspicious ratings are never deleted and never shown to the rated user as
+ * "someone tried to cheat". Mild suspicion only lowers a rating's weight;
+ * once the weight falls under PROTECT_BELOW the rating is *protected*, and a
+ * protected rating stops counting altogether — its weight is set to zero, so
+ * it lands in no score, no trait average and no badge. It stays in the
+ * database, stays visible to moderation, and stays out of Gold's identity
+ * view (§15). "Votes found to be suspicious do not count" is a promise the
+ * privacy screen makes; this is where it is kept.
  */
 
 export { FRAUD_FLAGS, parseFlags, type FraudFlagKey } from "@/lib/fraud-flags";
@@ -98,7 +103,8 @@ export async function evaluateRating({
   for (const f of flags) weight *= FRAUD_FLAGS[f].penalty;
   weight = Math.max(MIN_WEIGHT, Math.round(weight * 100) / 100);
 
-  return { flags, weight, isProtected: weight < PROTECT_BELOW };
+  const isProtected = weight < PROTECT_BELOW;
+  return { flags, weight: isProtected ? 0 : weight, isProtected };
 }
 
 /**

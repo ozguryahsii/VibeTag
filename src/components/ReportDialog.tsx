@@ -53,7 +53,7 @@ export function ReportDialog({
           !compact
             ? "h-11 w-full rounded-full bg-white border border-line text-[13.5px] font-bold text-muted active:scale-[0.98] transition-transform"
             : tone === "danger"
-              ? "h-9 w-full whitespace-nowrap rounded-full px-3 text-[11px] font-bold text-white bg-gradient-to-r from-[#F05262] to-[#E85C8F] shadow-[0_6px_16px_rgba(240,82,98,0.28)] active:scale-[0.97] transition-transform"
+              ? "h-9 w-full min-w-0 truncate rounded-full px-2.5 text-[11px] font-bold text-white bg-gradient-to-r from-[#F05262] to-[#E85C8F] shadow-[0_6px_16px_rgba(240,82,98,0.28)] active:scale-[0.97] transition-transform"
               : "text-[11.5px] font-bold text-muted underline underline-offset-2"
         }
       >

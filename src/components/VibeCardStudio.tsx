@@ -32,7 +32,7 @@ export function VibeCardStudio({ data }: { data: CardData }) {
   // The approved card art uses trait pills as the only mid-card metadata.
   // Badges remain available as an explicit option, but no longer distort the
   // first impression of the score-driven design.
-  const [showBadges, setShowBadges] = useState(false);
+  const [showBadges, setShowBadges] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
 
   const { band } = sceneFor(data.score);

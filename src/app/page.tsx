@@ -68,9 +68,9 @@ export default async function Welcome() {
           </div>
 
           <div className="relative z-10 flex flex-col items-center">
-            <Avatar name="Özgür Yahşi" color="#D77A52" size={88} ring />
+            <Avatar name={d.welcome.sampleName} color="#D77A52" size={88} ring />
             <p className="mt-4 font-display text-[25px] font-semibold tracking-[-0.035em] text-ink">
-              Özgür Yahşi
+              {d.welcome.sampleName}
             </p>
             <div className="mt-2 flex items-center gap-1.5" aria-hidden="true">
               <span className="h-px w-8 bg-coral/45" />

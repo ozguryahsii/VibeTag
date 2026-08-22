@@ -15,7 +15,8 @@ import {
  * Design rules that come straight from the product brief:
  *  - the number is never a verdict on a person, so it is deliberately
  *    generous and shrinks toward a neutral prior when evidence is thin;
- *  - suspicious ratings are down-weighted rather than deleted;
+ *  - suspicious ratings are down-weighted, and the ones the detector
+ *    protected carry weight 0 — they count for nothing without being deleted;
  *  - every displayed number must be explainable from the raw data.
  */
 

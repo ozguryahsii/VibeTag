@@ -87,7 +87,8 @@ Planı uygulama içinden **Profil → Üyelik** ekranından anında değiştireb
 | Davet            | `/invite`          | Kişisel davet linki, QR, paylaşım ve katılım sayısı         |
 | Davet karşılama  | `/i/[code]`        | Public — davet edenin profiliyle açılır                     |
 | Bildirimler      | `/notifications`   | Yeni değerlendirme, davet kabulü, rozet                     |
-| Profil & Üyelik  | `/settings`        | Avatar, bio, plan, gizlilik, engellenenler, hesap silme     |
+| Mesajlar         | `/messages`        | Sohbetler; sağa kaydır arşivle, sola kaydır sil             |
+| Profil & Üyelik  | `/settings`        | Avatar, fotoğraf kasası, bio, plan, gizlilik, hesap silme   |
 | Yönetim paneli   | `/admin`           | Üye/plan/rozet sayıları, premium dağılımı — sadece admin    |
 | Üyeler           | `/admin/members`   | Ara, elle plan ver ya da geri al                            |
 | İndirim kodları  | `/admin/codes`     | Kod oluştur, kapat, kaç kere kimin kullandığını gör         |
@@ -141,8 +142,10 @@ bağlıdır.
 
 ### 5. Sahte oy tespiti — `src/lib/fraud.ts`
 
-Şüpheli oylar silinmez, **ağırlığı düşürülür** (`weight` 0..1) ve korumaya
-alınır. Bakılan sinyaller: çok yeni hesap, itibar geçmişi olmayan değerlendiren,
+Şüpheli oylar silinmez, **ağırlığı düşürülür** (`weight` 0..1). Ağırlık eşiğin
+altına inerse oy **korumaya alınır ve ağırlığı sıfırlanır** — yani hiçbir
+puana, hiçbir ortalamaya ve hiçbir rozete sayılmaz; kayıt yerinde durur,
+moderasyon görebilir. Bakılan sinyaller: çok yeni hesap, itibar geçmişi olmayan değerlendiren,
 kısa sürede oy patlaması, karşılıklı tam puan alışverişi, herkese aynı tekdüze
 puanı veren profil.
 

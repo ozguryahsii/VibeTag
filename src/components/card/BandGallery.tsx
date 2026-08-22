@@ -12,8 +12,8 @@ import type { CardBand } from "@/lib/card-bands";
  * comparing designs is only possible when nothing else moves.
  */
 const SAMPLE: Omit<CardData, "score"> = {
-  name: "Özgür Yahşi",
-  username: "ozguryahsi",
+  name: "Vibe Tag",
+  username: "vibetag",
   ratingCount: 126,
   percentile: 5,
   tags: [
@@ -27,7 +27,7 @@ const SAMPLE: Omit<CardData, "score"> = {
     { key: "kindHeart", label: "Kind Heart", icon: "heart", tier: "SILVER" },
     { key: "wellKnown", label: "Well Known", icon: "globe", tier: "BRONZE" },
   ],
-  avatarUrl: "/card-preview/ozgur-avatar.png",
+  avatarUrl: null,
   avatarColor: "#FF8A3D",
 };
 

@@ -72,7 +72,9 @@ describe("dictionaries", () => {
     // The one thing that must not be translated: "My Vibe" is the same words
     // in Turkish, and the plan names are brand, not description.
     expect(tr.nav.myVibe).toBe(en.nav.myVibe);
-    expect(tr.nav.insights).toBe(en.nav.insights);
+    // The screen is still called Vibe Insights — that is the product's name
+    // for it. The tab label under the icon is not: it is a signpost, and a
+    // Turkish signpost reading "Insights" helps nobody find the screen.
     expect(tr.insights.title).toBe(en.insights.title);
     expect(tr.card.title).toBe(en.card.title);
     expect(tr.common.appName).toBe(en.common.appName);

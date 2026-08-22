@@ -235,3 +235,45 @@ export function bestPerFamily<T extends Badge>(badges: T[]): T[] {
     (a, b) => TIER_RANK[b.tier] - TIER_RANK[a.tier],
   );
 }
+
+/**
+ * How hard a badge is to earn, on one comparable scale.
+ *
+ * Thresholds live in different units — a trait score of 90 and a count of 25
+ * are not the same number — so each requirement is scored against the
+ * hardest ask for that same metric anywhere in the table, and the badge's
+ * difficulty is the sum. Tier leads, because a Gold is always harder than
+ * the Silver of the same family, and a badge with two conditions outranks a
+ * badge with one at the same tier by construction.
+ */
+const HARDEST_NEED = (() => {
+  const max = new Map<string, number>();
+  for (const family of BADGE_FAMILIES) {
+    for (const tier of BADGE_TIERS) {
+      family.metrics.forEach((m, i) => {
+        const key = `${m.kind}:${m.key}`;
+        max.set(key, Math.max(max.get(key) ?? 0, family.tiers[tier][i]));
+      });
+    }
+  }
+  return max;
+})();
+
+export function badgeDifficulty(badge: Badge): number {
+  const asks = badge.requirements.reduce((sum, r) => {
+    const hardest = HARDEST_NEED.get(`${r.metric.kind}:${r.metric.key}`) ?? r.need;
+    return sum + (hardest > 0 ? r.need / hardest : 0);
+  }, 0);
+  // `any` families need only one of their conditions, so the sum overstates
+  // them — halve it rather than pretend both were required.
+  const family = BADGE_FAMILIES.find((f) => f.key === badge.key);
+  return TIER_RANK[badge.tier] * 10 + (family?.any ? asks / 2 : asks);
+}
+
+/** The n hardest badges somebody holds, hardest first. */
+export function hardestBadges<T extends Badge>(badges: T[], n: number): T[] {
+  return [...badges]
+    .filter((b) => b.earned)
+    .sort((a, b) => badgeDifficulty(b) - badgeDifficulty(a))
+    .slice(0, n);
+}

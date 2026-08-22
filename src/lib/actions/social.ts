@@ -314,7 +314,10 @@ export async function sendMessageAction(
     }),
     prisma.conversation.update({
       where: { id: convo.id },
-      data: { lastMessageAt: new Date() },
+      // A new message brings the thread back for whoever had cleared it:
+      // deleting is "not in my list", not "never speak to me again" — that
+      // is what blocking is for.
+      data: { lastMessageAt: new Date(), deletedAAt: null, deletedBAt: null },
     }),
   ]);
 
@@ -323,4 +326,62 @@ export async function sendMessageAction(
   revalidatePath(`/messages/${convo.id}`);
   revalidatePath("/messages");
   return { ok: true };
+}
+
+// ------------------------------------------------------------- thread shelf
+
+/** Which side of this thread the signed-in user is, or null if neither. */
+async function sideOf(conversationId: string, userId: string) {
+  const convo = await prisma.conversation.findUnique({
+    where: { id: conversationId },
+    select: { userAId: true, userBId: true },
+  });
+  if (!convo) return null;
+  if (convo.userAId === userId) return "A" as const;
+  if (convo.userBId === userId) return "B" as const;
+  return null;
+}
+
+/**
+ * Archive or unarchive one thread, for me only.
+ *
+ * Both of these and `deleteThreadAction` write a single per-side column, so
+ * one person tidying their inbox can never touch the other's.
+ */
+export async function archiveThreadAction(formData: FormData): Promise<void> {
+  const me = await requireUser();
+  const id = String(formData.get("conversationId") ?? "");
+  const on = String(formData.get("archived") ?? "on") !== "off";
+
+  const side = await sideOf(id, me.id);
+  if (!side) return;
+
+  await prisma.conversation.update({
+    where: { id },
+    data:
+      side === "A"
+        ? { archivedAAt: on ? new Date() : null }
+        : { archivedBAt: on ? new Date() : null },
+  });
+  revalidatePath("/messages");
+  revalidatePath("/messages/archive");
+}
+
+/** Clear a thread from my list. The other side keeps theirs. */
+export async function deleteThreadAction(formData: FormData): Promise<void> {
+  const me = await requireUser();
+  const id = String(formData.get("conversationId") ?? "");
+
+  const side = await sideOf(id, me.id);
+  if (!side) return;
+
+  await prisma.conversation.update({
+    where: { id },
+    data:
+      side === "A"
+        ? { deletedAAt: new Date(), archivedAAt: null }
+        : { deletedBAt: new Date(), archivedBAt: null },
+  });
+  revalidatePath("/messages");
+  revalidatePath("/messages/archive");
 }

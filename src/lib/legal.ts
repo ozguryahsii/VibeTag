@@ -193,7 +193,7 @@ const trTerms: LegalDoc = {
       body: [
         "Bir kişiyi yalnızca gerçekten tanıdığın bağlamda değerlendirebilirsin. “Bu kişiyi nereden tanıyorsun?” sorusu zorunludur ve hangi kriterleri puanlayabileceğini belirler.",
         "Her kişiyi bir kez değerlendirirsin. Değerlendirmeni ayda bir güncelleyebilirsin; her güncellemede önceki sürüm arşivlenir.",
-        "Sahte, intikam amaçlı veya karşılıklı anlaşmayla verilen değerlendirmeler yasaktır. Otomatik tespit sistemi bu tür oyların ağırlığını düşürür ve değerlendirmeyi korumaya alabilir.",
+        "Sahte, intikam amaçlı veya karşılıklı anlaşmayla verilen değerlendirmeler yasaktır. Otomatik tespit sistemi bu tür oyların ağırlığını düşürür; şüpheli olduğu tespit edilen oylar ise hiç değerlendirmeye alınmaz.",
       ],
     },
     {
@@ -413,7 +413,7 @@ const enTerms: LegalDoc = {
       body: [
         "You may rate someone only in the context you actually know them from. “How do you know this person?” is mandatory and decides which criteria you can score.",
         "You rate each person once. You may revise it once a month; every revision archives the previous version.",
-        "Fake ratings, revenge ratings and arranged reciprocal ratings are prohibited. Automatic detection reduces the weight of such votes and may place a rating under protection.",
+        "Fake ratings, revenge ratings and arranged reciprocal ratings are prohibited. Automatic detection reduces the weight of such votes; votes found to be suspicious do not count at all.",
       ],
     },
     {

@@ -4,6 +4,8 @@ import { prisma } from "@/lib/db";
 import { logoutAction } from "@/lib/actions/auth";
 import { setCommentPolicyAction, toggleBlockAction } from "@/lib/actions/safety";
 import { ProfileEditor } from "@/components/ProfileEditor";
+import { PhotoVault } from "@/components/PhotoVault";
+import { SHOWCASE_LIMIT, VAULT_SIZE } from "@/lib/photos";
 import { DeleteAccount } from "@/components/DeleteAccount";
 import { PushToggle } from "@/components/PushToggle";
 import { RedeemCode } from "@/components/RedeemCode";
@@ -27,6 +29,10 @@ export default async function SettingsPage() {
   const user = await requireUser();
   const d = await getDict();
   const pushKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || null;
+  const vault = await prisma.profilePhoto.findMany({
+    where: { userId: user.id },
+    orderBy: { position: "asc" },
+  });
 
   const blocks = await prisma.block.findMany({
     where: { blockerId: user.id },
@@ -85,6 +91,18 @@ export default async function SettingsPage() {
           avatarUrl={user.avatarUrl}
           avatarColor={user.avatarColor}
         />
+        <div className="mt-2.5">
+          <PhotoVault
+            photos={vault.map((p) => ({
+              id: p.id,
+              url: p.url,
+              showcase: p.showcase,
+              isMain: p.url === user.avatarUrl,
+            }))}
+            vaultSize={VAULT_SIZE}
+            showcaseLimit={SHOWCASE_LIMIT[user.plan] ?? 0}
+          />
+        </div>
       </div>
 
       <div className="mt-7">

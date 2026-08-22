@@ -13,6 +13,7 @@ export const tr: Dictionary = {
     send: "Gönder",
     sending: "Gönderiliyor…",
     remove: "Kaldır",
+    delete: "Sil",
     yes: "Evet, çıkar",
     no: "Hayır, kalsın",
     anonymous: "Anonim",
@@ -39,7 +40,7 @@ export const tr: Dictionary = {
     myVibe: "My Vibe",
     people: "Kişiler",
     rate: "Değerlendir",
-    insights: "Insights",
+    insights: "Analiz",
     profile: "Profil",
     messages: "Mesajlar",
     notifications: "Bildirimler",
@@ -49,6 +50,7 @@ export const tr: Dictionary = {
   },
 
   welcome: {
+    sampleName: "Adın soyadın",
     kicker: "SOSYAL İMZAN",
     titleA: "İnsanlar seni",
     titleB: "nasıl",
@@ -106,6 +108,7 @@ export const tr: Dictionary = {
     registerKicker: "SOSYAL İMZANI OLUŞTUR",
     emailPlaceholder: "sen@ornek.com",
     namePlaceholder: "Özgür Yahşi",
+    usernamePlaceholder: "kullaniciadin",
     loginTitle: "Tekrar hoş geldin 👋",
     loginBody: "Vibe profilin seni bekliyor.",
     registerTitle: "My Vibe'ını oluştur",
@@ -334,7 +337,7 @@ export const tr: Dictionary = {
     unlockWith: "{plan} ile aç",
     protectedNote:
       "🔒 Bu değerlendirmenin kimliği sistem tarafından korunuyor — Gold üyelikte de görünmez.",
-    reportRating: "Değerlendirmeyi bildir",
+    reportRating: "Bildir !",
     goldKicker: "GOLD · VIBE IDENTITY",
     goldTitle: "Kimlerin değerlendirdiğini gör",
     goldBody:
@@ -383,7 +386,7 @@ export const tr: Dictionary = {
     showScore: "Skoru göster",
     showScoreBody: "Kapatırsan kartta sadece etiketlerin görünür.",
     showBadges: "Rozetlerimi göster",
-    showBadgesBody: "En iyi üç rozetin, kendi seviye renkleriyle karta eklenir.",
+    showBadgesBody: "Kazanması en zor dört rozetin ve doğrulama rozetin karta eklenir.",
     share: "Paylaş",
     download: "PNG indir ({w}×{h})",
     downloaded: "Kart indirildi 🎉",
@@ -398,6 +401,23 @@ export const tr: Dictionary = {
     moodRoom: "Gelişime açık",
   },
 
+  photos: {
+    title: "Fotoğraf kasası",
+    body: "En fazla {n} fotoğraf saklayabilirsin. Biri ana fotoğrafın olur; diğerleri profilinde onun yanında küçük yuvarlaklar olarak yer alabilir.",
+    add: "Fotoğraf ekle",
+    adding: "Yükleniyor…",
+    added: "Fotoğraf kasana eklendi.",
+    vaultFull: "Kasan {n} fotoğraf alıyor. Yenisini eklemek için birini sil.",
+    main: "Ana",
+    setMain: "Ana yap",
+    showcase: "Fotoğrafımın yanında",
+    showcaseOn: "Görünüyor",
+    showcaseOff: "Gizli",
+    showcaseCount: "{max} yan fotoğraftan {used} tanesi",
+    freeNote: "Yan fotoğraflar Silver ve Gold ile geliyor. Free planda kasan durur ve ana fotoğrafını seçersin.",
+    empty: "Henüz fotoğraf yok.",
+    deletePhoto: "Sil",
+  },
   photo: {
     cropTitle: "Kırpmayı seç",
     cropHint:
@@ -612,12 +632,20 @@ export const tr: Dictionary = {
   },
 
   messages: {
+    archive: "Arşivle",
+    unarchive: "Arşivden çıkar",
+    archived: "Arşiv",
+    archiveBody: "Kenara aldığın sohbetler. İstediğin an kaydırıp geri alabilirsin.",
+    swipeHint: "Sohbeti sağa kaydır arşivle, sola kaydır sil.",
+    deleteTitle: "Bu sohbet silinsin mi?",
+    deleteBody: "{name} ile olan sohbet kutundan kaybolur. Karşı taraftaki kopya durur ve yeni bir mesaj geldiğinde sohbet geri gelir.",
+    deleteConfirm: "Evet, sil",
     title: "Mesajlar",
     subtitle: "Mesajlar sadece seninle karşı taraf arasında kalır.",
     emptyTitle: "Kutun boş",
     emptyBody:
       "Arkadaşlarınla mesajlaşabilirsin. Premium üyeler kendilerini değerlendirenlere de yazabilir.",
-    newFromRating: "Değerlendirene mesaj at",
+    newFromRating: "Mesaj gönder",
     placeholder: "Bir mesaj yaz…",
     send: "Gönder",
     friendsOnly:
@@ -689,20 +717,20 @@ export const tr: Dictionary = {
     deleteMismatch: "Onaylamak için kullanıcı adını yaz: {username}",
     privacyPoints: [
       {
-        title: "Değerlendirmeler varsayılan olarak anonimdir",
+        title: "Anonim Değerlendirmeler",
         body: "Kimin ne yazdığı profillerde görünmez. Yalnızca Gold üyeler kendilerini değerlendirenleri görebilir.",
       },
       {
-        title: "Korunan değerlendirmeler",
-        body: "Şüpheli görülen oyların kimliği Gold üyelikte de gizli kalır.",
+        title: "Korunan Değerlendirmeler",
+        body: "Şüpheli olduğu tespit edilen oylar değerlendirmeye alınmaz.",
       },
       {
-        title: "Güncelleme geçmişi",
-        body: "Bir değerlendirme güncellendiğinde eski sürümü kayıt altına alınır.",
+        title: "Yorum Güncelleme",
+        body: "Bir değerlendirme zaman içerisinde güncellenerek değiştirilebilir.",
       },
       {
-        title: "Bağlam kilidi",
-        body: "Kimse seni tanımadığı bir alanda değerlendiremez.",
+        title: "Bağlam Kilidi",
+        body: "Seni değerlendirenler yalnızca seni tanıdıkları bağlamda oylama yapabilirler.",
       },
       {
         title: "Engelleme",

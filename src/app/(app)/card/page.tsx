@@ -4,7 +4,7 @@ import { VibeCardStudio } from "@/components/VibeCardStudio";
 import { EmptyState, Button } from "@/components/ui";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { badgeLabel, tagLabel } from "@/lib/labels";
-import { bestPerFamily, computeBadges } from "@/lib/badges";
+import { bestPerFamily, computeBadges, hardestBadges } from "@/lib/badges";
 import { prisma } from "@/lib/db";
 import { LangToggle } from "@/components/LangToggle";
 
@@ -23,11 +23,16 @@ export default async function CardPage() {
     select: { key: true, tier: true },
   });
   const heldIds = new Set(held.map((b) => `${b.key}:${b.tier}`));
-  const badges = bestPerFamily(
-    computeBadges(profile).map((b) => ({
-      ...b,
-      earned: b.earned || heldIds.has(`${b.key}:${b.tier}`),
-    })),
+  // One per family, then the four hardest of those — the card should show
+  // what took the most doing, not whatever happens to sort first.
+  const badges = hardestBadges(
+    bestPerFamily(
+      computeBadges(profile).map((b) => ({
+        ...b,
+        earned: b.earned || heldIds.has(`${b.key}:${b.tier}`),
+      })),
+    ),
+    4,
   );
 
   if (profile.ratingCount === 0) {
@@ -86,14 +91,28 @@ export default async function CardPage() {
           avatarUrl: user.avatarUrl,
           avatarColor: user.avatarColor,
           tags: profile.tags
-            .slice(0, 4)
+            .slice(0, 5)
             .map((t) => ({ key: t.key, label: tagLabel(t.key, locale) })),
-          badges: badges.slice(0, 3).map((b) => ({
-            key: b.key,
-            label: badgeLabel(b.key, d),
-            icon: b.icon,
-            tier: b.tier,
-          })),
+          badges: [
+            ...badges.map((b) => ({
+              key: b.key,
+              label: badgeLabel(b.key, d),
+              icon: b.icon,
+              tier: b.tier as "BRONZE" | "SILVER" | "GOLD" | "VERIFIED",
+            })),
+            // The verification chip is not a badge and never competes with
+            // one for a slot: it rides along whenever the email is confirmed.
+            ...(user.emailVerifiedAt
+              ? [
+                  {
+                    key: "verifiedEmail",
+                    label: d.verifications.email.label,
+                    icon: "shieldCheck",
+                    tier: "VERIFIED" as const,
+                  },
+                ]
+              : []),
+          ],
         }}
       />
     </main>

@@ -5,6 +5,7 @@ import { fill } from "@/lib/i18n";
 import { isLegalSlug, legalDoc, legalIndex } from "@/lib/legal";
 import { SUPPORT_EMAIL } from "@/lib/support";
 import { LangToggle } from "@/components/LangToggle";
+import { BackButton } from "@/components/BackButton";
 import { Wordmark } from "@/components/Logo";
 
 export const dynamic = "force-dynamic";
@@ -27,8 +28,11 @@ export default async function LegalPage({
   const withEmail = (text: string) => fill(text, { email: SUPPORT_EMAIL });
 
   return (
-    <main className="px-6 pt-12 pb-16 max-w-[560px] mx-auto">
-      <div className="flex items-start justify-between gap-3">
+    <main className="vt-sheet px-6 pt-12 pb-16 max-w-[560px] mx-auto">
+      {/* Same drawer manners as the notifications sheet: in from the right,
+          out through the arrow in the corner. */}
+      <div className="flex items-center justify-between gap-3">
+        <BackButton />
         <Link href="/">
           <Wordmark size={19} />
         </Link>

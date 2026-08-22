@@ -15,7 +15,8 @@ import { TIER_STYLE } from "@/lib/tier-style";
 import { RELATIONSHIPS } from "@/lib/taxonomy";
 import { groupIconFor, iconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
-import { PhotoLightbox } from "@/components/PhotoLightbox";
+import { PhotoRing } from "@/components/PhotoRing";
+import { allowedShowcase } from "@/lib/photos";
 import { ScoreDial } from "@/components/ScoreDial";
 import { VibeMark } from "@/components/Logo";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
@@ -34,6 +35,20 @@ export default async function PublicProfile({
   if (!user) notFound();
 
   const isMe = user.id === me.id;
+
+  // The circles beside the photo: the owner's showcase, trimmed to what
+  // their plan allows so a downgrade stops publishing extras immediately
+  // without deleting anything.
+  const sidePhotos = allowedShowcase(
+    (
+      await prisma.profilePhoto.findMany({
+        where: { userId: user.id, showcase: true },
+        orderBy: { position: "asc" },
+        select: { url: true },
+      })
+    ).map((p) => p.url),
+    user.plan,
+  );
   const firstName = user.name.split(" ")[0];
   const profile = await getVibeProfile(user.id);
   const percentile = await getPercentile(user.id, profile.score);
@@ -101,11 +116,12 @@ export default async function PublicProfile({
         </div>
 
         <div className="relative z-10 flex flex-col items-center">
-          <PhotoLightbox
+          <PhotoRing
             name={user.name}
-            url={user.avatarUrl}
+            mainUrl={user.avatarUrl}
             color={user.avatarColor}
             size={84}
+            side={sidePhotos}
             ring
           />
           <div className="mt-3 flex items-center justify-center gap-1.5">

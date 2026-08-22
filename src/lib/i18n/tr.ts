@@ -99,6 +99,9 @@ export const tr: Dictionary = {
   },
 
   auth: {
+    consentPrefix: "Şunları okudum ve kabul ediyorum:",
+    consentAnd: "ve",
+    consentSuffix: ".",
     loginKicker: "TEKRAR HOŞ GELDİN",
     registerKicker: "SOSYAL İMZANI OLUŞTUR",
     emailPlaceholder: "sen@ornek.com",
@@ -123,6 +126,7 @@ export const tr: Dictionary = {
     signUp: "Kayıt ol",
     haveAccount: "Zaten hesabın var mı?",
     errors: {
+      consent: "Kaydolmak için Gizlilik Politikası'nı, KVKK Aydınlatma Metni'ni ve Kullanım Şartları'nı kabul etmen gerekiyor.",
       name: "İsmini yazar mısın?",
       email: "Geçerli bir e-posta gerekli.",
       username: "Kullanıcı adı en az 3 karakter olmalı.",
@@ -199,9 +203,9 @@ export const tr: Dictionary = {
       "Konumunu tam olarak değil, kabaca saklarız ve yalnızca bu listeyi sıralamak için kullanırız. İstediğin an kapatabilirsin.",
     nearbyEnable: "Yakındakileri aç",
     nearbyDisable: "Yakındakileri kapat",
-    nearbyLockedTitle: "Yakınındaki üyeler premium bir görünüm",
+    nearbyLockedTitle: "Yakınındakiler özelliği Premium bir özelliktir",
     nearbyLockedBody:
-      "Konumun açık ve yakınındaki premium üyeler seni görebiliyor. Listeyi kendin görmek Silver ve Gold ile geliyor.",
+      "Konumun açık ve yakınındaki premium üyeler seni görebiliyor. Yakınındaki kişileri görmek için Silver veya Gold Premium satın al.",
     nearbyLockedCta: "Planlara bak",
     nearbyAsking: "Konumun alınıyor…",
     nearbyDenied:
@@ -407,6 +411,19 @@ export const tr: Dictionary = {
   otp: {
     tooMany: "Çok fazla deneme. {n} dakika sonra tekrar dene.",
     sendFailed: "Kodu şu an gönderemedik. Birazdan tekrar dene.",
+    loginExpired: "Bu giriş denemesinin süresi doldu. Şifreni yeniden gir.",
+    loginKicker: "İKİ ADIMLI GİRİŞ",
+    loginTitle: "Giriş kodunu gir",
+    loginBody: "{email} adresine 6 haneli bir kod gönderdik. Girişi tamamlamak için kodu gir.",
+    backToLogin: "← Girişe dön",
+    anim: {
+      checking: "Kontrol ediliyor…",
+      wrong: "Kod doğru değil.",
+      network: "Sunucuya ulaşılamadı. Tekrar dene.",
+      ok: "Doğrulandı",
+      group: "{n} haneli doğrulama kodu",
+      digit: "Hane {i} / {n}",
+    },
     errors: {
       none: "Önce bir kod iste.",
       expired: "Bu kodun süresi doldu. Yeni bir tane iste.",
@@ -419,6 +436,11 @@ export const tr: Dictionary = {
       subject: "Vibe Tag kodun",
       heading: "E-postanı doğrula",
       body: "Bu adresin sana ait olduğunu onaylamak için bu kodu Vibe Tag'e gir.",
+    },
+    loginMail: {
+      subject: "Vibe Tag giriş kodun",
+      heading: "Sen olduğunu doğrula",
+      body: "Girişi tamamlamak için bu kodu Vibe Tag'e gir. Bu sen değilsen şifreni değiştir.",
     },
     resetMail: {
       subject: "Vibe Tag şifreni sıfırla",
@@ -717,9 +739,9 @@ export const tr: Dictionary = {
         price: "₺149/ay",
         perks: [
           "Silver'daki her şey",
-          "Kim değerlendirdi, nereden tanıyor",
-          "Korunan oylar yine anonim kalır",
-        ],
+          "Sana yapılan her değerlendirmenin sahibini gör",
+          "Kim, seni nereden tanıyarak değerlendirmiş",
+              ],
       },
     },
   },
@@ -864,6 +886,13 @@ export const tr: Dictionary = {
       maxUses: "En fazla kullanım",
       maxUsesHint: "Boş bırakırsan sınırsız.",
       expiresAt: "Şu tarihe kadar geçerli",
+      percent: "İndirim %",
+      percentHint: "Mağaza ödemesi geldiğinde kodun keseceği oran. Boş bırakırsan kod planı doğrudan verir, yani %100.",
+      percentBadge: "%{n} indirim",
+      deleteCta: "Sil",
+      deleteTitle: "Bu kod silinsin mi?",
+      deleteBody: "{code} ve tüm kullanım geçmişi kalıcı olarak silinecek. Daha önce verilmiş planlar geri alınmaz.",
+      deleteConfirm: "Evet, sil",
       create: "Kodu oluştur",
       creating: "Oluşturuluyor…",
       created: "{code} hazır.",
@@ -904,6 +933,7 @@ export const tr: Dictionary = {
       badPlan: "Geçerli bir plan seç.",
       badDays: "Gün, 1 ile 3650 arasında bir sayı olmalı.",
       badUses: "En fazla kullanım en az 1 olmalı.",
+      badPercent: "İndirim 1 ile 100 arasında bir sayı olmalı.",
       badDate: "Bu tarih okunamadı.",
       badCode: "Kod 4–24 harf, rakam veya tire olmalı.",
       codeTaken: "Bu kod zaten var.",

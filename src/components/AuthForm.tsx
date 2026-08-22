@@ -147,6 +147,29 @@ export function RegisterForm() {
           placeholder={d.auth.passwordHint}
           required
         />
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            name="consent"
+            required
+            className="mt-0.5 w-5 h-5 shrink-0 accent-[#FF5C77]"
+          />
+          <span className="text-[12.5px] text-muted leading-relaxed">
+            {d.auth.consentPrefix}{" "}
+            <Link href="/legal/privacy" target="_blank" className="font-bold text-orange">
+              {d.legal.privacy}
+            </Link>
+            {", "}
+            <Link href="/legal/kvkk" target="_blank" className="font-bold text-orange">
+              {d.legal.kvkk}
+            </Link>{" "}
+            {d.auth.consentAnd}{" "}
+            <Link href="/legal/terms" target="_blank" className="font-bold text-orange">
+              {d.legal.terms}
+            </Link>
+            {d.auth.consentSuffix}
+          </span>
+        </label>
         {state.error && (
           <p className="text-[13px] font-semibold text-coral bg-coral/8 border border-coral/20 rounded-2xl px-4 py-3">
             {state.error}

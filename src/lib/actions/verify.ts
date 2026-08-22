@@ -8,7 +8,14 @@ import { fill } from "@/lib/i18n";
 import { loginWhere } from "@/lib/identity";
 import { guard } from "@/lib/rate-limit";
 import { checkOtp, markEmailVerified, sendOtp } from "@/lib/otp";
-import { createSession, getCurrentUser, hashPassword, requireUser } from "@/lib/auth";
+import {
+  clearPendingLogin,
+  createSession,
+  getCurrentUser,
+  hashPassword,
+  readPendingLogin,
+  requireUser,
+} from "@/lib/auth";
 import { redeemInviteFor } from "@/lib/invite";
 import type { FormState } from "@/lib/actions/auth";
 
@@ -146,4 +153,76 @@ export async function confirmResetAction(
 export async function currentEmail(): Promise<string | null> {
   const user = await getCurrentUser();
   return user?.email ?? null;
+}
+
+/** The animated code card's result shape: no redirects, plain answers. */
+export type CodeCheck =
+  | { ok: true; redirect: string }
+  | { ok: false; message: string };
+
+/**
+ * Confirm the signed-in account's email — the imperative twin of
+ * `confirmEmailAction`, for the animated card: the client decides when to
+ * navigate, because the seal animation plays before the redirect.
+ */
+export async function confirmEmailCodeAction(code: string): Promise<CodeCheck> {
+  const d = await getDict();
+  const user = await requireUser();
+
+  const limit = await guard("otpCheck", user.email);
+  if (!limit.ok) {
+    return {
+      ok: false,
+      message: fill(d.otp.tooMany, { n: Math.ceil(limit.retryAfter / 60) }),
+    };
+  }
+
+  let result = await checkOtp(user.id, "REGISTER", code.trim());
+  if (!result.ok && result.reason !== "wrong" && result.reason !== "burned") {
+    result = await checkOtp(user.id, "VERIFY", code.trim());
+  }
+  if (!result.ok) return { ok: false, message: d.otp.errors[result.reason] };
+
+  await markEmailVerified(user.id);
+  revalidatePath("/", "layout");
+  return { ok: true, redirect: "/home" };
+}
+
+/** Step two of sign-in: the code lands, the session opens. */
+export async function loginOtpCheckAction(code: string): Promise<CodeCheck> {
+  const d = await getDict();
+  const user = await readPendingLogin();
+  if (!user) return { ok: false, message: d.otp.loginExpired };
+
+  const limit = await guard("otpCheck", user.email);
+  if (!limit.ok) {
+    return {
+      ok: false,
+      message: fill(d.otp.tooMany, { n: Math.ceil(limit.retryAfter / 60) }),
+    };
+  }
+
+  const result = await checkOtp(user.id, "LOGIN", code.trim());
+  if (!result.ok) return { ok: false, message: d.otp.errors[result.reason] };
+
+  await createSession(user.id);
+  await clearPendingLogin();
+
+  // The invite that brought them in survives the extra step.
+  const inviter = await redeemInviteFor(user.id);
+  return { ok: true, redirect: inviter ? `/rate/${inviter}` : "/home" };
+}
+
+/** A fresh sign-in code for whoever holds a valid pending-login ticket. */
+export async function resendLoginCodeAction(): Promise<FormState> {
+  const d = await getDict();
+  const user = await readPendingLogin();
+  if (!user) return { error: d.otp.loginExpired };
+
+  const limit = await guard("otpSend", user.email);
+  if (!limit.ok) {
+    return { error: fill(d.otp.tooMany, { n: Math.ceil(limit.retryAfter / 60) }) };
+  }
+  const sent = await sendOtp(user, "LOGIN", d);
+  return sent.sent ? { ok: true } : { error: d.otp.sendFailed };
 }

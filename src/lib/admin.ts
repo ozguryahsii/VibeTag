@@ -150,6 +150,7 @@ export type CodeSummary = {
   note: string | null;
   plan: string;
   days: number | null;
+  percentOff: number | null;
   maxUses: number | null;
   expiresAt: Date | null;
   active: boolean;
@@ -181,6 +182,7 @@ export async function listCodes(take = 60): Promise<CodeSummary[]> {
     note: c.note,
     plan: c.plan,
     days: c.days,
+    percentOff: c.percentOff,
     maxUses: c.maxUses,
     expiresAt: c.expiresAt,
     active: c.active,

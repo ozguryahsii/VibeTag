@@ -1,0 +1,316 @@
+/* =====================================================================
+   OTP giriş animasyonu — bağımsız paket (vMon'dan çıkarılmıştır)
+   Köken: hasib41/otp-verification-v3 (MIT License, Copyright (c) 2026 Hasib)
+   https://github.com/hasib41/otp-verification-v3
+
+   Bu dosya TEMA İÇERMEZ: yalnız hane kutuları, çember (yörünge), mühür karosu,
+   ışık zerreleri ve durum geçişleri. Kart/sayfa görünümü sizin CSS'inizden gelir.
+   Renkleri :root'taki --otp-* değişkenlerini ezerek değiştirin.
+
+   Tek doğruluk kaynağı: .otp-card üzerindeki data-state
+   (idle | filling | checking | ok | error). otp-animation.js yalnız CSS'in
+   yapamadığını üstlenir: satırı çembere saran polar matematik, çemberdeki
+   tam tur + çeyrek dönüş ve tek karoya vidalanma.
+   ===================================================================== */
+:root {
+  --otp-brand: #ed1c24;
+  --otp-brand-soft: rgba(237, 28, 36, 0.14);
+  --otp-ink: #0f172a;
+  --otp-line: #cbd5e1;
+  --otp-bg: #f8fafc;
+  --otp-ok: #10b981;
+  --otp-ok-lift: #34d399;
+  --otp-err: #e11d48;
+}
+
+/* ---------- sahne: kutuların üzerinde döndüğü alan ---------------------- */
+/* Çember satırdan çok daha yüksektir; o pay komşu boşluklarla SABİT taşınır
+   ki kutular hiç hareket etmeyen bir yerleşim kutusundan transform'la yolculuk
+   etsin — altındaki hiçbir şey seğirmesin. */
+.code-wrap {
+  position: relative;
+  margin: 30px 0 14px;
+}
+
+.code {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ---------- haneler ----------------------------------------------------- */
+.slot {
+  position: relative;
+  width: 44px;
+  height: 54px;
+  border-radius: 12px;
+  background: var(--otp-bg);
+  border: 1.5px solid var(--otp-line);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.2s ease;
+  cursor: text;
+  will-change: transform;
+}
+
+.slot:focus-within {
+  border-color: var(--otp-brand);
+  box-shadow: 0 0 0 4px var(--otp-brand-soft);
+}
+
+.slot.is-filled { border-color: var(--otp-line); background: #fff; }
+
+/* Girdi ancak JS varken gizlenir: rakamı .slot__digit çizer. JS yoksa
+   (noscript bloğu ilk kutuyu genişletir) düz, görünür bir alan kalır. */
+.slot__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  text-align: center;
+  font-size: 18px;
+  color: var(--otp-ink);
+  outline: none;
+}
+html.js .slot__input { opacity: 0; font-size: 16px; caret-color: transparent; }
+.slot__input::selection { background: transparent; }
+
+.slot__win {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.slot__digit {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--otp-ink);
+  line-height: 1;
+  will-change: transform;
+}
+
+/* imleç: boş ve odaklı hanede yanıp sönen alt çizgi */
+.slot:focus-within:not(.is-filled) .slot__win::after {
+  content: "";
+  position: absolute;
+  bottom: 10px;
+  width: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--otp-brand);
+  animation: otpCaret 1.1s ease-in-out infinite;
+}
+@keyframes otpCaret { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.9; } }
+
+/* kilit parlaması: çember kapandığında her kutudan yayılır */
+.slot__glow {
+  position: absolute;
+  inset: -7px;
+  border-radius: 16px;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(closest-side, rgba(16, 185, 129, 0.35), transparent 72%);
+  will-change: transform, opacity;
+}
+
+/* ---------- çember (yörünge) ------------------------------------------- */
+/* Boy/konum YERLEŞİMDİR — otp.js ölçüp bir kez yazar; sonrasında yalnız
+   scale/rotate/opacity'ye dokunulur. */
+.orbit { position: absolute; inset: 0; pointer-events: none; }
+
+.orbit__ring {
+  position: absolute;
+  opacity: 0;
+  overflow: visible;
+  will-change: transform, opacity;
+}
+
+.orbit__path {
+  fill: none;
+  stroke: rgba(100, 116, 139, 0.4);
+  stroke-width: 1.5px;
+  stroke-dasharray: 0.012 0.02;   /* pathLength=1 üzerinden noktalı iz */
+  stroke-linecap: round;
+}
+
+.orbit__hub {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--otp-ok);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.55);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.otp-card[data-locked] .orbit__path { stroke: rgba(16, 185, 129, 0.55); }
+.otp-card[data-locked] .slot { border-color: var(--otp-ok); background: #ecfdf5; }
+.otp-card[data-locked] .slot__digit { color: var(--otp-ok); }
+
+/* ---------- mühür: altının dönüştüğü tek karo --------------------------- */
+/* Satırın merkezine GRID ile oturur, asla transform'la değil — transform
+   animasyonun kendisidir. İki halka: ikincisi geç çıkar ve daha uzağa gider;
+   tek genişleyen çizgi "spinner" gibi okunurdu. */
+.seal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.seal__tile {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(150deg, #10b981, #059669);
+  box-shadow: 0 10px 26px rgba(16, 185, 129, 0.4);
+  opacity: 0;
+  transform: scale(0.24) rotate(-150deg);
+  overflow: hidden;
+}
+.otp-card[data-state="ok"] .seal__tile {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  transition: transform 0.62s cubic-bezier(0.22, 1.2, 0.32, 1), opacity 0.2s linear;
+}
+
+.seal__sheen {
+  position: absolute;
+  inset: -40% -70%;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.55) 50%, transparent 58%);
+  transform: translateX(-120%) rotate(8deg);
+}
+.otp-card[data-state="ok"] .seal__sheen {
+  transform: translateX(120%) rotate(8deg);
+  transition: transform 0.7s ease 0.45s;
+}
+
+.seal__tile svg { width: 30px; height: 30px; }
+.seal__check {
+  stroke: #fff;
+  stroke-width: 3.4;
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.otp-card[data-state="ok"] .seal__check {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.4s cubic-bezier(0.3, 0, 0.2, 1) 0.34s;
+}
+
+.seal__ring {
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  box-shadow: 0 0 0 1.5px var(--otp-ok);
+  opacity: 0;
+}
+.otp-card[data-state="ok"] .seal__ring {
+  animation: otpRing 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) 0.15s forwards;
+}
+.otp-card[data-state="ok"] .seal__ring--wide {
+  animation: otpRing 1.15s cubic-bezier(0.2, 0.7, 0.3, 1) 0.32s forwards;
+}
+@keyframes otpRing {
+  0% { transform: scale(0.7); opacity: 0.9; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+
+/* ---------- ışık zerreleri --------------------------------------------- */
+/* Az, yuvarlak ve hızlı olduğundan yavaş — ölçülülük kasıtlı: kare konfeti
+   yağmuru bir doğrulama ekranının okunmaması gereken tek şeydir. */
+.burst { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.mote {
+  position: absolute;
+  width: 5.5px;
+  height: 5.5px;
+  border-radius: 50%;
+  background: var(--otp-ok);
+  will-change: transform, opacity;
+  opacity: 0;
+}
+.mote--sm { width: 3.5px; height: 3.5px; }
+.mote--lg { width: 8px; height: 8px; }
+.mote--pale { background: var(--otp-ok-lift); }
+
+/* ---------- durumlar ----------------------------------------------------- */
+.otp-card[data-state="checking"] .slot { cursor: default; }
+.otp-card[data-state="checking"] .slot,
+.otp-card[data-state="ok"] .slot { pointer-events: none; }
+.otp-card[data-state="checking"] .slot { animation: otpPulse 1s ease-in-out infinite; }
+@keyframes otpPulse { 0%, 100% { border-color: var(--otp-line); } 50% { border-color: var(--otp-brand); } }
+
+.otp-card[data-state="error"] .slot {
+  border-color: var(--otp-err);
+  background: #fff1f2;
+}
+.otp-card[data-state="error"] .code { animation: otpShake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+@keyframes otpShake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+.otp-err {
+  min-height: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--otp-err);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.otp-card[data-state="error"] .otp-err { opacity: 1; }
+
+/* başlık/alt yazı çapraz geçişi: kart yüksekliği hiç değişmez */
+.otp-swap { display: grid; }
+.otp-swap > * {
+  grid-area: 1 / 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.otp-swap [data-when="ok"] { opacity: 0; transform: translateY(6px); pointer-events: none; }
+.otp-card[data-state="ok"] ~ * .otp-swap [data-when="idle"],
+body[data-otp-ok] .otp-swap [data-when="idle"] { opacity: 0; transform: translateY(-6px); }
+body[data-otp-ok] .otp-swap [data-when="ok"] { opacity: 1; transform: translateY(0); }
+
+/* ok durumunda doğrula düğmesi ve alt eylemler yumuşakça çekilir */
+.otp-card[data-state="ok"] .otp-actions { opacity: 0.35; pointer-events: none; transition: opacity 0.4s ease; }
+
+/* ---------- hareket azaltma --------------------------------------------- */
+/* Sistem tercihi hareketi kapatmışsa dönüş hiç oynamaz: otp.js kısa yolu
+   seçer, CSS de kalan geçişleri sadeleştirir. */
+@media (prefers-reduced-motion: reduce) {
+  .otp-card[data-state="checking"] .slot { animation: none; }
+  .otp-card[data-state="error"] .code { animation: none; }
+  .otp-card[data-state="ok"] .seal__tile { transition-duration: 0.2s; transform: scale(1) rotate(0); }
+  .otp-card[data-state="ok"] .seal__ring,
+  .otp-card[data-state="ok"] .seal__ring--wide { animation: none; }
+}
+
+/* ------------------------------------------------------------------ theme
+   Vibe Tag overrides — the package ships theme-free on purpose; these are
+   the only knobs it asks for. Values mirror globals.css tokens. */
+:root {
+  --otp-brand: #ff8a3d;
+  --otp-brand-soft: rgba(255, 138, 61, 0.16);
+  --otp-ink: #2d211c;
+  --otp-line: #e4d7c8;
+  --otp-bg: #fcf8ef;
+  --otp-ok: #2f8c5e;
+  --otp-ok-lift: #5fc08a;
+  --otp-err: #f05262;
+}
+.slot.is-filled { background: #fff; }
+.otp-card[data-locked] .slot { background: #f2f9f1; }
+.otp-card[data-state="error"] .slot { background: #fdf1f1; }

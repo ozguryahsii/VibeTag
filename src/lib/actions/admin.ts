@@ -103,8 +103,10 @@ export async function createCodeAction(
 
   const days = num("days", 3650);
   const maxUses = num("maxUses", 100_000);
+  const percentOff = num("percentOff", 100);
   if (days === "bad") return { error: d.admin.errors.badDays };
   if (maxUses === "bad") return { error: d.admin.errors.badUses };
+  if (percentOff === "bad") return { error: d.admin.errors.badPercent };
 
   const rawExpires = String(formData.get("expiresAt") ?? "").trim();
   let expiresAt: Date | null = null;
@@ -123,6 +125,7 @@ export async function createCodeAction(
       note: String(formData.get("note") ?? "").trim() || null,
       plan,
       days,
+      percentOff,
       maxUses,
       expiresAt,
       createdById: me.id,
@@ -149,6 +152,20 @@ export async function toggleCodeAction(formData: FormData): Promise<void> {
     where: { id },
     data: { active: !code.active },
   });
+  revalidatePath("/admin/codes");
+  revalidatePath("/admin");
+}
+
+/**
+ * Delete a code outright. The cascade takes its redemption rows with it —
+ * plans already granted stay granted (they live on the user), but "who used
+ * this code" is gone for good, which is exactly what deleting means.
+ */
+export async function deleteCodeAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const id = String(formData.get("codeId") ?? "");
+
+  await prisma.discountCode.deleteMany({ where: { id } });
   revalidatePath("/admin/codes");
   revalidatePath("/admin");
 }

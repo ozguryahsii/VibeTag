@@ -1,6 +1,6 @@
 import "server-only";
 
-import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { prisma } from "@/lib/db";
@@ -109,6 +109,70 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     commentPolicy: u.commentPolicy,
   };
 });
+
+const PENDING_COOKIE = "vt_pending";
+const PENDING_TTL_MS = 10 * 60_000;
+
+/**
+ * The half-open door between password and one-time code.
+ *
+ * Sign-in now has two steps, and between them the browser holds a ticket:
+ * user id, expiry, and an HMAC keyed off that user's password hash. Nothing
+ * new is stored and no new secret is configured — the password hash is
+ * already the thing only the server knows, and changing the password
+ * invalidates every outstanding ticket for free.
+ */
+function pendingMac(userId: string, exp: number, passwordHash: string): string {
+  return createHmac("sha256", `${passwordHash}:pending-login`)
+    .update(`${userId}.${exp}`)
+    .digest("base64url");
+}
+
+export async function openPendingLogin(user: {
+  id: string;
+  passwordHash: string;
+}): Promise<void> {
+  const store = await cookies();
+  const exp = Date.now() + PENDING_TTL_MS;
+  store.set(
+    PENDING_COOKIE,
+    `${user.id}.${exp}.${pendingMac(user.id, exp, user.passwordHash)}`,
+    {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: PENDING_TTL_MS / 1000,
+      path: "/",
+    },
+  );
+}
+
+/** The user this ticket belongs to, or null for absent/expired/forged. */
+export async function readPendingLogin() {
+  const store = await cookies();
+  const raw = store.get(PENDING_COOKIE)?.value;
+  if (!raw) return null;
+  const [userId, expRaw, mac] = raw.split(".");
+  const exp = Number(expRaw);
+  if (!userId || !Number.isFinite(exp) || exp < Date.now() || !mac) return null;
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || user.suspendedAt) return null;
+
+  const expected = pendingMac(userId, exp, user.passwordHash);
+  if (
+    mac.length !== expected.length ||
+    !timingSafeEqual(Buffer.from(mac), Buffer.from(expected))
+  ) {
+    return null;
+  }
+  return user;
+}
+
+export async function clearPendingLogin(): Promise<void> {
+  const store = await cookies();
+  store.delete(PENDING_COOKIE);
+}
 
 export async function requireUser(): Promise<SessionUser> {
   const user = await getCurrentUser();

@@ -3,27 +3,16 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { confirmEmailCodeAction, resendCodeAction } from "@/lib/actions/verify";
-import { logoutAction } from "@/lib/actions/auth";
+import {
+  loginOtpCheckAction,
+  resendLoginCodeAction,
+} from "@/lib/actions/verify";
 import { fill, useD } from "@/components/LocaleProvider";
 import { AuthShell } from "@/components/AuthShell";
 import { OtpCard } from "@/components/otp/OtpCard";
 
-/**
- * The verify screen, in both of its moods.
- *
- * `required` is a new account that cannot use the app yet; the same screen
- * with `required` false is somebody who already had an account and chose to
- * verify. Only the copy and the escape hatch differ, so it is one component —
- * two would drift, and the drift would land on whichever mood is rarer.
- */
-export function VerifyForm({
-  email,
-  required,
-}: {
-  email: string;
-  required: boolean;
-}) {
+/** Step two of sign-in: the code from the inbox, in the animated card. */
+export function LoginOtpForm({ email }: { email: string }) {
   const d = useD();
   const router = useRouter();
   const [resent, setResent] = useState<string | null>(null);
@@ -34,7 +23,7 @@ export function VerifyForm({
     setResent(null);
     setResendError(null);
     startResend(async () => {
-      const result = await resendCodeAction();
+      const result = await resendLoginCodeAction();
       if (result.error) setResendError(result.error);
       else setResent(d.verify.resent);
     });
@@ -42,29 +31,18 @@ export function VerifyForm({
 
   return (
     <AuthShell
-      kicker={d.verify.kicker}
-      title={required ? d.verify.title : d.verify.voluntaryTitle}
-      body={fill(required ? d.verify.body : d.verify.voluntaryBody, { email })}
+      kicker={d.otp.loginKicker}
+      title={d.otp.loginTitle}
+      body={fill(d.otp.loginBody, { email })}
       footer={
-        required ? (
-          <>
-            {d.verify.wrongAccount}{" "}
-            <form action={logoutAction} className="inline">
-              <button type="submit" className="font-bold text-orange">
-                {d.verify.signOut}
-              </button>
-            </form>
-          </>
-        ) : (
-          <Link href="/settings" className="font-bold text-orange">
-            {d.verify.later}
-          </Link>
-        )
+        <Link href="/login" className="font-bold text-orange">
+          {d.otp.backToLogin}
+        </Link>
       }
     >
       <div className="mt-8">
         <OtpCard
-          verify={confirmEmailCodeAction}
+          verify={loginOtpCheckAction}
           onSuccess={(redirect) => {
             router.push(redirect ?? "/home");
             router.refresh();
@@ -86,9 +64,7 @@ export function VerifyForm({
       >
         {resending ? d.verify.resending : d.verify.resend}
       </button>
-      <p className="mt-2 text-[12px] text-muted leading-relaxed">
-        {d.verify.spam}
-      </p>
+      <p className="mt-2 text-[12px] text-muted leading-relaxed">{d.verify.spam}</p>
     </AuthShell>
   );
 }

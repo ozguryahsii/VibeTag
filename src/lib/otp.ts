@@ -20,7 +20,7 @@ import type { Dictionary } from "@/lib/i18n";
 export const OTP_TTL_MS = 10 * 60_000;
 const MAX_ATTEMPTS = 5;
 
-export type OtpPurpose = "REGISTER" | "VERIFY" | "RESET";
+export type OtpPurpose = "REGISTER" | "VERIFY" | "RESET" | "LOGIN";
 
 function hashCode(code: string): string {
   return createHash("sha256").update(code).digest("hex");
@@ -66,7 +66,12 @@ export async function sendOtp(
     }),
   ]);
 
-  const copy = purpose === "RESET" ? d.otp.resetMail : d.otp.verifyMail;
+  const copy =
+    purpose === "RESET"
+      ? d.otp.resetMail
+      : purpose === "LOGIN"
+        ? d.otp.loginMail
+        : d.otp.verifyMail;
   const mail = otpEmail(code, {
     subject: copy.subject,
     heading: copy.heading,

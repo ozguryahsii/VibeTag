@@ -10,6 +10,7 @@ import type { Locale } from "@/lib/i18n/config";
 import { planLabel } from "@/lib/labels";
 import { LangToggle } from "@/components/LangToggle";
 import { CodeForm } from "@/components/admin/CodeForm";
+import { DeleteCode } from "@/components/admin/DeleteCode";
 import { Card, EmptyState, SectionTitle } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -82,6 +83,8 @@ export default async function AdminCodesPage() {
                         {c.days === null
                           ? a.forever
                           : fill(a.forDays, { n: c.days })}
+                        {c.percentOff !== null &&
+                          ` · ${fill(a.percentBadge, { n: c.percentOff })}`}
                       </p>
                     </div>
                     <span
@@ -128,12 +131,15 @@ export default async function AdminCodesPage() {
                     )}
                   </div>
 
-                  <form action={toggleCodeAction} className="mt-3">
-                    <input type="hidden" name="codeId" value={c.id} />
-                    <button className="text-[12px] font-bold text-muted bg-white border border-line rounded-full px-3.5 py-2">
-                      {c.active ? a.turnOff : a.turnOn}
-                    </button>
-                  </form>
+                  <div className="mt-3 flex items-center gap-2">
+                    <form action={toggleCodeAction}>
+                      <input type="hidden" name="codeId" value={c.id} />
+                      <button className="text-[12px] font-bold text-muted bg-white border border-line rounded-full px-3.5 py-2">
+                        {c.active ? a.turnOff : a.turnOn}
+                      </button>
+                    </form>
+                    <DeleteCode codeId={c.id} code={c.code} />
+                  </div>
                 </Card>
               );
             })}

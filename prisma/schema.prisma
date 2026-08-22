@@ -55,6 +55,11 @@ model User {
   phoneVerifiedAt DateTime?
   idVerifiedAt    DateTime?
 
+  /// When they ticked "I read and accept" at registration — the privacy
+  /// policy, KVKK notice and terms, as one consent. Null on accounts that
+  /// predate the checkbox.
+  termsAcceptedAt DateTime?
+
   /// New accounts must confirm their email before the app opens. Accounts that
   /// existed before verification was introduced are grandfathered — being
   /// locked out of an account you already had is not a security improvement.

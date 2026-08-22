@@ -14,6 +14,7 @@ import {
   createSession,
   destroySession,
   hashPassword,
+  openPendingLogin,
   requireUser,
   verifyPassword,
 } from "@/lib/auth";
@@ -62,6 +63,12 @@ export async function registerAction(
     return { error: d.auth.errors.email };
   if (username.length < 3) return { error: d.auth.errors.username };
   if (password.length < 6) return { error: d.auth.errors.password };
+  // The legal texts are accepted or the account does not exist — and the
+  // moment of acceptance is recorded, because "did they agree" is a
+  // question that gets asked with a date attached.
+  if (formData.get("consent") !== "on") {
+    return { error: d.auth.errors.consent };
+  }
 
   const clash = await prisma.user.findFirst({
     where: { OR: [{ email }, { username }] },
@@ -77,6 +84,7 @@ export async function registerAction(
       username,
       passwordHash: hashPassword(password),
       avatarColor: pick(AVATAR_COLORS, email),
+      termsAcceptedAt: new Date(),
     },
   });
 
@@ -126,12 +134,12 @@ export async function loginAction(
     };
   }
 
-  await createSession(user.id);
-
-  // Someone who already had an account can be invited too — redeeming here
-  // is what makes an invite-only profile reachable by an existing user.
-  const inviter = await redeemInviteFor(user.id);
-  redirect(inviter ? `/rate/${inviter}` : "/home");
+  // The password is step one of two. No session yet — a ticket cookie
+  // carries who passed, and the code sent to their inbox finishes it on
+  // /verify-login.
+  await sendOtp(user, "LOGIN", d);
+  await openPendingLogin(user);
+  redirect("/verify-login");
 }
 
 export async function logoutAction(): Promise<void> {

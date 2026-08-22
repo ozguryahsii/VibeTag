@@ -79,6 +79,19 @@ export function CodeForm() {
           </label>
         </div>
 
+        <label>
+          <span className={LABEL}>{a.percent}</span>
+          <input
+            name="percentOff"
+            inputMode="numeric"
+            placeholder="100"
+            className={`${FIELD} tabular-nums`}
+          />
+          <span className="mt-1 block text-[11px] text-muted leading-relaxed">
+            {a.percentHint}
+          </span>
+        </label>
+
         <p className="text-[11px] text-muted leading-relaxed -mt-1">
           {a.daysHint} {a.maxUsesHint}
         </p>

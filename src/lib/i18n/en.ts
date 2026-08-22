@@ -102,6 +102,9 @@ export const en = {
   },
 
   auth: {
+    consentPrefix: "I have read and accept the",
+    consentAnd: "and the",
+    consentSuffix: ".",
     loginKicker: "WELCOME BACK",
     registerKicker: "CREATE YOUR SIGNATURE",
     emailPlaceholder: "you@example.com",
@@ -126,6 +129,7 @@ export const en = {
     signUp: "Sign up",
     haveAccount: "Already have an account?",
     errors: {
+      consent: "You need to accept the privacy policy, the KVKK notice and the terms to sign up.",
       name: "What is your name?",
       email: "A valid email is required.",
       username: "Username must be at least 3 characters.",
@@ -202,9 +206,9 @@ export const en = {
       "We store your location roughly, never precisely, and only use it to sort this list. You can turn it off any time.",
     nearbyEnable: "Turn on nearby",
     nearbyDisable: "Turn off nearby",
-    nearbyLockedTitle: "Nearby members are a premium view",
+    nearbyLockedTitle: "Nearby is a Premium feature",
     nearbyLockedBody:
-      "Your location is on and premium members nearby can see you. Seeing the list yourself comes with Silver and Gold.",
+      "Your location is on and premium members nearby can see you. Buy Silver or Gold Premium to see the people near you.",
     nearbyLockedCta: "See the plans",
     nearbyAsking: "Getting your location…",
     nearbyDenied:
@@ -410,6 +414,19 @@ export const en = {
   otp: {
     tooMany: "Too many attempts. Try again in {n} minutes.",
     sendFailed: "We could not send the code just now. Try again in a moment.",
+    loginExpired: "This sign-in attempt expired. Enter your password again.",
+    loginKicker: "TWO-STEP SIGN-IN",
+    loginTitle: "Enter your sign-in code",
+    loginBody: "We sent a 6-digit code to {email}. Enter it to finish signing in.",
+    backToLogin: "← Back to sign-in",
+    anim: {
+      checking: "Checking…",
+      wrong: "That code is not right.",
+      network: "Could not reach the server. Try again.",
+      ok: "Verified",
+      group: "{n}-digit verification code",
+      digit: "Digit {i} of {n}",
+    },
     errors: {
       none: "Ask for a code first.",
       expired: "That code has expired. Ask for a new one.",
@@ -422,6 +439,11 @@ export const en = {
       subject: "Your Vibe Tag code",
       heading: "Confirm your email",
       body: "Enter this code in Vibe Tag to confirm this address is yours.",
+    },
+    loginMail: {
+      subject: "Your Vibe Tag sign-in code",
+      heading: "Confirm it is you",
+      body: "Enter this code in Vibe Tag to finish signing in. If this was not you, change your password.",
     },
     resetMail: {
       subject: "Reset your Vibe Tag password",
@@ -720,9 +742,9 @@ export const en = {
         price: "₺149/mo",
         perks: [
           "Everything in Silver",
-          "Who rated you and how they know you",
-          "Protected ratings still stay anonymous",
-        ],
+          "See who wrote every rating you received",
+          "Who rated you, and how they know you",
+              ],
       },
     },
   },
@@ -867,6 +889,13 @@ export const en = {
       maxUses: "Max uses",
       maxUsesHint: "Empty means unlimited.",
       expiresAt: "Redeemable until",
+      percent: "Discount %",
+      percentHint: "What the code will take off at checkout when store billing arrives. Empty means it grants the plan outright, i.e. 100%.",
+      percentBadge: "{n}% off",
+      deleteCta: "Delete",
+      deleteTitle: "Delete this code?",
+      deleteBody: "{code} and its entire redemption history will be removed permanently. Plans already granted stay granted.",
+      deleteConfirm: "Yes, delete",
       create: "Create code",
       creating: "Creating…",
       created: "{code} is ready.",
@@ -907,6 +936,7 @@ export const en = {
       badPlan: "Pick a valid plan.",
       badDays: "Days must be a number between 1 and 3650.",
       badUses: "Max uses must be a number of at least 1.",
+      badPercent: "Discount must be a number between 1 and 100.",
       badDate: "That date could not be read.",
       badCode: "A code is 4–24 letters, digits or dashes.",
       codeTaken: "That code already exists.",

@@ -1043,13 +1043,13 @@ export const tr: Dictionary = {
     receivedService: "Hizmet aldım",
     providedService: "Hizmet verdim",
     online: "Online tanışıyoruz",
-    community: "Topluluk / grup üzerinden",
+    community: "Sosyal medya üzerinden takip ediyorum",
     other: "Diğer",
   },
 
   traitHints: {
     reliability: "Sözünü tutar mı?",
-    communication: "Kendini net ifade eder mi?",
+    communication: "Kendini net ifade eder, seni dinler mi?",
     kindness: "Nazik ve saygılı mı?",
     helpfulness: "İhtiyaç anında yardım eder mi?",
     professionalism: "İşini ciddiye alır mı?",
@@ -1059,7 +1059,7 @@ export const tr: Dictionary = {
     diligence: "Emek verir mi?",
     leadership: "Yön gösterir mi?",
     punctuality: "Zamanına sadık mı?",
-    honesty: "Açık ve dürüst mü?",
+    honesty: "Doğruyu söyler mi?",
     empathy: "Seni anlar mı?",
     supportiveness: "Zor anında yanında mı?",
     funToBeAround: "Birlikte vakit geçirmek keyifli mi?",
@@ -1068,6 +1068,14 @@ export const tr: Dictionary = {
     fairness: "Fiyat ve şartlarda adil mi?",
     respect: "Sınırlara saygılı mı?",
     positivity: "Ortama enerji katar mı?",
+    expertise: "İşini doğru yapmak için gerekli bilgiye sahip mi?",
+    justice: "Ekibi içindeki değerlendirmelerde adil mi?",
+    equality: "Farklı kişilerle yaşanan aynı olaylarda eşit tepki verir mi?",
+    compliance: "Şirketin belirlediği kurallara uyar mı?",
+    loyalty: "İlişkilerine sadık mıdır?",
+    boundaries: "Yeni ortamlarda mesafesini korumayı bilir mi?",
+    appearance: "Dış görünüşüne özen gösteriyor mu?",
+    authenticity: "Sosyal medya içerikleri kendini yansıtıyor mu?",
   },
 
   // Açıklamalar rozetin ne anlama geldiğini söyler; her seviyenin sayıları
@@ -1089,7 +1097,7 @@ export const tr: Dictionary = {
       label: "İyi Kalp"
     },
     manyWorlds: {
-      label: "Çok Yönlü"
+      label: "Çok Sosyal"
     },
     straightTalker: {
       label: "Sözü Dürüst"
@@ -1102,6 +1110,9 @@ export const tr: Dictionary = {
     },
     wellKnown: {
       label: "Çevresi Geniş"
+    },
+    originalMind: {
+      label: "Özgün Fikir"
     },
   },
 

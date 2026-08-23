@@ -62,7 +62,15 @@ export type TraitKey =
   | "workQuality"
   | "fairness"
   | "respect"
-  | "positivity";
+  | "positivity"
+  | "expertise"
+  | "justice"
+  | "equality"
+  | "compliance"
+  | "loyalty"
+  | "boundaries"
+  | "appearance"
+  | "authenticity";
 
 export type Trait = {
   key: TraitKey;
@@ -85,7 +93,7 @@ export const TRAITS: Record<TraitKey, Trait> = {
     label: "İletişim",
     en: "Communication",
     emoji: "💬",
-    hint: "Kendini net ifade eder mi?",
+    hint: "Kendini net ifade eder, seni dinler mi?",
   },
   kindness: {
     key: "kindness",
@@ -124,7 +132,7 @@ export const TRAITS: Record<TraitKey, Trait> = {
   },
   problemSolving: {
     key: "problemSolving",
-    label: "Problem çözme",
+    label: "Çözüm Odaklı",
     en: "Problem Solving",
     emoji: "💡",
     hint: "Çözüm üretir mi?",
@@ -155,7 +163,7 @@ export const TRAITS: Record<TraitKey, Trait> = {
     label: "Dürüstlük",
     en: "Honesty",
     emoji: "🛡️",
-    hint: "Açık ve dürüst mü?",
+    hint: "Doğruyu söyler mi?",
   },
   empathy: {
     key: "empathy",
@@ -173,7 +181,7 @@ export const TRAITS: Record<TraitKey, Trait> = {
   },
   funToBeAround: {
     key: "funToBeAround",
-    label: "Eğlenceli olma",
+    label: "Eğlenceli",
     en: "Fun",
     emoji: "😄",
     hint: "Birlikte vakit geçirmek keyifli mi?",
@@ -213,6 +221,62 @@ export const TRAITS: Record<TraitKey, Trait> = {
     emoji: "🔥",
     hint: "Ortama enerji katar mı?",
   },
+  expertise: {
+    key: "expertise",
+    label: "İşinde Uzman",
+    en: "Expertise",
+    emoji: "🎓",
+    hint: "İşini doğru yapmak için gerekli bilgiye sahip mi?",
+  },
+  justice: {
+    key: "justice",
+    label: "Adalet",
+    en: "Justice",
+    emoji: "🏛️",
+    hint: "Ekibi içindeki değerlendirmelerde adil mi?",
+  },
+  equality: {
+    key: "equality",
+    label: "Eşitlik",
+    en: "Equality",
+    emoji: "🤲",
+    hint: "Farklı kişilerle yaşanan aynı olaylarda eşit tepki verir mi?",
+  },
+  compliance: {
+    key: "compliance",
+    label: "Kurallara Uyum",
+    en: "Compliance",
+    emoji: "📏",
+    hint: "Şirketin belirlediği kurallara uyar mı?",
+  },
+  loyalty: {
+    key: "loyalty",
+    label: "Sadık",
+    en: "Loyalty",
+    emoji: "💖",
+    hint: "İlişkilerine sadık mıdır?",
+  },
+  boundaries: {
+    key: "boundaries",
+    label: "Mesafeye Saygı",
+    en: "Respects Boundaries",
+    emoji: "🚪",
+    hint: "Yeni ortamlarda mesafesini korumayı bilir mi?",
+  },
+  appearance: {
+    key: "appearance",
+    label: "Dış Görünüş",
+    en: "Appearance",
+    emoji: "🪞",
+    hint: "Dış görünüşüne özen gösteriyor mu?",
+  },
+  authenticity: {
+    key: "authenticity",
+    label: "Doğal Olma",
+    en: "Authenticity",
+    emoji: "🍃",
+    hint: "Sosyal medya içerikleri kendini yansıtıyor mu?",
+  },
 };
 
 // ---------------------------------------------------- relationships
@@ -247,6 +311,16 @@ export type Relationship = {
   emoji: string;
   /** Traits this relationship may score. Order matters in the UI. */
   traits: TraitKey[];
+  /**
+   * Question wording that differs *in this relationship only*.
+   *
+   * A trait's question is global, but the same trait sometimes needs to be
+   * asked differently in one context — "is it fun to be around them?" makes
+   * no sense about a social-media account, where the question is whether the
+   * *content* is fun. Both languages live here so the rating flow and the
+   * taxonomy report cannot drift apart.
+   */
+  hintOverrides?: Partial<Record<TraitKey, { tr: string; en: string }>>;
 };
 
 export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
@@ -262,8 +336,14 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
       "teamwork",
       "professionalism",
       "diligence",
-      "positivity",
+      "problemSolving",
     ],
+    hintOverrides: {
+      problemSolving: {
+        tr: "Problem çözümlerinde aktif rol alıyor mu?",
+        en: "Do they take an active role in solving problems?",
+      },
+    },
   },
   wasMyManager: {
     key: "wasMyManager",
@@ -278,7 +358,16 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
       "empathy",
       "professionalism",
       "problemSolving",
+      "justice",
+      "equality",
+      "expertise",
     ],
+    hintOverrides: {
+      reliability: {
+        tr: "Verdiği sözleri tutar mı?",
+        en: "Do they keep the promises they make?",
+      },
+    },
   },
   wasMyEmployee: {
     key: "wasMyEmployee",
@@ -293,7 +382,15 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
       "problemSolving",
       "punctuality",
       "teamwork",
+      "expertise",
+      "compliance",
     ],
+    hintOverrides: {
+      punctuality: {
+        tr: "Zamanlamaya sadık mı?",
+        en: "Do they stick to the schedule?",
+      },
+    },
   },
   sameProject: {
     key: "sameProject",
@@ -308,6 +405,7 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
       "problemSolving",
       "diligence",
       "communication",
+      "expertise",
     ],
   },
   wasMyClient: {
@@ -322,6 +420,7 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
       "reliability",
       "punctuality",
       "fairness",
+      "expertise",
     ],
   },
 
@@ -338,6 +437,7 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
       "supportiveness",
       "funToBeAround",
       "positivity",
+      "loyalty",
     ],
   },
   friend: {
@@ -350,8 +450,9 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
       "reliability",
       "kindness",
       "funToBeAround",
-      "supportiveness",
+      "communication",
       "positivity",
+      "honesty",
     ],
   },
   socialCircle: {
@@ -360,7 +461,7 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
     label: "Sosyal çevreden tanıyorum",
     en: "Social circle",
     emoji: "🎉",
-    traits: ["kindness", "respect", "funToBeAround", "positivity", "communication"],
+    traits: ["kindness", "respect", "positivity", "communication", "boundaries"],
   },
   familyCircle: {
     key: "familyCircle",
@@ -368,7 +469,15 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
     label: "Aile çevresinden tanıyorum",
     en: "Family circle",
     emoji: "🏡",
-    traits: ["kindness", "respect", "supportiveness", "reliability", "empathy"],
+    traits: [
+      "kindness",
+      "respect",
+      "supportiveness",
+      "reliability",
+      "empathy",
+      "funToBeAround",
+      "honesty",
+    ],
   },
 
   knowAsSeller: {
@@ -417,21 +526,33 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
     label: "Online tanışıyoruz",
     en: "Met online",
     emoji: "💻",
-    traits: ["communication", "kindness", "helpfulness", "positivity"],
+    traits: ["communication", "kindness", "helpfulness", "positivity", "appearance"],
   },
   community: {
     key: "community",
     group: "OTHER",
-    label: "Topluluk / grup üzerinden",
-    en: "Community",
+    label: "Sosyal medya üzerinden takip ediyorum",
+    en: "Follow on social media",
     emoji: "🌍",
     traits: [
       "helpfulness",
       "communication",
       "kindness",
-      "positivity",
+      "funToBeAround",
       "creativity",
+      "appearance",
+      "authenticity",
     ],
+    hintOverrides: {
+      helpfulness: {
+        tr: "İnsanlara yardım eder mi?",
+        en: "Do they help people?",
+      },
+      funToBeAround: {
+        tr: "İçerikleri eğlenceli mi?",
+        en: "Is their content fun?",
+      },
+    },
   },
   other: {
     key: "other",
@@ -439,7 +560,7 @@ export const RELATIONSHIPS: Record<RelationshipKey, Relationship> = {
     label: "Diğer",
     en: "Other",
     emoji: "✳️",
-    traits: ["kindness", "communication", "respect"],
+    traits: ["kindness", "communication", "respect", "positivity"],
   },
 };
 
@@ -632,6 +753,23 @@ export function allowedVibeTags(relationship: RelationshipKey): VibeTag[] {
 /** Traits a rater may score given the relationship they declared. */
 export function allowedTraits(relationship: RelationshipKey): Trait[] {
   return RELATIONSHIPS[relationship].traits.map((k) => TRAITS[k]);
+}
+
+/**
+ * The question to put under a trait, in the context it is being asked.
+ *
+ * Falls back to the trait's own wording. The override exists because the same
+ * trait sometimes means something different in one relationship — "is it fun
+ * to be around them?" is the wrong question about somebody you only follow on
+ * social media, where what is fun is the content.
+ */
+export function traitQuestion(
+  relationship: RelationshipKey,
+  trait: TraitKey,
+  locale: "tr" | "en" = "tr",
+): string | null {
+  const o = RELATIONSHIPS[relationship].hintOverrides?.[trait];
+  return o ? o[locale] : null;
 }
 
 /** Hard server-side guard — the whole trust model rests on this. */

@@ -10,6 +10,7 @@ import {
   MAX_VIBE_TAGS_PER_RATING,
   RELATIONSHIPS,
   allowedTraits,
+  traitQuestion,
   allowedVibeTags,
   relationshipsByGroup,
   type ContextGroup,
@@ -309,7 +310,8 @@ export function RateFlow({
                       </span>
                     </div>
                     <p className="text-[11.5px] text-muted mt-0.5 mb-3">
-                      {traitHint(t.key, d)}
+                      {traitQuestion(relationship, t.key, locale) ??
+                        traitHint(t.key, d)}
                     </p>
                     <input
                       type="range"

@@ -225,6 +225,14 @@ export const TRAIT_ICON: Record<string, keyof typeof ICONS> = {
   fairness: "scales",
   respect: "leaf",
   positivity: "bolt",
+  expertise: "medal",
+  justice: "scales",
+  equality: "users",
+  compliance: "check",
+  loyalty: "heart",
+  boundaries: "shield",
+  appearance: "userCircle",
+  authenticity: "leaf",
 };
 
 /** Relationship contexts share the vocabulary too. */

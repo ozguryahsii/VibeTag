@@ -5,6 +5,8 @@ import {
   allowedVibeTags,
   assertAllowed,
   isRelationshipKey,
+  traitQuestion,
+  TRAITS,
   MAX_VIBE_TAGS_PER_RATING,
 } from "@/lib/taxonomy";
 
@@ -77,5 +79,76 @@ describe("context lock", () => {
 
   it("rejects a relationship key that does not exist", () => {
     expect(isRelationshipKey("wasMyLandlord")).toBe(false);
+  });
+
+  /*
+   * The lock covers the newer criteria too.
+   *
+   * Several of them are only meaningful in one kind of relationship: whether
+   * somebody follows company rules is a thing a colleague saw, and how
+   * genuine their posts are is a thing a follower saw. Asked in the wrong
+   * place they are not merely odd, they are the lock quietly loosening.
+   */
+  it("keeps workplace-only criteria out of everywhere else", () => {
+    const asks = (trait: string) =>
+      Object.keys(RELATIONSHIPS).filter((key) =>
+        (
+          RELATIONSHIPS[key as keyof typeof RELATIONSHIPS]
+            .traits as readonly string[]
+        ).includes(trait),
+      );
+
+    for (const trait of ["compliance", "justice", "equality"]) {
+      const where = asks(trait);
+      expect(where.length, trait).toBeGreaterThan(0);
+      for (const key of where) {
+        expect(
+          RELATIONSHIPS[key as keyof typeof RELATIONSHIPS].group,
+          `${trait} in ${key}`,
+        ).toBe("PROFESSIONAL");
+      }
+    }
+  });
+
+  it("asks about social-media content only where there is any", () => {
+    const asks = (trait: string) =>
+      Object.keys(RELATIONSHIPS).filter((key) =>
+        (
+          RELATIONSHIPS[key as keyof typeof RELATIONSHIPS]
+            .traits as readonly string[]
+        ).includes(trait),
+      );
+    expect(asks("authenticity")).toEqual(["community"]);
+    expect(asks("loyalty")).toEqual(["closeFriend"]);
+  });
+
+  /*
+   * A question override belongs to a relationship that actually asks the
+   * trait. An override on a trait the relationship dropped is dead text that
+   * nobody sees and nobody notices has stopped matching.
+   */
+  it("only overrides questions for traits the relationship asks", () => {
+    for (const key of Object.keys(RELATIONSHIPS)) {
+      if (!isRelationshipKey(key)) throw new Error(`bad key ${key}`);
+      const rel = RELATIONSHIPS[key];
+      for (const trait of Object.keys(rel.hintOverrides ?? {})) {
+        expect(rel.traits as readonly string[], `${key}.${trait}`).toContain(
+          trait,
+        );
+      }
+    }
+  });
+
+  it("gives every criterion a question in both languages", () => {
+    for (const trait of Object.values(TRAITS)) {
+      expect(trait.hint.length, trait.key).toBeGreaterThan(3);
+      expect(trait.en.length, trait.key).toBeGreaterThan(1);
+    }
+    // And an override, where one exists, is filled in for both.
+    expect(traitQuestion("community", "funToBeAround", "tr")).toBe(
+      "İçerikleri eğlenceli mi?",
+    );
+    expect(traitQuestion("community", "funToBeAround", "en")).toBeTruthy();
+    expect(traitQuestion("friend", "funToBeAround", "tr")).toBeNull();
   });
 });

@@ -1046,13 +1046,13 @@ export const en = {
     receivedService: "I received a service",
     providedService: "I provided a service",
     online: "We know each other online",
-    community: "Through a community or group",
+    community: "Follow on social media",
     other: "Other",
   },
 
   traitHints: {
     reliability: "Do they keep their word?",
-    communication: "Do they express themselves clearly?",
+    communication: "Do they express themselves clearly and listen to you?",
     kindness: "Are they kind and respectful?",
     helpfulness: "Do they help when it is needed?",
     professionalism: "Do they take their work seriously?",
@@ -1062,7 +1062,7 @@ export const en = {
     diligence: "Do they put in the effort?",
     leadership: "Do they give direction?",
     punctuality: "Are they on time?",
-    honesty: "Are they open and honest?",
+    honesty: "Do they tell the truth?",
     empathy: "Do they understand you?",
     supportiveness: "Are they there in hard times?",
     funToBeAround: "Is it fun to spend time with them?",
@@ -1071,6 +1071,14 @@ export const en = {
     fairness: "Are they fair on price and terms?",
     respect: "Do they respect boundaries?",
     positivity: "Do they lift the room?",
+    expertise: "Do they know what the job actually needs?",
+    justice: "Are they fair when they judge their own team?",
+    equality: "Do they react the same way to the same thing, whoever did it?",
+    compliance: "Do they follow the rules the company sets?",
+    loyalty: "Are they loyal to the people close to them?",
+    boundaries: "Do they keep their distance in a new group?",
+    appearance: "Do they take care of how they present themselves?",
+    authenticity: "Does their social media reflect who they really are?",
   },
 
   // Descriptions say what the badge *means*; the numbers for each tier are
@@ -1092,7 +1100,7 @@ export const en = {
       label: "Kind Heart"
     },
     manyWorlds: {
-      label: "Many Worlds"
+      label: "Widely Social"
     },
     straightTalker: {
       label: "Straight Talker"
@@ -1105,6 +1113,9 @@ export const en = {
     },
     wellKnown: {
       label: "Well Known"
+    },
+    originalMind: {
+      label: "Original Mind"
     },
   },
 

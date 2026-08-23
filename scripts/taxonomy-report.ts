@@ -22,6 +22,7 @@ import {
   MIN_VIBE_TAGS_PER_RATING,
   RATING_UPDATE_COOLDOWN_DAYS,
   allowedVibeTags,
+  traitQuestion,
   type ContextGroup,
 } from "../src/lib/taxonomy";
 import { BADGE_FAMILIES, BADGE_TIERS } from "../src/lib/badges";
@@ -42,7 +43,9 @@ const relationships = RELATIONSHIP_KEYS.map((k) => {
       key: t,
       tr: TRAITS[t].label,
       en: TRAITS[t].en,
-      question: TRAITS[t].hint,
+      // The question as this relationship actually asks it, override included.
+      question: traitQuestion(r.key, t, "tr") ?? TRAITS[t].hint,
+      overridden: traitQuestion(r.key, t, "tr") !== null,
     })),
     tags: allowedVibeTags(r.key).map((t) => t.key),
   };
@@ -106,6 +109,7 @@ const METRIC_TR: Record<string, string> = {
   "trait:honesty": "Dürüstlük puanı",
   "trait:problemSolving": "Problem çözme puanı",
   "trait:empathy": "Empati puanı",
+  "trait:creativity": "Yaratıcılık puanı",
   "count:ratings": "Toplam değerlendirme sayısı",
   "count:score": "Vibe Score",
   "count:workRatings": "Profesyonel çevreden gelen değerlendirme sayısı",
@@ -155,7 +159,7 @@ w(
   "| Etiketler | Sayılır. Profildeki ve Vibe Card'daki en çok oy alan 5 etiketi belirler; «Good Energy» rozeti Positive Energy etiketinin sayısını da kabul eder. |",
 );
 w(
-  "| Not (yorum) | Puana etki etmez. Profilde anonim not olarak görünür (§9 — hiçbir zaman kime ait olduğu yazılmaz). |",
+  "| Not (yorum) | Puana etki etmez. Profilde anonim not olarak görünür (§9 — hiçbir zaman kime ait olduğu yazılmaz). Gold üyeler yalnızca *kendilerine* yapılan değerlendirmelerde yazanı görebilir; koruma altına alınmış bir oy Gold'a da açılmaz. |",
 );
 w();
 w("### Vibe Score nasıl hesaplanıyor?");
@@ -196,7 +200,8 @@ for (const g of report.groups) {
     w("| # | Kriter | Soru | EN |");
     w("|---|---|---|---|");
     r.traits.forEach((t, i) => {
-      w(`| ${i + 1} | ${t.tr} | ${t.question} | ${t.en} |`);
+      const q = t.overridden ? `${t.question} *(bu çevreye özel)*` : t.question;
+      w(`| ${i + 1} | ${t.tr} | ${q} | ${t.en} |`);
     });
     w();
   }

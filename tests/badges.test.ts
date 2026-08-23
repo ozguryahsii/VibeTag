@@ -34,8 +34,8 @@ describe("badges", () => {
     expect(earnedBadges(buildVibeProfile([]))).toEqual([]);
   });
 
-  it("offers ten families at three tiers each", () => {
-    expect(BADGE_FAMILIES).toHaveLength(10);
+  it("offers eleven families at three tiers each", () => {
+    expect(BADGE_FAMILIES).toHaveLength(11);
     expect(BADGE_TIERS).toHaveLength(3);
     expect(computeBadges(buildVibeProfile([]))).toHaveLength(BADGE_COUNT);
   });

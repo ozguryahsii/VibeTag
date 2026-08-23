@@ -163,6 +163,12 @@ export const BADGE_FAMILIES: FamilyDef[] = [
     metrics: [RATINGS],
     tiers: { BRONZE: [5], SILVER: [20], GOLD: [50] },
   },
+  {
+    key: "originalMind",
+    icon: "sparkle",
+    metrics: [trait("creativity")],
+    tiers: { BRONZE: [78], SILVER: [87], GOLD: [94] },
+  },
 ];
 
 export const BADGE_COUNT = BADGE_FAMILIES.length * BADGE_TIERS.length;

@@ -6,3 +6,6 @@ node_modules
 !.env.example
 *.log
 tests
+# The Capacitor shell builds on a laptop with Xcode/Android Studio,
+# never inside the server image — and its packages are not installed here.
+mobile

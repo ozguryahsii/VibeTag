@@ -12,7 +12,7 @@ import {
   areFriends,
   canSendInConversation,
   isBlockedEitherWay,
-  pairKey,
+  threadKey,
 } from "@/lib/social";
 
 export type SocialState = { error?: string; ok?: boolean };
@@ -210,11 +210,15 @@ export async function openFriendThreadAction(
   if (!other) redirect("/messages");
   if (!(await areFriends(me.id, other.id))) redirect("/messages");
 
-  const [userAId, userBId] = pairKey(me.id, other.id);
+  // Keyed on the kind as well as the pair. Without that, two friends who also
+  // have an anonymous rating thread share one row, and this button — which
+  // somebody pressed *next to a name* — opens the anonymous one, saying who
+  // the anonymous rater is without ever printing it.
+  const key = threadKey(me.id, other.id, "FRIEND");
   const convo = await prisma.conversation.upsert({
-    where: { userAId_userBId: { userAId, userBId } },
+    where: { userAId_userBId_kind: key },
     update: {},
-    create: { userAId, userBId, kind: "FRIEND" },
+    create: key,
   });
 
   redirect(`/messages/${convo.id}`);
@@ -246,21 +250,22 @@ export async function openRatingThreadAction(
   if (!rating || rating.ratedUserId !== me.id) redirect("/messages");
   if (await isBlockedEitherWay(me.id, rating.raterUserId)) redirect("/messages");
 
-  const [userAId, userBId] = pairKey(me.id, rating.raterUserId);
-  const raterSide = userAId === rating.raterUserId ? "A" : "B";
+  const key = threadKey(me.id, rating.raterUserId, "RATING");
+  const raterSide = key.userAId === rating.raterUserId ? "A" : "B";
 
   // Hide the rater only from someone who could not already see them. A Gold
   // member reading this person's name on the insights screen must not be told
   // "anonymous rater" one tap later.
   const anonymousSide = canSeeRaterIdentity(me.plan, rating) ? null : raterSide;
 
+  // The mirror of the same rule: a friend thread that happens to exist must
+  // not be handed back here, or the rater's real name lands in the header of
+  // a thread opened precisely because they were anonymous.
   const convo = await prisma.conversation.upsert({
-    where: { userAId_userBId: { userAId, userBId } },
+    where: { userAId_userBId_kind: key },
     update: {},
     create: {
-      userAId,
-      userBId,
-      kind: "RATING",
+      ...key,
       ratingId: rating.id,
       raterSide,
       anonymousSide,

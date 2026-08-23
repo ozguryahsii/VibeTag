@@ -84,7 +84,9 @@ export default async function MessagesPage({
                   <p className="text-[12.5px] text-muted truncate mt-0.5">
                     {t.lastMessage
                       ? `${t.lastMessage.senderId === me.id ? `${d.messages.you}: ` : ""}${t.lastMessage.body}`
-                      : d.messages.startedFromRating}
+                      : t.kind === "RATING"
+                        ? d.messages.startedFromRating
+                        : d.messages.noMessagesYet}
                   </p>
                 </div>
 

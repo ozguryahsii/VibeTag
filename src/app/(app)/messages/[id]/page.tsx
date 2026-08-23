@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getDict } from "@/lib/i18n/server";
-import { canSendInConversation } from "@/lib/social";
+import { canSendInConversation, hidesOther } from "@/lib/social";
 import { Avatar } from "@/components/Avatar";
 import { MessageComposer } from "@/components/MessageComposer";
 import { ReportDialog } from "@/components/ReportDialog";
@@ -31,7 +31,7 @@ export default async function ThreadPage({
 
   const iAmA = convo.userAId === me.id;
   const other = iAmA ? convo.userB : convo.userA;
-  const otherIsAnonymous = convo.anonymousSide === (iAmA ? "B" : "A");
+  const otherIsAnonymous = hidesOther(convo, me.id);
 
   // Mark what they sent us as read now that it is on screen.
   await prisma.message.updateMany({

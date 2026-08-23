@@ -662,6 +662,7 @@ export const tr: Dictionary = {
     unreadOne: "1 okunmamış mesaj",
     unreadMany: "{n} okunmamış mesaj",
     startedFromRating: "Bir değerlendirmeden başladı",
+    noMessagesYet: "Henüz mesaj yok",
     threadWith: "{name} ile sohbet",
     reportThread: "Bildir",
     reportAnonymousNote:

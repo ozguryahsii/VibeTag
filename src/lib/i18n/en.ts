@@ -665,6 +665,7 @@ export const en = {
     unreadOne: "1 unread message",
     unreadMany: "{n} unread messages",
     startedFromRating: "Started from a rating",
+    noMessagesYet: "No messages yet",
     threadWith: "Conversation with {name}",
     reportThread: "Report",
     reportAnonymousNote:

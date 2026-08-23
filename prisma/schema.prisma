@@ -450,7 +450,12 @@ model Conversation {
   /// FRIEND | RATING
   kind String @default("FRIEND")
 
-  /// Stored with the lower id first so a pair can only ever have one thread.
+  /// Stored with the lower id first, so a pair maps to one row per `kind`.
+  ///
+  /// Two threads at most, and the pair alone is deliberately *not* unique: a
+  /// friend thread and an anonymous rating thread between the same two people
+  /// have to stay separate rows. Merged, tapping "message my friend" would
+  /// land somebody in the anonymous thread and name the rater by navigation.
   userAId String
   userA   User   @relation("ConvA", fields: [userAId], references: [id], onDelete: Cascade)
   userBId String
@@ -483,7 +488,7 @@ model Conversation {
 
   messages Message[]
 
-  @@unique([userAId, userBId])
+  @@unique([userAId, userBId, kind])
   @@index([lastMessageAt])
 }
 

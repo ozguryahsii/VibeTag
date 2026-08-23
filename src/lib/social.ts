@@ -1,6 +1,10 @@
 import "server-only";
 
 import { prisma } from "@/lib/db";
+import { hidesOther, pairKey, threadKey } from "@/lib/threads";
+
+export { hidesOther, pairKey, threadKey };
+export type { ThreadKind } from "@/lib/threads";
 
 /**
  * Friendships and the permission rules around direct messages.
@@ -16,11 +20,6 @@ export type FriendState =
   | "FRIENDS"
   | "REQUEST_SENT"
   | "REQUEST_RECEIVED";
-
-/** Conversation ids are stored with the lower user id first. */
-export function pairKey(a: string, b: string): [string, string] {
-  return a < b ? [a, b] : [b, a];
-}
 
 export async function friendState(
   meId: string,
@@ -142,11 +141,6 @@ export async function canSendInConversation(
   return incoming > 0 ? { ok: true } : { ok: false, reason: "WAIT_FOR_REPLY" };
 }
 
-export async function findConversation(meId: string, otherId: string) {
-  const [userAId, userBId] = pairKey(meId, otherId);
-  return prisma.conversation.findUnique({ where: { userAId_userBId: { userAId, userBId } } });
-}
-
 /**
  * Threads for one person's inbox.
  *
@@ -191,9 +185,7 @@ export async function listConversations(
   return rows.map((c) => {
     const iAmA = c.userAId === userId;
     const other = iAmA ? c.userB : c.userA;
-    // The other side is hidden when *they* are the anonymous participant.
-    const otherSide = iAmA ? "B" : "A";
-    const otherIsAnonymous = c.anonymousSide === otherSide;
+    const otherIsAnonymous = hidesOther(c, userId);
 
     return {
       id: c.id,

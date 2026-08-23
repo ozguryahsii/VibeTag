@@ -692,6 +692,8 @@ export const en = {
     activePlan: "Your active plan",
     planNote:
       "Plans will be purchased through the App Store and Google Play. Until then, a discount code below is the way in.",
+    planNoteShell:
+      "Plan management is coming here soon with in-app purchases.",
     privacy: "Privacy and safety",
     whoCanComment: "Who can write you a note?",
     whoCanCommentBody:

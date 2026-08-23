@@ -12,6 +12,7 @@ import {
   sidePhotos,
 } from "@/lib/photos";
 import { CARD_TAG_COUNT, topTags } from "@/lib/card-tags";
+import { isShellUserAgent, SHELL_UA_TOKEN } from "@/lib/shell-ua";
 
 const nobody = {
   emailVerifiedAt: null,
@@ -171,5 +172,29 @@ describe("card tags", () => {
   it("asks for no more than somebody has", () => {
     expect(topTags(tags.slice(0, 2))).toHaveLength(2);
     expect(topTags([])).toHaveLength(0);
+  });
+});
+
+/*
+ * The mobile shell announces itself through the user agent, and the server
+ * changes what the membership screen shows because of it (no prices without
+ * a purchase button — App Store 3.1.1). A broken predicate fails silently
+ * in both directions: prices in the store app, or a web user losing the
+ * redeem box.
+ */
+describe("native shell detection", () => {
+  it("recognises the shell token anywhere in the UA", () => {
+    expect(
+      isShellUserAgent(
+        `Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) ${SHELL_UA_TOKEN}/1.0`,
+      ),
+    ).toBe(true);
+  });
+
+  it("treats ordinary browsers as the web", () => {
+    expect(isShellUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0)")).toBe(false);
+    expect(isShellUserAgent(null)).toBe(false);
+    expect(isShellUserAgent(undefined)).toBe(false);
+    expect(isShellUserAgent("")).toBe(false);
   });
 });

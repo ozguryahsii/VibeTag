@@ -58,6 +58,7 @@ export default async function RootLayout({
     >
       <head>
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body>
         <div className="app-shell">

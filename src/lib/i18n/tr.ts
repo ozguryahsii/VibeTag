@@ -689,6 +689,8 @@ export const tr: Dictionary = {
     activePlan: "Aktif planın",
     planNote:
       "Planlar App Store ve Google Play üzerinden satın alınacak. O zamana kadar aşağıya bir indirim kodu girerek geçebilirsin.",
+    planNoteShell:
+      "Planların yönetimi yakında uygulama içi satın alma ile burada olacak.",
     privacy: "Gizlilik ve güvenlik",
     whoCanComment: "Sana kimler yorum yapabilir?",
     whoCanCommentBody:

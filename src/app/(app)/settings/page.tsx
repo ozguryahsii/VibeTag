@@ -14,6 +14,7 @@ import { IconGlyph } from "@/components/Icon";
 import { ICONS } from "@/lib/icons";
 import { Card, SectionTitle } from "@/components/ui";
 import { getDict } from "@/lib/i18n/server";
+import { isNativeShell } from "@/lib/native-shell";
 import { fill } from "@/lib/i18n";
 import { LangToggle } from "@/components/LangToggle";
 
@@ -28,6 +29,11 @@ export const dynamic = "force-dynamic";
 export default async function SettingsPage() {
   const user = await requireUser();
   const d = await getDict();
+  // Inside the store apps the membership section may not show prices beside
+  // no purchase button (App Store 3.1.1), and an arbitrary redeem code that
+  // unlocks premium reads as sidestepping in-app purchase. Both hide until
+  // IAP lands; the web keeps them.
+  const inShell = await isNativeShell();
   const pushKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || null;
   const vault = await prisma.profilePhoto.findMany({
     where: { userId: user.id },
@@ -127,7 +133,9 @@ export default async function SettingsPage() {
                       {plan.tagline}
                     </span>
                   </div>
-                  <span className="text-[14px] font-extrabold">{plan.price}</span>
+                  {!inShell && (
+                    <span className="text-[14px] font-extrabold">{plan.price}</span>
+                  )}
                 </div>
 
                 <ul className="mt-3 grid gap-1.5">
@@ -152,11 +160,13 @@ export default async function SettingsPage() {
           })}
         </div>
         <p className="text-[11.5px] text-muted mt-3 px-1 leading-relaxed">
-          {d.settings.planNote}
+          {inShell ? d.settings.planNoteShell : d.settings.planNote}
         </p>
-        <div className="mt-3">
-          <RedeemCode />
-        </div>
+        {!inShell && (
+          <div className="mt-3">
+            <RedeemCode />
+          </div>
+        )}
       </div>
 
       {/* Only offered when push is actually configured for this deployment. */}

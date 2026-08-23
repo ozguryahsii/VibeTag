@@ -424,6 +424,7 @@ export const tr: Dictionary = {
     use: "Bunu kullan",
     open: "Fotoğrafı aç",
     close: "Kapatmak için bir yere dokun",
+    swipe: "Fotoğraflar arasında geçmek için kaydır · kapatmak için dokun",
   },
 
   otp: {

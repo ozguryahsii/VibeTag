@@ -427,6 +427,7 @@ export const en = {
     use: "Use this",
     open: "Open photo",
     close: "Tap anywhere to close",
+    swipe: "Swipe for the next photo · tap to close",
   },
 
   otp: {

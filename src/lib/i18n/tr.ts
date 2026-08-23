@@ -385,8 +385,6 @@ export const tr: Dictionary = {
     styleFromScore: "Kartının tasarımı Vibe Score'unu takip eder ({n}).",
     showScore: "Skoru göster",
     showScoreBody: "Kapatırsan kartta sadece etiketlerin görünür.",
-    showBadges: "Rozetlerimi göster",
-    showBadgesBody: "Kazanması en zor dört rozetin ve doğrulama rozetin karta eklenir.",
     share: "Paylaş",
     download: "PNG indir ({w}×{h})",
     downloaded: "Kart indirildi 🎉",

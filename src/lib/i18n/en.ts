@@ -388,8 +388,6 @@ export const en = {
     styleFromScore: "Your card design follows your Vibe Score ({n}).",
     showScore: "Show the score",
     showScoreBody: "Turn it off to share only your tags.",
-    showBadges: "Show my badges",
-    showBadgesBody: "Your four hardest-won badges and your verification badge are added to the card.",
     share: "Share",
     download: "Download PNG ({w}×{h})",
     downloaded: "Card downloaded 🎉",

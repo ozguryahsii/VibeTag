@@ -11,6 +11,7 @@ import {
   photoLimit,
   sidePhotos,
 } from "@/lib/photos";
+import { CARD_TAG_COUNT, topTags } from "@/lib/card-tags";
 
 const nobody = {
   emailVerifiedAt: null,
@@ -135,5 +136,40 @@ describe("photo limits", () => {
   it("stops publishing extras when the plan shrinks, without deleting", () => {
     expect(sidePhotos(photos, "one", "SILVER")).toHaveLength(3);
     expect(sidePhotos(photos, "one", "FREE")).toHaveLength(0);
+  });
+});
+
+/*
+ * The Vibe Card and the profile card show the same tags.
+ *
+ * They are drawn by completely different code — one on a canvas, one in
+ * React — so nothing on screen looks wrong when they stop agreeing; the
+ * profile just quietly says something the shared picture does not.
+ */
+describe("card tags", () => {
+  const tags = [
+    { key: "reliable" },
+    { key: "creative" },
+    { key: "calm" },
+    { key: "positiveEnergy" },
+    { key: "goodListener" },
+    { key: "funny" },
+    { key: "helpful" },
+  ];
+
+  it("shows five, in the order they arrive", () => {
+    expect(CARD_TAG_COUNT).toBe(5);
+    expect(topTags(tags).map((t) => t.key)).toEqual([
+      "reliable",
+      "creative",
+      "calm",
+      "positiveEnergy",
+      "goodListener",
+    ]);
+  });
+
+  it("asks for no more than somebody has", () => {
+    expect(topTags(tags.slice(0, 2))).toHaveLength(2);
+    expect(topTags([])).toHaveLength(0);
   });
 });

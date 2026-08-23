@@ -3,9 +3,8 @@ import { getPercentile, getVibeProfile } from "@/lib/profile";
 import { VibeCardStudio } from "@/components/VibeCardStudio";
 import { EmptyState, Button } from "@/components/ui";
 import { getDict, getLocale } from "@/lib/i18n/server";
-import { badgeLabel, tagLabel } from "@/lib/labels";
-import { bestPerFamily, computeBadges, hardestBadges } from "@/lib/badges";
-import { prisma } from "@/lib/db";
+import { tagLabel } from "@/lib/labels";
+import { topTags } from "@/lib/card-tags";
 import { LangToggle } from "@/components/LangToggle";
 
 export default async function CardPage() {
@@ -14,26 +13,6 @@ export default async function CardPage() {
   const locale = await getLocale();
   const profile = await getVibeProfile(user.id);
   const percentile = await getPercentile(user.id, profile.score);
-
-  // Owned badges beat the live calculation, exactly as on the Badges tab —
-  // a card must never show fewer badges than the app just congratulated
-  // someone for.
-  const held = await prisma.earnedBadge.findMany({
-    where: { userId: user.id },
-    select: { key: true, tier: true },
-  });
-  const heldIds = new Set(held.map((b) => `${b.key}:${b.tier}`));
-  // One per family, then the four hardest of those — the card should show
-  // what took the most doing, not whatever happens to sort first.
-  const badges = hardestBadges(
-    bestPerFamily(
-      computeBadges(profile).map((b) => ({
-        ...b,
-        earned: b.earned || heldIds.has(`${b.key}:${b.tier}`),
-      })),
-    ),
-    4,
-  );
 
   if (profile.ratingCount === 0) {
     return (
@@ -90,29 +69,10 @@ export default async function CardPage() {
           percentile,
           avatarUrl: user.avatarUrl,
           avatarColor: user.avatarColor,
-          tags: profile.tags
-            .slice(0, 5)
-            .map((t) => ({ key: t.key, label: tagLabel(t.key, locale) })),
-          badges: [
-            ...badges.map((b) => ({
-              key: b.key,
-              label: badgeLabel(b.key, d),
-              icon: b.icon,
-              tier: b.tier as "BRONZE" | "SILVER" | "GOLD" | "VERIFIED",
-            })),
-            // The verification chip is not a badge and never competes with
-            // one for a slot: it rides along whenever the email is confirmed.
-            ...(user.emailVerifiedAt
-              ? [
-                  {
-                    key: "verifiedEmail",
-                    label: d.verifications.email.label,
-                    icon: "shieldCheck",
-                    tier: "VERIFIED" as const,
-                  },
-                ]
-              : []),
-          ],
+          tags: topTags(profile.tags).map((t) => ({
+            key: t.key,
+            label: tagLabel(t.key, locale),
+          })),
         }}
       />
     </main>

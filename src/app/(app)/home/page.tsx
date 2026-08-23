@@ -5,11 +5,12 @@ import { unreadCount } from "@/lib/notifications";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 import { badgeLabel, tagLabel, tierLabel, traitLabel } from "@/lib/labels";
+import { topTags } from "@/lib/card-tags";
 import { TIER_STYLE } from "@/lib/tier-style";
 import { LangToggle } from "@/components/LangToggle";
 import { getPercentile, getVibeProfile } from "@/lib/profile";
 import { VibeCardCanvas } from "@/components/card/VibeCardCanvas";
-import { bestPerFamily, computeBadges, hardestBadges } from "@/lib/badges";
+import { bestPerFamily, computeBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ICONS, iconFor } from "@/lib/icons";
@@ -62,27 +63,10 @@ export default async function HomePage() {
     percentile,
     avatarUrl: user.avatarUrl,
     avatarColor: user.avatarColor,
-    tags: profile.tags
-      .slice(0, 5)
-      .map((t) => ({ key: t.key, label: tagLabel(t.key, locale) })),
-    badges: [
-      ...hardestBadges(earned, 4).map((b) => ({
-        key: b.key,
-        label: badgeLabel(b.key, d),
-        icon: b.icon,
-        tier: b.tier as "BRONZE" | "SILVER" | "GOLD" | "VERIFIED",
-      })),
-      ...(user.emailVerifiedAt
-        ? [
-            {
-              key: "verifiedEmail",
-              label: d.verifications.email.label,
-              icon: "shieldCheck",
-              tier: "VERIFIED" as const,
-            },
-          ]
-        : []),
-    ],
+    tags: topTags(profile.tags).map((t) => ({
+      key: t.key,
+      label: tagLabel(t.key, locale),
+    })),
   };
 
   return (

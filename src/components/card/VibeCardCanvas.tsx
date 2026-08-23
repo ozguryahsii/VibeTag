@@ -15,7 +15,6 @@ export function VibeCardCanvas({
   data,
   format,
   showScore = true,
-  showBadges = true,
   className,
   style,
   canvasRef: externalRef,
@@ -23,7 +22,6 @@ export function VibeCardCanvas({
   data: CardData;
   format: FormatKey;
   showScore?: boolean;
-  showBadges?: boolean;
   className?: string;
   style?: React.CSSProperties;
   /** Handed back so a parent can export the pixels. */
@@ -45,13 +43,12 @@ export function VibeCardCanvas({
       data,
       format,
       showScore,
-      showBadges,
       photo: photoRef.current,
       d,
     });
     // photoReady is a redraw trigger, not a value this function reads.
     void photoReady;
-  }, [data, format, showScore, showBadges, d, photoReady, ref]);
+  }, [data, format, showScore, d, photoReady, ref]);
 
   // Decode the profile photo once, then redraw. Data URLs are same-origin, so
   // the canvas stays untainted and toDataURL keeps working.

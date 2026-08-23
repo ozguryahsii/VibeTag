@@ -29,10 +29,6 @@ export function VibeCardStudio({ data }: { data: CardData }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [format, setFormat] = useState<FormatKey>("story");
   const [showScore, setShowScore] = useState(true);
-  // The approved card art uses trait pills as the only mid-card metadata.
-  // Badges remain available as an explicit option, but no longer distort the
-  // first impression of the score-driven design.
-  const [showBadges, setShowBadges] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
 
   const { band } = sceneFor(data.score);
@@ -87,7 +83,6 @@ export function VibeCardStudio({ data }: { data: CardData }) {
           data={data}
           format={format}
           showScore={showScore}
-          showBadges={showBadges}
           className="w-full h-auto rounded-[26px]"
           style={{
             maxWidth:
@@ -141,25 +136,6 @@ export function VibeCardStudio({ data }: { data: CardData }) {
           </span>
         </span>
       </label>
-
-      {data.badges.length > 0 && (
-        <label className="mt-2.5 flex items-center gap-3 card p-4 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={showBadges}
-            onChange={(e) => setShowBadges(e.target.checked)}
-            className="w-5 h-5 accent-[#F05262]"
-          />
-          <span>
-            <span className="block text-[13.5px] font-bold">
-              {d.card.showBadges}
-            </span>
-            <span className="block text-[12px] text-muted">
-              {d.card.showBadgesBody}
-            </span>
-          </span>
-        </label>
-      )}
 
       <div className="mt-5 grid gap-2.5">
         <button

@@ -21,11 +21,7 @@ const SAMPLE: Omit<CardData, "score"> = {
     { key: "creative", label: "Creative" },
     { key: "calm", label: "Calm" },
     { key: "positiveEnergy", label: "Positive Energy" },
-  ],
-  badges: [
-    { key: "trustedPerson", label: "Trusted", icon: "shieldCheck", tier: "GOLD" },
-    { key: "kindHeart", label: "Kind Heart", icon: "heart", tier: "SILVER" },
-    { key: "wellKnown", label: "Well Known", icon: "globe", tier: "BRONZE" },
+    { key: "goodListener", label: "Good Listener" },
   ],
   avatarUrl: null,
   avatarColor: "#FF8A3D",
@@ -41,7 +37,6 @@ function sampleScore(band: CardBand): number {
 
 export function BandGallery({ bands }: { bands: CardBand[] }) {
   const [format, setFormat] = useState<FormatKey>("story");
-  const [showBadges, setShowBadges] = useState(false);
 
   return (
     <div>
@@ -57,15 +52,6 @@ export function BandGallery({ bands }: { bands: CardBand[] }) {
             {k}
           </button>
         ))}
-        <label className="ml-auto flex items-center gap-2 text-[12px] font-bold text-muted cursor-pointer">
-          <input
-            type="checkbox"
-            checked={showBadges}
-            onChange={(e) => setShowBadges(e.target.checked)}
-            className="w-4 h-4 accent-[#F05262]"
-          />
-          badges
-        </label>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
@@ -74,7 +60,6 @@ export function BandGallery({ bands }: { bands: CardBand[] }) {
             <VibeCardCanvas
               data={{ ...SAMPLE, score: sampleScore(band) }}
               format={format}
-              showBadges={showBadges}
               className="w-full h-auto rounded-[16px]"
             />
             <p className="mt-2 text-[12.5px] font-extrabold leading-tight">

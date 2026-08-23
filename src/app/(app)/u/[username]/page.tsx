@@ -6,7 +6,7 @@ import { ReportDialog } from "@/components/ReportDialog";
 import { prisma } from "@/lib/db";
 import { getMyRatingOf, getPercentile, getUserByUsername, getVibeProfile } from "@/lib/profile";
 import { cooldownDaysLeft } from "@/lib/rating-rules";
-import { bestPerFamily, earnedBadges } from "@/lib/badges";
+import { bestPerFamily, earnedBadges, hardestBadges } from "@/lib/badges";
 import { generateVibeSummary } from "@/lib/insights";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
@@ -17,6 +17,7 @@ import { groupIconFor, iconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { PhotoRing } from "@/components/PhotoRing";
 import { sidePhotos } from "@/lib/photos";
+import { topTags } from "@/lib/card-tags";
 import { ScoreDial } from "@/components/ScoreDial";
 import { VibeMark } from "@/components/Logo";
 import { Avatar, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
@@ -54,6 +55,35 @@ export default async function PublicProfile({
   // Best tier per family: three Kind Hearts in a row would read as three
   // badges rather than one climbed.
   const badges = bestPerFamily(earnedBadges(profile));
+  /*
+   * The medals in the corner of the card.
+   *
+   * The same set the Vibe Card used to carry — the four hardest badges plus
+   * the verification chip — moved to where it belongs. A shared picture is
+   * one impression of a person; a profile is somebody reading about them, and
+   * that is where proof of who they are earns its place. The chip also
+   * replaces the tick that used to sit beside the name: one mark, one meaning.
+   */
+  const cardMedals = [
+    ...hardestBadges(badges, 4).map((b) => ({
+      key: `${b.key}:${b.tier}`,
+      label: `${badgeLabel(b.key, d)} · ${tierLabel(b.tier, d)}`,
+      icon: b.icon,
+      gradient: TIER_STYLE[b.tier].canvas,
+      ring: TIER_STYLE[b.tier].ring,
+    })),
+    ...(user.isVerified
+      ? [
+          {
+            key: "verifiedEmail",
+            label: d.verifications.email.label,
+            icon: "shieldCheck",
+            gradient: ["#5FC08A", "#2F8C5E"] as [string, string],
+            ring: "rgba(64,160,110,0.3)",
+          },
+        ]
+      : []),
+  ];
   // Third person: this page is about somebody else, and the self copy says
   // "you" — which on this page would tell the reader these are their ratings.
   const summary = generateVibeSummary(
@@ -114,6 +144,34 @@ export default async function PublicProfile({
           <VibeMark size={43} id="public-profile-mark" />
         </div>
 
+        {/* Slightly overlapped, so five of them still end well before the
+            photo in the middle of the card rather than sliding under it. */}
+        {cardMedals.length > 0 && (
+          <div className="absolute left-5 top-5 z-10 flex items-center">
+            {cardMedals.map((m, i) => (
+              <span
+                key={m.key}
+                title={m.label}
+                aria-label={m.label}
+                className="grid h-6 w-6 place-items-center rounded-full border border-white/80"
+                style={{
+                  background: `linear-gradient(135deg, ${m.gradient[0]}, ${m.gradient[1]})`,
+                  boxShadow: `0 3px 10px ${m.ring}`,
+                  marginLeft: i === 0 ? 0 : -4,
+                  zIndex: cardMedals.length - i,
+                }}
+              >
+                <IconGlyph
+                  def={iconFor(m.icon)}
+                  size={12}
+                  color="#fff"
+                  strokeWidth={2.2}
+                />
+              </span>
+            ))}
+          </div>
+        )}
+
         <div className="relative z-10 flex flex-col items-center">
           <PhotoRing
             name={user.name}
@@ -123,12 +181,11 @@ export default async function PublicProfile({
             side={side}
             ring
           />
-          <div className="mt-3 flex items-center justify-center gap-1.5">
-            <h1 className="font-display text-[26px] font-semibold tracking-[-0.035em] text-ink">
-              {user.name}
-            </h1>
-            {user.isVerified && <span>✅</span>}
-          </div>
+          {/* No tick beside the name: it pushed the name off the card's
+              centre line, and what it stood for now sits in the corner. */}
+          <h1 className="mt-3 w-full text-center font-display text-[26px] font-semibold tracking-[-0.035em] text-ink">
+            {user.name}
+          </h1>
           <p className="text-[12.5px] text-muted">@{user.username}</p>
           {user.bio && (
             <p className="mt-2 max-w-[300px] text-[13px] leading-relaxed text-ink/80">
@@ -156,8 +213,9 @@ export default async function PublicProfile({
                   who: isMe ? d.profile.you : d.profile.them,
                 })}
               </p>
+              {/* The same count the Vibe Card shows — see lib/card-tags. */}
               <div className="flex flex-wrap justify-center gap-2">
-                {profile.tags.slice(0, 4).map((t) => (
+                {topTags(profile.tags).map((t) => (
                   <TagPill key={t.key} tagKey={t.key} label={tagLabel(t.key, locale)} />
                 ))}
               </div>

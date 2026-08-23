@@ -70,27 +70,49 @@ export function PhotoRing({
     </div>
   ) : null;
 
+  /*
+   * Side circles ride a full circle-height below the middle of the row.
+   *
+   * Level with the main photo they read as three photos of equal standing;
+   * dropped, they read as what they are — the ones beside the profile
+   * picture. A transform rather than a margin, so the row keeps the height
+   * of the main photo and nothing below it moves.
+   */
   const circle = (url: string, key: string) => (
-    <button
+    <span
       key={key}
-      type="button"
-      onClick={() => setOpen(url)}
-      aria-label={d.photo.open}
-      className="rounded-full active:scale-95 transition-transform"
+      className="inline-flex"
+      style={{ transform: `translateY(${sideSize}px)` }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={url}
-        alt=""
-        style={{ width: sideSize, height: sideSize }}
-        className="rounded-full object-cover border-2 border-white shadow-[0_6px_16px_rgba(83,60,40,0.18)]"
-      />
-    </button>
+      <button
+        type="button"
+        onClick={() => setOpen(url)}
+        aria-label={d.photo.open}
+        className="rounded-full active:scale-95 transition-transform"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url}
+          alt=""
+          style={{ width: sideSize, height: sideSize }}
+          className="rounded-full object-cover border-2 border-white shadow-[0_6px_16px_rgba(83,60,40,0.18)]"
+        />
+      </button>
+    </span>
   );
+
+  // How far the dropped circles hang below the main photo, so whatever comes
+  // next on the page keeps its distance instead of meeting a circle.
+  const overhang = side.length
+    ? Math.max(0, sideSize - (size - sideSize) / 2)
+    : 0;
 
   return (
     <>
-      <div className="flex items-center justify-center gap-2">
+      <div
+        className="flex items-center justify-center gap-2"
+        style={{ marginBottom: overhang }}
+      >
         {left.map((url, i) => circle(url, `l${i}`))}
         <button
           type="button"

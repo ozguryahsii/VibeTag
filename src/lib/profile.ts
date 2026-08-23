@@ -13,6 +13,10 @@ export type PublicUser = {
   avatarColor: string;
   plan: string;
   isVerified: boolean;
+  /** The three proofs, for the marks in the corner of the profile card. */
+  emailVerifiedAt: Date | null;
+  phoneVerifiedAt: Date | null;
+  idVerifiedAt: Date | null;
   commentPolicy: string;
   createdAt: Date;
 };
@@ -31,6 +35,9 @@ export async function getUserByUsername(
       avatarColor: true,
       plan: true,
       isVerified: true,
+      emailVerifiedAt: true,
+      phoneVerifiedAt: true,
+      idVerifiedAt: true,
       commentPolicy: true,
       createdAt: true,
     },

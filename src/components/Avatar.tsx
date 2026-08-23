@@ -45,6 +45,9 @@ export function Avatar({
       <img
         src={url}
         alt={name}
+        // Not draggable: the browser's own image drag hijacks the pointer
+        // stream, which is what a swipeable row of photos runs on.
+        draggable={false}
         style={{ ...common, objectFit: "cover" }}
         className="inline-block"
       />

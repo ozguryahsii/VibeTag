@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { getMyRatingOf, getPercentile, getUserByUsername, getVibeProfile } from "@/lib/profile";
 import { cooldownDaysLeft } from "@/lib/rating-rules";
 import { bestPerFamily, earnedBadges, hardestBadges } from "@/lib/badges";
+import { verificationState } from "@/lib/verification";
 import { generateVibeSummary } from "@/lib/insights";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
@@ -54,36 +55,21 @@ export default async function PublicProfile({
   const percentile = await getPercentile(user.id, profile.score);
   // Best tier per family: three Kind Hearts in a row would read as three
   // badges rather than one climbed.
-  const badges = bestPerFamily(earnedBadges(profile));
+  // The five hardest badges, in their own section further down. A profile
+  // that lists every rung somebody climbed reads as a trophy cabinet; five
+  // reads as what they are known for.
+  const badges = hardestBadges(bestPerFamily(earnedBadges(profile)), 5);
+
   /*
-   * The medals in the corner of the card.
+   * The marks in the corner of the card: proofs, not achievements.
    *
-   * The same set the Vibe Card used to carry — the four hardest badges plus
-   * the verification chip — moved to where it belongs. A shared picture is
-   * one impression of a person; a profile is somebody reading about them, and
-   * that is where proof of who they are earns its place. The chip also
-   * replaces the tick that used to sit beside the name: one mark, one meaning.
+   * Email, phone and identity — only the ones actually held, wearing the same
+   * icon they wear on the Badges page. They belong apart from the badges
+   * below because they are not earned from what people saw in somebody; they
+   * are things that person supplied. This is also what replaced the tick
+   * beside the name: one mark, one meaning.
    */
-  const cardMedals = [
-    ...hardestBadges(badges, 4).map((b) => ({
-      key: `${b.key}:${b.tier}`,
-      label: `${badgeLabel(b.key, d)} · ${tierLabel(b.tier, d)}`,
-      icon: b.icon,
-      gradient: TIER_STYLE[b.tier].canvas,
-      ring: TIER_STYLE[b.tier].ring,
-    })),
-    ...(user.isVerified
-      ? [
-          {
-            key: "verifiedEmail",
-            label: d.verifications.email.label,
-            icon: "shieldCheck",
-            gradient: ["#5FC08A", "#2F8C5E"] as [string, string],
-            ring: "rgba(64,160,110,0.3)",
-          },
-        ]
-      : []),
-  ];
+  const proofs = verificationState(user).filter((v) => v.earned);
   // Third person: this page is about somebody else, and the self copy says
   // "you" — which on this page would tell the reader these are their ratings.
   const summary = generateVibeSummary(
@@ -144,26 +130,22 @@ export default async function PublicProfile({
           <VibeMark size={43} id="public-profile-mark" />
         </div>
 
-        {/* Slightly overlapped, so five of them still end well before the
-            photo in the middle of the card rather than sliding under it. */}
-        {cardMedals.length > 0 && (
-          <div className="absolute left-5 top-5 z-10 flex items-center">
-            {cardMedals.map((m, i) => (
+        {proofs.length > 0 && (
+          <div className="absolute left-5 top-5 z-10 flex items-center gap-1.5">
+            {proofs.map((v) => (
               <span
-                key={m.key}
-                title={m.label}
-                aria-label={m.label}
-                className="grid h-6 w-6 place-items-center rounded-full border border-white/80"
+                key={v.key}
+                title={d.verifications[v.key].label}
+                aria-label={d.verifications[v.key].label}
+                className="grid h-7 w-7 place-items-center rounded-full border border-white/80"
                 style={{
-                  background: `linear-gradient(135deg, ${m.gradient[0]}, ${m.gradient[1]})`,
-                  boxShadow: `0 3px 10px ${m.ring}`,
-                  marginLeft: i === 0 ? 0 : -4,
-                  zIndex: cardMedals.length - i,
+                  background: "linear-gradient(135deg,#5FC08A,#2F8C5E)",
+                  boxShadow: "0 3px 10px rgba(64,160,110,0.3)",
                 }}
               >
                 <IconGlyph
-                  def={iconFor(m.icon)}
-                  size={12}
+                  def={iconFor(v.icon)}
+                  size={13}
                   color="#fff"
                   strokeWidth={2.2}
                 />

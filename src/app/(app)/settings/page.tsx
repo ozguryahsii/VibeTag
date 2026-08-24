@@ -134,7 +134,16 @@ export default async function SettingsPage() {
                     </span>
                   </div>
                   {!inShell && (
-                    <span className="text-[14px] font-extrabold">{plan.price}</span>
+                    <div className="text-right">
+                      <span className="block text-[14px] font-extrabold">
+                        {plan.price}
+                      </span>
+                      {plan.trial && (
+                        <span className="block text-[10.5px] font-bold text-orange">
+                          {plan.trial}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -162,6 +171,11 @@ export default async function SettingsPage() {
         <p className="text-[11.5px] text-muted mt-3 px-1 leading-relaxed">
           {inShell ? d.settings.planNoteShell : d.settings.planNote}
         </p>
+        {!inShell && (
+          <p className="text-[11.5px] text-muted mt-1.5 px-1 leading-relaxed">
+            {d.settings.trialNote}
+          </p>
+        )}
         {!inShell && (
           <div className="mt-3">
             <RedeemCode />
@@ -318,7 +332,7 @@ export default async function SettingsPage() {
       <div className="mt-7">
         <SectionTitle>{d.settings.account}</SectionTitle>
         <div className="grid gap-2.5">
-          <DeleteAccount username={user.username} />
+          <DeleteAccount username={user.username} plan={user.plan} />
         </div>
       </div>
 

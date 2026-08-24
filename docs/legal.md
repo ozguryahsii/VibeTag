@@ -4,15 +4,13 @@ Bu dosya elle yazılmadı: `npm run legal --silent > docs/legal.md` komutu
 uygulamanın gösterdiği metinlerin ta kendisini `src/lib/legal.ts`'ten üretir.
 Ekranda ne yazıyorsa burada da o yazıyor.
 
-Son güncelleme: **2026-08-20** · İletişim adresi: **destek@vibetag.app**
+Son güncelleme: **2026-08-24** · İletişim adresi: **destek@vibetag.app**
 
-## Avukatın bilmesi gereken notlar
+## Durum
 
-- Metinler **hukukçu tarafından hazırlanmadı.** Uygulamanın ne yaptığı doğru anlatılıyor — her cümle koddaki bir tabloya veya kontrole dayanıyor — ama hukuki denetimden geçmedi. Uygulamada da bunu söyleyen kalıcı bir uyarı var.
-- **Tüzel kişi bilgileri eksik.** KVKK metninde veri sorumlusu olarak yalnızca «Vibe Tag» yazıyor; ticari unvan, adres, MERSİS ve VERBİS kaydı yayına çıkmadan önce eklenecek. Metinde bunu belirten bir parantez var.
-- **Sorumluluk sınırlaması bilinçli olarak yumuşak yazıldı** («emredici hukukun izin verdiği ölçüde»). Tüketici ve veri koruma yükümlülükleri sözleşmeyle kaldırılamıyor; bunu görmezden gelen bir madde ilk elenen madde olur ve metnin geri kalanının inandırıcılığını da götürür. Daha sert bir ifade tercih edilecekse sınırın nerede olduğunu avukat söylemeli.
-- **Anonimlik bir vaat değil, ürünün kuralı.** Değerlendirmeler arayüzde hiçbir zaman kişiye bağlanmıyor, ama veritabanında kimin kimi değerlendirdiği kayıtlı — sahtecilik tespiti, itiraz ve kötüye kullanım incelemesi için. Gold üyelik kendisini değerlendirenleri gösteriyor. Bu ayrımın metinde doğru kurulduğu ayrıca kontrol edilmeli.
-- **Ödeme bilgisi hiç bize ulaşmıyor.** Satın alma App Store ve Google Play üzerinden yapılıyor; bize sadece aboneliğin durumu geliyor. Cayma hakkı ve iade akışının mağaza kurallarıyla çelişmediği kontrol edilmeli.
+- Metinler **2026-08-24 tarihinde avukat tarafından incelendi ve revize edildi.** Bu dosya o revizyonun ta kendisidir. Henüz yürürlükte değil: köşeli parantezli alanlar (şirket unvanı, adres, MERSİS/VERBİS, ilgili e-postalar, yetkili mahkeme, ücretsiz kullanıcı sorumluluk tavanı) gerçek bilgilerle doldurulmadan yayımlanmaz. Uygulamada da bunu söyleyen kalıcı bir uyarı var.
+- **Tüzel kişi bilgileri eksik.** Veri sorumlusu olarak yalnızca «[TÜZEL KİŞİ / İŞLETME UNVANI]» yazıyor; ticari unvan, adres, MERSİS ve VERBİS durumu doldurulacak. Metinde bunu belirten köşeli parantezler var.
+- **Yayın öncesi doldurulacak diğer alanlar:** ilgili e-postalar (gizlilik, içerik bildirimleri, güvenlik, KVKK, itiraz, ABD talepleri, AB/AEA temsilcisi — tek adres mi yoksa ayrı ayrı mı olacağına karar verilecek), tüketici olmayanlar için yetkili mahkeme şehri, ücretsiz kullanıcılar için sorumluluk tavanı tutarı, ve varsa KEP/posta adresi.
 
 ---
 
@@ -20,184 +18,225 @@ Son güncelleme: **2026-08-20** · İletişim adresi: **destek@vibetag.app**
 
 ## Gizlilik Politikası
 
-*Yürürlük: 2026-08-20 · Adres: /legal/privacy*
+*Yürürlük: 2026-08-24 · Adres: /legal/privacy*
 
-Vibe Tag, insanların birbirinde gördüğü olumlu özellikleri paylaştığı bir uygulamadır. Bu metin, hangi verileri neden tuttuğumuzu ve onlarla ne yapıp ne yapmadığımızı anlatır.
+Vibe Tag reklam amaçlı veri satmaz. Hizmet, güvenlik, moderasyon ve yasal yükümlülükler için gerekli verileri işler. Hakkındaki değerlendirmeler başkaları tarafından oluşturulabilir. Gold üyelik, aşağıdaki istisnalar dışında değerlendirenin kimliğini değerlendirilen kullanıcıya gösterebilir.
 
-### Topladığımız veriler
+### Kimiz ve kapsam
 
-Yalnızca uygulamanın çalışması için gereken verileri tutarız. Bunlar:
+Bu politika, [TÜZEL KİŞİ / İŞLETME UNVANI] (“Vibe Tag”, “biz”) tarafından sunulan Vibe Tag uygulaması ve bağlantılı hizmetlerde kişisel verilerin işlenmesini açıklar. Veri sorumlusu/işletmeci: [TÜZEL KİŞİ / İŞLETME UNVANI]; adres: [İŞLETME ADRESİ]; MERSİS: [MERSİS NO — VARSA]; VERBİS: [VERBİS KAYIT DURUMU]; gizlilik: destek@vibetag.app; içerik bildirimleri: destek@vibetag.app. GDPR m.27 temsilcisi gerekiyorsa: [AB/AEA TEMSİLCİSİ].
 
-- Hesap bilgileri: ad, kullanıcı adı, e-posta, şifrenin geri döndürülemez özeti (scrypt), varsa biyografi ve profil fotoğrafı. Fotoğraflar cihazında kırpılır, JPEG'e çevrilir ve öyle saklanır.
-- E-posta doğrulama: doğrulama kodlarının geri döndürülemez özeti. Kod 10 dakika içinde geçersizleşir ve kullanılmış kodlar düzenli olarak silinir.
-- Değerlendirmeler: verdiğin ve aldığın puanlar, seçtiğin Vibe Tag'ler, notlar, tanışıklık türü ve her güncellemenin önceki sürümü.
-- Üyelik: planın, planının varsa bitiş tarihi, kullandığın indirim kodları ve — mağaza satın alımı yaptıysan — aboneliğin ürün adı, durumu ve bitiş tarihi. Kart ve ödeme bilgisi bize hiçbir zaman ulaşmaz; ödemeyi App Store veya Google Play işler.
-- Konum: yalnızca “Yakınındakiler” özelliğini açarsan. Konumun yaklaşık 100 metreye yuvarlanarak saklanır ve sadece listeyi mesafeye göre sıralamak için kullanılır. Varsayılan kapalıdır ve istediğin an kapatabilirsin.
-- Mesajlar ve bildirimler: gönderdiğin ve aldığın doğrudan mesajlar, uygulama içi bildirimlerin ve — açtıysan — tarayıcının anlık bildirim adresi.
-- Çerezler: tarayıcında tutulan bir oturum çerezi (httpOnly) ve dil tercihini saklayan bir çerez. Reklam veya takip çerezi kullanmıyoruz.
-- Güvenlik kayıtları: giriş, kayıt ve kod isteklerinde IP adresi (istek sınırlaması için, saatler içinde silinir) ve sunucu hata kayıtları (30 gün içinde silinir).
+App Store, Google Play ve bağlantı verilen bağımsız hizmetlerin kendi veri uygulamaları bu politikanın dışındadır.
 
-### Değerlendirmeler ve anonimlik
+### Topladığımız veriler ve kaynaklar
 
-Değerlendirmeler arayüzde hiçbir zaman kişiye bağlanarak gösterilmez. Veritabanında kimin kimi değerlendirdiği kayıtlıdır — sahtecilik tespiti, itiraz ve kötüye kullanım incelemesi bunu gerektirir.
+- Hesap ve profil: ad, kullanıcı adı, e-posta, tuzlanmış scrypt parola özeti, biyografi ve profil fotoğrafı.
+- Doğrulama/güvenlik: kod özeti, oturum, IP, tarih-saat, giriş, istek sınırlama, erişim ve hata kayıtları.
+- Kullanıcı içeriği: verilen/alınan puanlar, Vibe Tag'ler, notlar, tanışıklık türü, sürüm geçmişi, mesajlar, davetler, bildirimler, arkadaşlık/engelleme, şikâyet ve itirazlar.
+- Başkalarından gelen veri: başka kullanıcıların senin hakkında oluşturduğu değerlendirme, not ve ilişki bağlamı.
+- Üyelik: plan, süre, indirim kodu, mağaza ürün kimliği ve abonelik durumu. Kart/ödeme aracı bilgisi bize ulaşmaz.
+- Yaklaşık konum: yalnızca Yakınındakiler açıldığında, yaklaşık 100 metre hassasiyete düşürülerek.
+- Teknik veri: zorunlu httpOnly oturum çerezi, dil tercihi, cihaz/tarayıcının zorunlu teknik bilgileri ve açıldıysa push uç noktası. Mevcut tasarımda reklam/takip çerezi yoktur.
 
-Gold üyelik, kendisini değerlendirenlerin kimliğini görme imkânı verir. Değerlendiren kişi bunu engelleyemez; kimliğin görünürlüğü değerlendirilen kişinin üyeliğine bağlıdır. İstisna: sahtecilik tespitinin korumaya aldığı değerlendirmeler — ve geçmişte “kimliğimi gizle” seçeneği varken o seçenekle verilmiş değerlendirmeler — hiçbir üyelikte görünmez.
+### Amaçlar ve hukuki dayanak
 
-### Verileri neden işliyoruz
+Verileri hesap ve sözleşmeyi yürütmek; profil, puan, mesaj, bildirim ve üyeliği sunmak; sahtecilik, taciz ve güvenlik olaylarını önlemek; şikâyet/itirazı sonuçlandırmak; hakları savunmak ve yasal yükümlülükleri yerine getirmek için işleriz.
 
-Hesabını oluşturmak, e-postanı doğrulamak ve oturumunu sürdürmek; profilini ve puanını hesaplamak; sahte değerlendirmeleri tespit etmek; bildirimleri iletmek; üyelik ve ödeme durumunu yönetmek; kötüye kullanım bildirimlerini incelemek; hizmeti güvende tutmak. Bunların dışında bir amaç için kullanmıyoruz.
+Türkiye'de faaliyete göre KVKK m.5/2-c (sözleşme), m.5/2-ç (hukuki yükümlülük), m.5/2-e (hakkın tesisi/kullanılması/korunması) ve temel haklara zarar vermemek kaydıyla m.5/2-f (meşru menfaat); AB/AEA'da GDPR m.6(1)(b), (c), (f) uygulanır. Yaklaşık konum ayrı ve geri alınabilir rızaya dayanır; reddetmek diğer özellikleri etkilemez.
 
-### Hizmet sağlayıcılar
+Başka kullanıcının senin hakkında oluşturduğu veri, doğrudan senden alınmaz. Sosyal değerlendirme işlevi, sahteciliğin önlenmesi ve hakların korunmasına ilişkin meşru menfaat ile senin hakların dengelenir. Profilinle eşleştirildiğinde kaynak ve temel işleme bilgisiyle bildirim, erişim ve itiraz araçları sunulur. İtiraz otomatik silme yaratmaz; hukuka aykırılık, doğruluk iddiası, ifade özgürlüğü ve kişilik/veri hakları insan incelemesiyle dengelenir.
 
-Verilerini satmıyoruz, reklam için üçüncü taraflarla paylaşmıyoruz ve profilleme amaçlı veri simsarlarına aktarmıyoruz. Hizmeti çalıştırmak için sınırlı sayıda sağlayıcı kullanıyoruz:
+### Değerlendirmeler, kimlik görünürlüğü ve otomasyon
 
-- Barındırma: uygulama ve veritabanı kendi sunucumuzda çalışır.
-- E-posta iletimi (Resend): doğrulama ve şifre sıfırlama e-postalarını iletmek için adın ve e-posta adresin bu sağlayıcıya iletilir; sunucuları yurt dışında olabilir.
-- Trafik altyapısı (Cloudflare): siteye erişim bu ağ üzerinden geçer.
-- Ödeme (App Store / Google Play): mağaza üzerinden satın alım yaparsan ödemeyi ilgili mağaza işler; bize yalnızca aboneliğin durumu iletilir.
-- Yasal bir zorunluluk doğmadıkça bunların dışında hiçbir veriyi dışarı vermeyiz.
+Değerlendirenin adı genel arayüzde gösterilmez; kimlik sahtecilik, güvenlik ve itiraz için veritabanında tutulur. Gold üye kendisini değerlendiren kişiyi görebilir. Sahtecilik korumasındaki ve geçmişte açık “kimliğimi gizle” seçeneğiyle gönderilen değerlendirmeler istisnadır. Bu kural değerlendirme gönderilmeden hemen önce ayrıca gösterilir; mutlak anonimlik vaat edilmez.
 
-### Saklama süresi
+Otomatik araç bir oyun ağırlığını azaltabilir veya hesaba katmayabilir. Yalnızca otomatik işlemle hukuki veya benzer önemli sonuç doğurmamayı hedefleriz; etkilenen kullanıcı insan incelemesi ve itiraz isteyebilir.
 
-Hesabın açık olduğu sürece verilerini saklarız. Hesabını sildiğinde profilin, verdiğin ve aldığın tüm değerlendirmeler, davetlerin, mesajların ve bildirimlerin kalıcı olarak silinir.
+### Alıcılar ve satış yapılmaması
 
-İstisnalar: moderasyon kararıyla kaldırılan değerlendirmeler silinmez, gizlenir — geri bakılamayan bir karar itiraz edilemez bir karardır. Sunucu hata kayıtları 30 gün, istek sınırlama kayıtları saatler içinde kendiliğinden silinir. Yedekler düzenli olarak alınır ve yaklaşık 30 gün içinde dönüşümlü olarak imha edilir; silinen bir hesap en geç yedeklerin dolaşımından çıktığında tamamen yok olur.
+Kişisel veriyi para karşılığı satmayız, veri simsarına vermeyiz ve mevcut modelde hedefli/çapraz bağlam reklam için paylaşmayız. Amaçla sınırlı olarak şu alıcılara açıklama yapılabilir:
 
-### Güvenlik
+- Kendi sunucumuz ve barındırma/veritabanı tedarikçileri.
+- Resend: doğrulama ve şifre sıfırlama için ad, e-posta ve ileti teknik verileri.
+- Cloudflare: trafik yönlendirme ve güvenlik için IP, istek ve bağlantı verileri.
+- Apple/Google: mağaza satın alımını mağaza işler; bize ürün ve abonelik durumu gelir.
+- Danışman, denetçi, mahkeme ve yetkili kurumlar: geçerli talep, yükümlülük veya hakların korunması ölçüsünde.
+- Birleşme/yatırım/devir tarafları: gizlilik ve yasal sınırlar içinde, tamamlanan işlemde uygun bildirimle.
 
-Şifreler geri döndürülemez biçimde (scrypt, kullanıcıya özel tuz ile) saklanır; düz metin şifre hiçbir yerde tutulmaz. Oturum çerezi httpOnly'dir ve tarayıcıdaki JavaScript tarafından okunamaz. Tüm trafik TLS ile şifrelenir. Giriş ve kod ekranları istek sınırlamasıyla korunur.
+### Yurtdışına aktarım
 
-### Bize ulaş
+Resend, Cloudflare, Apple, Google veya alt sağlayıcıları nedeniyle veri yurtdışına aktarılabilir. Türkiye'den aktarımda KVKK m.9 uyarınca yeterlilik kararı, uygun güvence (özellikle Kurul standart sözleşmesi ve yasal bildirim) veya yalnızca gerçek arızi hâllerde kanuni istisna kullanılır. Açık rıza rutin/sürekli aktarım için varsayılan çözüm değildir.
 
-Gizlilikle ilgili her soru için destek@vibetag.app adresine yazabilirsin.
+AB/AEA verisinde yeterlilik veya Avrupa Komisyonu SCC'leri, gerektiğinde transfer etki değerlendirmesi ve ek tedbirler uygulanır. Mekanizma hakkında destek@vibetag.app'dan bilgi istenebilir.
+
+### Saklama ve silme
+
+Hesap verileri üyelik boyunca; hata kayıtları kural olarak en çok 30 gün; hız sınırlama IP kayıtları saatler; yedekler yaklaşık 30 günlük dönüşümle tutulur. Hesap silinince profil, mesaj, davet, bildirim ve değerlendirmeler aktif sistemlerden silinir veya geri döndürülemez anonimleştirilir.
+
+Moderasyon, dolandırıcılık, itiraz, yasal talep veya uyuşmazlığa ilişkin sınırlı kayıtlar kararın denetlenmesi ve hak savunması için erişimi kısıtlanarak gerekli ve zamanaşımıyla ölçülü süre tutulabilir; süresiz tutulmaz.
+
+### Güvenlik ve veri ihlali
+
+Riskle orantılı TLS, tuzlanmış scrypt parola özeti, httpOnly ve uygun secure/sameSite çerezleri, erişim kontrolü, hız sınırlama, kayıt/izleme, yedekleme, güncelleme, tedarikçi ve olay yönetimi uygularız. Mutlak güvenlik vaat etmeyiz; kanuni güvenlik sorumluluğumuzu reddetmeyiz.
+
+İhlali sınırlar, riskini değerlendirir ve belgeleriz. KVKK bakımından Kurula gecikmeksizin ve kural olarak öğrenmeden itibaren en geç 72 saat içinde, etkilenenlere makul en kısa sürede bildirim yapılır. GDPR bakımından risk doğuran ihlal makama mümkünse 72 saat içinde; yüksek risk doğuran ihlal kişiye gecikmeksizin bildirilir. Uygulanabilir ABD eyalet ihlal kuralları ayrıca izlenir.
+
+### Haklar ve talepler
+
+Bulunduğun yere göre erişim, kopya, düzeltme, silme, kısıtlama, taşınabilirlik, itiraz, rızayı geri alma, otomatik kararı insan incelemesine taşıma ve makama şikâyet hakların olabilir. Türkiye'de KVKK m.11; AB/AEA'da GDPR m.12–22 uygulanır. Talep: destek@vibetag.app. Kimliğini ölçülü doğrular, kanuni sürede cevap verir ve reddi gerekçelendiririz. Hesap silme: Profil → Hesap → Hesabımı Sil.
+
+### ABD eyalet gizlilik açıklaması
+
+CCPA/CPRA veya başka kapsamlı eyalet kanunu uygulanıyorsa eyalet sakini bilme/erişim, düzeltme, silme, taşınabilir kopya, satış/hedefli reklam/profillemeden vazgeçme ve ayrımcılığa uğramama haklarına sahip olabilir. Son 12 ayda “Topladığımız veriler ve kaynaklar” kategorileri, “Amaçlar ve hukuki dayanak” amaçlarıyla toplanmış ve “Alıcılar ve satış yapılmaması” bölümündeki alıcılara iş amacıyla açıklanmış olabilir.
+
+Mevcut modelde kişisel bilgiyi satmıyor ve çapraz bağlam davranışsal reklam için paylaşmıyoruz. Bu faaliyet başlarsa önceden bildirim, opt-out ve uygulanabilir yasal tercih sinyali desteği sağlanır. Hassas bilgi yalnızca beklenen hizmet/güvenlik için kullanılır. Talep: destek@vibetag.app ve varsa [ABD BAŞVURULARI İÇİN ÜCRETSİZ TELEFON]. Kapsam eşikleri düzenli doğrulanır.
+
+### Çocuklar ve değişiklikler
+
+Hizmet yalnızca 18+ içindir. 18 yaş altından bilerek hesap açmayız. Böyle bir hesabı öğrenirsek askıya alır, doğrular ve kanunen gerekenler dışında veriyi sileriz. Ebeveyn/vasi destek@vibetag.app'dan bildirebilir. 18+ sınırı yaş beyanı ve risk bazlı yaş güvencesiyle uygulanır; COPPA ve AB çocuk kuralları bertaraf edilmiş varsayılmaz.
+
+Önemli politika değişikliklerini önceden uygun yöntemle bildirir; rıza gereken yeni amaçta yeniden rıza alırız. İletişim: destek@vibetag.app, [İŞLETME ADRESİ].
 
 ---
 
 ## KVKK Aydınlatma Metni
 
-*Yürürlük: 2026-08-20 · Adres: /legal/kvkk*
+*Yürürlük: 2026-08-24 · Adres: /legal/kvkk*
 
-6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında, veri sorumlusu sıfatıyla seni bilgilendirmek isteriz.
+6698 sayılı Kanun kapsamında, veri sorumlusu sıfatıyla seni bilgilendirmek isteriz.
 
 ### Veri sorumlusu
 
-Vibe Tag. İletişim: destek@vibetag.app. (Ticari unvan, adres ve varsa VERBİS kaydı yayına çıkmadan önce bu bölüme eklenecektir.)
+Veri sorumlusu: [TÜZEL KİŞİ / İŞLETME UNVANI] (“Vibe Tag”). Adres: [İŞLETME ADRESİ]; MERSİS: [MERSİS NO — VARSA]; VERBİS: [VERBİS KAYIT DURUMU]; başvuru e-postası: destek@vibetag.app; KEP/posta/form: [KEP / POSTA ADRESİ — VARSA].
 
-### İşlenen kişisel veriler
+### İşlenen veri kategorileri
 
-Aşağıdaki kategorilerde kişisel veri işlenir:
+- Kimlik/profil: ad, kullanıcı adı, biyografi, fotoğraf.
+- İletişim: e-posta ve bildirim iletişim bilgileri.
+- Kullanıcı işlem/içerik: değerlendirmeler ve sürümleri, tag/not/tanışıklık, mesaj, davet, bildirim, arkadaşlık/engelleme, şikâyet/itiraz.
+- Müşteri işlem: plan, süre, kod, mağaza ürün/abonelik durumu; kart bilgisi işlenmez.
+- İşlem güvenliği: parola/kod özetleri, oturum, IP, tarih-saat, hata, erişim ve güvenlik kayıtları, zorunlu çerezler.
+- Konum: özellik seçilirse yaklaşık 100 metre hassasiyetli konum.
+- Hukuki işlem/risk: makam talepleri, uyuşmazlık, moderasyon delili ve kararı.
 
-- Kimlik: ad, kullanıcı adı.
-- İletişim: e-posta adresi.
-- Kullanıcı işlem: verdiğin ve aldığın değerlendirmeler ve önceki sürümleri, mesajlar, davetler, bildirimler, arkadaşlık ve engelleme kayıtları.
-- Müşteri işlem: üyelik planı ve bitiş tarihi, indirim kodu kullanımları, mağaza aboneliğinin ürünü, durumu ve bitiş tarihi. Ödeme aracı bilgisi işlenmez.
-- İşlem güvenliği: oturum kayıtları, istek sınırlama amaçlı IP adresi, e-posta doğrulama kodlarının özeti, sunucu hata kayıtları, çerezler.
-- Konum: yaklaşık (~100 m) konum — yalnızca “Yakınındakiler” özelliğini açtıysan.
-- Görsel: yüklediysen profil fotoğrafın.
+### Elde etme yöntemleri ve kaynaklar
 
-### İşleme amaçları
+Veriler kayıt, profil, mesaj ve değerlendirme ekranları; cihaz/tarayıcı; zorunlu çerezler; mağaza doğrulaması; destek ve şikâyet kanallarından otomatik veya kısmen otomatik yollarla elde edilir. Hakkındaki değerlendirme, not ve ilişki bağlamının kaynağı başka kullanıcı olabilir.
 
-Üyelik sözleşmesinin kurulması ve ifası, üyeliğin e-posta ile doğrulanması, hizmetin sunulması, sosyal itibar profilinin hesaplanması, sahte değerlendirmelerin tespiti, üyelik ve ödeme durumunun yönetilmesi, güvenliğin sağlanması, kötüye kullanım bildirimlerinin incelenmesi ve hukuki yükümlülüklerin yerine getirilmesi.
+### Amaç ve hukuki sebepler
 
-### Hukuki sebep
+Bir başkasının hakkında değerlendirme oluşturması sözleşme dayanağına tek başına bağlanmaz; sosyal işlev, sahtecilik ve hak koruması için meşru menfaat dengesi uygulanır ve itiraz üzerine insan incelemesi yapılır.
 
-Kimlik, iletişim, kullanıcı işlem ve müşteri işlem verileri KVKK m.5/2-c uyarınca sözleşmenin kurulması ve ifası için gerekli olduğundan; işlem güvenliği verileri m.5/2-f uyarınca meşru menfaat ve m.5/2-ç uyarınca hukuki yükümlülük kapsamında işlenir.
-
-Konum verisi yalnızca KVKK m.5/1 uyarınca açık rızana dayanır. Rızanı vermemen hizmetin diğer bölümlerini etkilemez; “Yakınındakiler” özelliği kapalı kalır. Rızanı istediğin an Kişiler ekranından geri çekebilirsin.
+- Üyelik ve temel hizmet/abonelik yönetimi: KVKK m.5/2-c.
+- Güvenlik, sahtecilik ve kötüye kullanımın önlenmesi: temel haklara zarar vermemek ve ölçülü olmak kaydıyla m.5/2-f.
+- Şikâyet, itiraz, delil ve uyuşmazlık: m.5/2-e ve gerektiğinde m.5/2-ç.
+- Yetkili makam/mevzuat yükümlülüğü: m.5/2-ç.
+- Yakınındakiler için yaklaşık konum: ayrı ve geri alınabilir açık rıza, m.5/1; rıza verilmemesi diğer hizmetleri etkilemez.
 
 ### Aktarım
 
-Kişisel verilerin pazarlama amacıyla üçüncü kişilere aktarılmaz. Hizmetin sunulması için sınırlı aktarım yapılır: doğrulama ve şifre sıfırlama e-postalarının iletilmesi için ad ve e-posta adresi, sunucuları yurt dışında bulunabilen e-posta iletim sağlayıcısına (Resend); site trafiği, içerik dağıtım ağına (Cloudflare) aktarılır. Yurt dışına aktarım, KVKK m.9 kapsamındaki şartlara uygun olarak yürütülür.
+Veriler pazarlama için satılmaz. Yurt içinde yetkili kurum/yargı, avukat/denetçi ve teknik hizmet sağlayıcılara amaçla sınırlı aktarılabilir. Yurtdışında bulunabilen Resend'e e-posta için ad/e-posta/teknik veri; Cloudflare'a trafik/IP/güvenlik verisi; Apple/Google'a mağazanın gerektirdiği sınırlı veri aktarılabilir.
 
-Mağaza üzerinden satın alım yapılması hâlinde ödeme, ilgili mağaza (Apple / Google) tarafından kendi sözleşmesi kapsamında işlenir; tarafımıza yalnızca aboneliğin durumu iletilir. Yasal talep hâlinde yetkili kamu kurumlarına aktarım saklıdır.
+Yurtdışı aktarım KVKK m.9'a göre yeterlilik, Kurul standart sözleşmesi veya diğer uygun güvenceyle; bunlar yoksa yalnızca kanuni arızi hâlde yapılır. Standart sözleşme yasal sürede Kuruma bildirilir.
 
 ### Saklama ve imha
 
-Veriler üyelik süresince saklanır; hesabın silinmesiyle kalıcı olarak imha edilir. Moderasyon kararıyla gizlenen değerlendirmeler itiraz hakkının kullanılabilmesi için saklanır. Sunucu hata kayıtları 30 gün, istek sınırlama kayıtları saatler içinde imha edilir. Yedekler yaklaşık 30 günlük dönüşümle imha edilir.
+Hesap verileri üyelik boyunca; hata kayıtları kural olarak 30 gün; hız sınırlama kayıtları saatler; yedekler yaklaşık 30 gün tutulur. Hesap silmede aktif veriler imha/anonimleştirilir. Moderasyon, dolandırıcılık ve uyuşmazlık kayıtları yalnızca itiraz, delil ve zamanaşımı için gerekli, erişimi kısıtlı süre tutulur.
 
-### Hakların (KVKK m.11)
+### KVKK m.11 hakları ve başvuru
 
-Kişisel verinin işlenip işlenmediğini öğrenme, işlenmişse buna ilişkin bilgi talep etme, işlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme, eksik veya yanlış işlenmişse düzeltilmesini isteme, silinmesini veya yok edilmesini isteme, bu işlemlerin aktarıldığı üçüncü kişilere bildirilmesini isteme, otomatik sistemlerle analiz edilmesi sonucu aleyhine bir sonuç çıkmasına itiraz etme ve zarara uğraman hâlinde zararın giderilmesini talep etme haklarına sahipsin.
+Verinin işlenip işlenmediğini öğrenme; bilgi isteme; amacı/uygun kullanımı ve alıcıları öğrenme; düzeltme; şartları varsa silme/yok etme ve alıcılara bildirim; münhasıran otomatik analizle aleyhe sonuca itiraz ve hukuka aykırı işleme zararının giderilmesini isteme hakların vardır.
 
-Bu haklarını kullanmak için destek@vibetag.app adresine yazabilirsin; başvurular en geç 30 gün içinde yanıtlanır. Hesabını uygulama içinden de kalıcı olarak silebilirsin: Profil → Hesap → Hesabımı sil.
+Başvuru [KEP ADRESİ — VARSA], [POSTA ADRESİ], sistemde kayıtlı destek@vibetag.app veya [BAŞVURU FORMU BAĞLANTISI — VARSA] ile Tebliğ'e uygun yapılabilir. En kısa sürede ve en geç 30 günde yanıtlanır; maliyet varsa Kurul tarifesi uygulanabilir. Kanuni sürelerle Kurula şikâyet hakkın saklıdır.
+
+### Güvenlik, ihlal ve başkasından alınan veri
+
+KVKK m.12 uyarınca riskle orantılı tedbir alınır ve işleyenler denetlenir. Kanuni olmayan elde etme öğrenildiğinde Kurula gecikmeksizin ve kural olarak en geç 72 saat içinde, etkilenen kişiye makul en kısa sürede bildirim yapılır.
+
+Başka kullanıcı hakkında veri oluşturduğunda kaynak ve temel işleme bilgisi makul sürede uygulama/profil bildirimiyle sunulur; kanuni istisnalar saklıdır. Erişim, düzeltme, itiraz veya hukuka aykırı içerik talebi destek@vibetag.app'a iletilebilir; gerekçeli karar ve başvuru yolu bildirilir.
 
 ---
 
 ## Kullanım Şartları
 
-*Yürürlük: 2026-08-20 · Adres: /legal/terms*
+*Yürürlük: 2026-08-24 · Adres: /legal/terms*
 
 Vibe Tag'i kullanarak aşağıdaki şartları kabul etmiş olursun. Kuralların özü tek bir fikir: insanlar hakkında yalnızca gerçekten bildiğin kadarını söylemek.
 
-### Üyelik
+### Taraflar, kabul ve hizmet
 
-Vibe Tag'i kullanmak için 18 yaşını doldurmuş olman gerekir. Kayıt sırasında verdiğin bilgilerin doğru olduğunu beyan edersin; e-posta adresin doğrulanmadan hesabın açılmaz.
+Bu şartlar [TÜZEL KİŞİ / İŞLETME UNVANI], [İŞLETME ADRESİ] (“Vibe Tag”) ile kullanıcı arasındadır. Hesap açarak bu şartları, Gizlilik Politikasını ve topluluk/moderasyon kurallarını kabul edersin. Emredici tüketici hakları saklıdır. Vibe Tag öznel sosyal değerlendirme platformudur; işe alım, kredi, sigorta, konut, eğitim, sağlık, referans veya yüksek etkili karar aracı değildir.
 
-Hesabın sana özeldir ve devredilemez. Şifrenin gizliliğinden ve hesabın üzerinden yapılan her işlemden sen sorumlusun; hesabına izinsiz erişildiğini fark edersen şifreni sıfırlaman ve bize bildirmen gerekir.
+### Yaş ve hesap güvenliği
 
-### Değerlendirme kuralları
+En az 18 yaşında olmalı; doğru/güncel bilgi vermeli; tek kişi adına tek hesap kullanmalı; hesabı devretmemeli ve başkasına izinsiz bürünmemelisin. Güçlü benzersiz parola kullan ve şüpheli erişimi destek@vibetag.app'a bildir. Hesaptaki her işlemi koşulsuz sana yüklemeyiz; yetkisiz erişimde tarafların kusuru ve emredici hukuk gözetilir.
 
-Bir kişiyi yalnızca gerçekten tanıdığın bağlamda değerlendirebilirsin. “Bu kişiyi nereden tanıyorsun?” sorusu zorunludur ve hangi kriterleri puanlayabileceğini belirler.
+### İçerik kuralları
 
-Her kişiyi bir kez değerlendirirsin. Değerlendirmeni ayda bir güncelleyebilirsin; her güncellemede önceki sürüm arşivlenir.
+Yalnız gerçekten tanıdığın kişiyi, bildiğin bağlamla ve dürüst kanaatin ölçüsünde değerlendirebilirsin. Tek değerlendirme/aylık güncelleme kuralını aşamazsın.
 
-Sahte, intikam amaçlı veya karşılıklı anlaşmayla verilen değerlendirmeler yasaktır. Otomatik tespit sistemi bu tür oyların ağırlığını düşürür; şüpheli olduğu tespit edilen oylar ise hiç değerlendirmeye alınmaz.
+- Hakaret, iftira, taciz, ısrarlı takip, tehdit, nefret söylemi, şiddet veya aşağılayıcı/cinsel içerik yasaktır.
+- Bilerek yanlış isnat, intikam, şantaj, sahte/koordine/karşılıklı veya ücretli değerlendirme yasaktır.
+- Kişisel veri, özel hayat, yazışma, telefon/e-posta, adres, kimlik/finans/sağlık bilgisi veya görüntünün hukuka aykırı ifşası yasaktır.
+- Fikri mülkiyet/kişilik hakkı ihlali, spam, zararlı bağlantı/yazılım yasaktır.
+- Bot, scraping, tersine mühendislik, yetkisiz erişim, güvenliği veya hız sınırını aşma ve hizmeti bozma yasaktır.
+- Puanları iş, kredi, sigorta, konut veya benzeri yüksek etkili kararın tek/belirleyici temeli yapmak yasaktır.
 
-### İçerik ve sorumluluk
+### Fikri mülkiyet ve içerik lisansı
 
-Yazdığın her değerlendirme, not, mesaj ve yüklediğin her görsel senin içeriğindir ve hukuki sorumluluğu yalnızca sana aittir. Vibe Tag, 5651 sayılı Kanun kapsamında yer sağlayıcıdır; kullanıcı içeriklerini önceden denetleme yükümlülüğü yoktur ve içeriğin doğruluğunu garanti etmez.
+İçeriğin haklarına sahip ve hukuka uygun olduğunu beyan edersin. Mülkiyet sende kalır. Hizmeti işletmek, göstermek, biçimlendirmek, güvenliğini sağlamak, yedeklemek ve şikâyeti incelemek için gerekli; dünya çapında, münhasır olmayan, hizmet sağlayıcılarla sınırlı alt lisanslanabilir, bedelsiz ve içerik silinene kadar geçerli lisans verirsin. Yasal kayıt/yedek istisnaları saklıdır.
 
-Hukuka aykırı olduğu bildirilen içerik incelenir ve gerekirse yayından kaldırılır. Bir içeriğin hakkını ihlal ettiğini düşünüyorsan uygulama içinden bildirebilir veya destek@vibetag.app adresine yazabilirsin.
+### Kimlik görünürlüğü
 
-İçeriğini hizmeti sunmak için gereken kapsamda (profillerde ve Vibe Card'da gösterme, puan hesaplama, yedekleme) kullanmamıza izin vermiş olursun. Bunun dışında içeriğin üzerinde hak iddia etmeyiz.
+Değerlendiren genel arayüzde adla gösterilmez; kimlik veritabanında tutulur. Gold üye kendisini değerlendireni görebilir. Sahtecilik korumasındaki ve geçmiş “kimliğimi gizle” seçeneğiyle verilenler istisnadır. Bu kural gönderimden önce görünür uyarıyla sunulur. Geçerli makam talebinde kimlik açıklanabilir.
 
-### Notlar ve mesajlar
+### Bildirim, kaldırma ve itiraz
 
-Hakaret, taciz, nefret söylemi, tehdit, başkasının kişisel verisini ifşa ve spam yasaktır. Notlarda telefon numarası, e-posta ve bağlantı paylaşılamaz. Herkes herkesi puanlayabilir; profil sahibi, değerlendirmesine kimlerin yazılı not ekleyebileceğini seçer (herkes ya da yalnızca davet ettikleri ve arkadaşları).
+Hukuka veya şartlara aykırı içerik uygulamadaki Bildir aracı ya da destek@vibetag.app ile bildirilebilir. Bildirim içeriğin kesin yeri/kimliği, ihlal gerekçesi, iletişim (kanuni anonimlik saklı), iyi niyet beyanı ve varsa hak/yetki belgesiyle delili içermelidir.
 
-Doğrudan mesajlar yalnızca arkadaşlar arasında açıktır. Premium üyeler kendilerini değerlendirenlere yazabilir; değerlendiren kişi ancak kendisine yazıldıktan sonra cevap verebilir.
+Alımı teyit eder, tarafsız ve özenli inceler, sonucu makul sürede bildiririz. Açık hukuka aykırılık/acil zarar riskinde derhal geçici kısıt; diğer hâllerde açıklama isteme, kaldırma, görünürlük azaltma, puandan çıkarma, hesap tedbiri veya işlem yapmama kararı verilebilir. Geçerli emirler uygulanır.
 
-### Moderasyon ve fesih
+Kısıtlamada kanunen yasak/güvenliği tehlikeye atan hâl dışında dayanak, kapsam, otomasyon ve itiraz yolunu içeren gerekçe sunulur. Karar bildiriminden itibaren 6 ay içinde destek@vibetag.app ile ücretsiz insan incelemesi isteyebilirsin. Misilleme amaçlı, tekrarlı ve açıkça dayanaksız başvuru ölçülü sınırlandırılabilir.
 
-Kurallara aykırı bulunan bir değerlendirme puan hesabından çıkarılır. Kurallara aykırı davranan bir hesap uyarı yapılmaksızın askıya alınabilir veya kapatılabilir; bu durumda kullanılmamış üyelik süresi için ücret iadesi yapılmaz.
+5651 sayılı Kanun bakımından yer sağlayıcı sayıldığımız ölçüde önceden denetim yükümlülüğümüz yoktur; usulüne uygun bildirim veya yetkili karar sonrası yükümlülükleri yerine getiririz. DSA uygulanıyorsa notice-and-action, gerekçe, iç şikâyet ve diğer zorunlu mekanizmalar yürütülür. Bu koruma kendi içerik, tasarım, bilgimiz veya eylemimize ilişkin sorumluluğu kaldırmaz.
 
-Kararlar kayıt altına alınır ve içeriğe geri bakılabilir. Hesabın askıya alındıysa destek@vibetag.app adresine yazarak itiraz edebilirsin.
+### Moderasyon ve hesap tedbirleri
 
-### Engelleme
+İnsan ve otomatik araçlarla; ağırlık, tekrar, bağlam, zarar, kast ve geçmişe göre uyarı, özellik kısıtı, kaldırma, puandan çıkarma, askı veya kapatma uygulanabilir. Acil güvenlik, açık hukuka aykırılık, dolandırıcılık veya soruşturma hâlinde önceden uyarı gerekmeyebilir. Engellenen kişi yeni değerlendirme/güncelleme yapamaz; mevcut değerlendirme sırf engelleme nedeniyle silinmez, fakat bildirilebilir.
 
-Engellediğin kişi sana yeni değerlendirme yapamaz ve mevcut değerlendirmesini güncelleyemez. Mevcut değerlendirmesi silinmez — aksi hâlde engelleme, düşük puanları temizleme aracına dönerdi. Haksız bulduğun bir değerlendirmeyi bildirebilirsin.
+### Planlar, mağaza ödemeleri ve iadeler
 
-### Üyelik planları ve ödeme
+Silver/Gold App Store veya Google Play'den alınabilir ya da promosyonla tanımlanabilir. Fiyat, dönem, özellik ve otomatik yenileme satın alma ekranında gösterilir. Ödeme/faturalama/yenileme/iptal teknik olarak mağazadan yürür; kart bilgisi bize gelmez. Dönem bitmeden mağazadan iptal edilmezse mağaza yenileyebilir; hesap silme aboneliği kendiliğinden iptal etmeyebilir ve bu silme ekranında gösterilir.
 
-Ücretli planlar (Silver, Gold) yalnızca App Store ve Google Play üzerinden, bir indirim kodu ile veya tarafımızca tanımlanarak edinilebilir; web üzerinden satış yapılmaz.
+İade öncelikle satın alınan mağazadan istenir. Ancak 6502 sayılı Kanun, Mesafeli Sözleşmeler Yönetmeliği ve ikamet yerindeki emredici haklar saklıdır. Dijital içerik/hizmete cayma süresinde başlanması ve hakkın kaybı için ayrı açık onay gerekiyorsa satın alma akışında alınır; salt bu şartların kabulü yeterli değildir. Ödenmiş dönemde temel fayda esaslı azaltılırsa uygun kanuni/mağaza çözümü sunulur.
 
-Mağaza üzerinden yapılan satın alımlarda faturalama, yenileme ve iade tamamen ilgili mağazanın (Apple / Google) kendi koşullarına tabidir; iade talepleri mağazaya yapılır. Ödeme bilgilerin bize hiçbir zaman ulaşmaz.
+### Üçüncü taraf hizmetler
 
-İndirim kodlarının parasal değeri yoktur, devredilemez ve kötüye kullanım hâlinde iptal edilebilir. Plan fiyatları ve kapsamları değişebilir; değişiklik, o ana kadar ödenmiş dönemleri etkilemez.
+Uygulama, marka, yazılım ve tasarım Vibe Tag'e/lisans verenlere aittir. Sana kişisel, sınırlı, geri alınabilir ve devredilemez kullanım hakkı verilir. Kanuni istisnalar dışında kopyalama, dağıtma, kaynak koda dönüştürme ve ticari kullanım yasaktır.
 
-Aboneliğin sona erdiğinde ücretli özellikler kapanır; verilerin ve profilin durur, silinmez.
+Cloudflare, Resend, Apple ve Google'ın kendi şartları uygulanabilir. Bağımsız üçüncü taraf kesintisini kontrol etmediğimiz ölçüde sorumlu değiliz; kendi tedarikçi seçimi, veri koruma ve emredici yükümlülüklerimiz saklıdır. Apple'dan edinimde sözleşme Apple ile değil Vibe Tag'ledir; Apple mağazaya özgü hükümlerin üçüncü taraf yararlanıcısı olabilir. Google Play kullanımı Google Play şartlarına tabidir.
 
-### Hizmetin niteliği ve garanti reddi
+### Fesih ve hizmet değişikliği
 
-Vibe Tag bir referans kontrol, kredi değerlendirme veya işe alım aracı değildir. Buradaki puanlar insanların öznel görüşlerinin bir özetidir; doğruluğu, güncelliği veya belirli bir amaca uygunluğu garanti edilmez. Puanlara dayanarak verdiğin her karar — ve bu kararların sonuçları — yalnızca sana aittir.
+Bakım, güvenlik veya hukuk nedeniyle hizmet geçici durabilir; özellikler makul bildirimle değişebilir. Hesabını silebilir, mağaza aboneliğini ayrıca iptal edebilirsin. Esaslı/tekrarlı ihlalde askı/kapatma mümkündür. Tüketicinin kusuruyla orantısız otomatik “hiç iade yok” uygulanmaz; olay, kullanılan dönem, mağaza ve emredici hukuk değerlendirilir.
 
-Hizmet “olduğu gibi” sunulur. Kesintisiz, hatasız veya güvenlik açığından arınmış olacağı taahhüt edilmez; bakım, güncelleme veya teknik zorunluluk nedeniyle hizmet geçici olarak durabilir, özellikler değişebilir veya kaldırılabilir.
+### Garanti ve sorumluluk sınırı
 
-### Sorumluluğun sınırlandırılması
+Emredici hukukun izin verdiği ölçüde hizmet mevcut hâliyle sunulur; kesintisizlik, hatasızlık, mutlak güvenlik veya kullanıcı içeriği doğruluğu garanti edilmez. Bu, vaat edilen temel dijital hizmet uygunluğunu, makul güvenliği veya tüketicinin ayıp/uygunluk haklarını kaldırmaz.
 
-Emredici hukuk kurallarının izin verdiği azami ölçüde: Vibe Tag; kâr kaybı, itibar kaybı, veri kaybı ve dolaylı zararlardan sorumlu tutulamaz. Kullanıcı içeriklerinden, diğer kullanıcıların eylemlerinden ve üçüncü taraf hizmetlerin (e-posta iletimi, mağazalar, altyapı) kesinti veya hatalarından doğan zararlar sorumluluğumuz dışındadır.
+Kanunen izin verilen ölçüde Vibe Tag; öngörülemeyen dolaylı zarar, kâr/fırsat kaybı veya salt üçüncü kullanıcı davranışından, kendi kusuru ve yükümlülüğü bulunmadığı ölçüde sorumlu değildir. Kullanıcı içeriği koruması aracı hizmet koşullarına bağlıdır.
 
-Her hâlükârda toplam sorumluluğumuz, zarara yol açan olaydan önceki 12 ay içinde hizmet için fiilen ödediğin tutarla; ücretsiz kullanıyorsan sıfırla sınırlıdır. Tüketicinin korunmasına ilişkin emredici hükümler ile kasıt ve ağır ihmal hâlleri saklıdır.
+Tüketici olmayanlarda doğrudan zarar için toplam sözleşmesel tavan, olaydan önceki 12 ayda fiilen ödenen ücrettir; ücretsiz kullanım için yayın öncesi makul [ÜCRETSİZ KULLANIM İÇİN SORUMLULUK TAVANI] belirlenir, sıfır tavan uygulanmaz. Sınır; kasıt/ağır ihmal, ölüm/bedensel zarar, dolandırıcılık, kanunen sınırlandırılamayan veri/gizlilik ve fikri mülkiyet sorumluluğu ile emredici tüketici hakkına uygulanmaz. Yerel hukuk izin vermiyorsa o ölçüde geçersizdir.
 
-### Tazminat
+### Tazmin
 
-Bu şartları ihlal etmenden, paylaştığın içerikten veya hizmeti hukuka aykırı kullanmandan doğan üçüncü kişi talepleri, idari yaptırımlar ve makul avukatlık ücretleri dâhil zararları karşılamayı kabul edersin.
+Tüketici olmayan kullanıcı, kendi hukuka aykırı içeriği, esaslı ihlali veya üçüncü kişi hakkı ihlali nedeniyle Vibe Tag'e yöneltilen talepten doğan kesinleşmiş makul zarar/masrafı kusuru oranında tazmin eder. Vibe Tag talebi gecikmeksizin bildirir, işbirliği sağlar ve kullanıcı onayı olmadan ona yükümlülük getiren sulh yapmaz. Bu hüküm tüketiciye kanunen izin verilenden geniş uygulanmaz ve Vibe Tag'in kendi kusurunu kullanıcıya yüklemez.
 
-### Değişiklikler, uygulanacak hukuk ve yetki
+### Hukuk, uyuşmazlık ve değişiklik
 
-Bu şartları güncelleyebiliriz; önemli değişiklikler uygulama içinden duyurulur ve yayımlandığı anda yürürlüğe girer. Değişiklikten sonra hizmeti kullanmaya devam etmen, güncel şartları kabul ettiğin anlamına gelir.
+Önce destek@vibetag.app üzerinden iyi niyetli çözüm aranır. Türkiye hukuku uygulanır. Türkiye'deki tüketici, yerleşim veya işlem yerindeki hakem heyeti/tüketici mahkemesi dâhil kanunen yetkili mercilere başvurabilirsin. Tüketici olmayanlarda [YETKİLİ MAHKEME ŞEHRİ] mahkeme/icra daireleri yetkilidir. Yabancı tüketicinin ikamet yerindeki vazgeçilemeyen koruma ve yetki hakları saklıdır. Zorunlu tahkim veya toplu dava feragati yoktur.
 
-Bu şartlar Türkiye Cumhuriyeti hukukuna tabidir; uyuşmazlıklarda İstanbul mahkemeleri ve icra daireleri yetkilidir. Tüketici işlemlerinde tüketici hakem heyetlerine ve tüketici mahkemelerine başvuru hakkın saklıdır. Şartlardan birinin geçersiz sayılması diğerlerinin geçerliliğini etkilemez.
+Önemli değişiklikler önceden uygun yöntemle bildirilir; yeni rıza/açık kabul gerekiyorsa ayrıca alınır. Sırf kullanıma devam, açık kabul gereken durumda yeterli değildir. Geçersiz hüküm diğerlerini etkilemez; hak kullanılmaması feragat değildir. İletişim: destek@vibetag.app, [İŞLETME ADRESİ].
 
 ---
 
@@ -205,184 +244,225 @@ Bu şartlar Türkiye Cumhuriyeti hukukuna tabidir; uyuşmazlıklarda İstanbul m
 
 ## Privacy Policy
 
-*Yürürlük: 2026-08-20 · Adres: /legal/privacy*
+*Yürürlük: 2026-08-24 · Adres: /legal/privacy*
 
-Vibe Tag is an app where people share the good things they see in each other. This explains what we keep, why, and what we do not do with it.
+Vibe Tag does not sell data for advertising. The service processes what it needs for the product, security, moderation and legal duties. Ratings about you can be created by other people. Gold membership can reveal a rater's identity to the person they rated, subject to the exceptions below.
 
-### What we collect
+### Who we are and scope
 
-Only what the app needs to work:
+This policy explains how personal data is processed in the Vibe Tag app and connected services, offered by [LEGAL ENTITY / BUSINESS NAME] (“Vibe Tag”, “we”). Data controller/operator: [LEGAL ENTITY / BUSINESS NAME]; address: [BUSINESS ADDRESS]; MERSİS: [MERSİS NUMBER — IF ANY]; VERBİS: [VERBİS REGISTRATION STATUS]; privacy: destek@vibetag.app; content notices: destek@vibetag.app. GDPR Art. 27 representative, if required: [EU/EEA REPRESENTATIVE].
 
-- Account: name, username, email, an irreversible hash of your password (scrypt), and your bio and photo if you add them. Photos are cropped on your device, converted to JPEG and stored that way.
-- Email verification: an irreversible hash of the verification codes. A code dies within 10 minutes, and used codes are pruned regularly.
-- Ratings: the scores you give and receive, the Vibe Tags chosen, notes, how you know each other, and the previous version of every update.
-- Membership: your plan, its end date if it has one, the discount codes you redeemed and — if you bought through a store — the subscription's product, status and expiry. Card and payment details never reach us; the App Store or Google Play processes the payment.
-- Location: only if you turn on Nearby. It is rounded to roughly 100 metres before it is stored and is used solely to sort a list by distance. Off by default, and you can turn it off at any time.
-- Messages and notifications: the direct messages you send and receive, your in-app notifications and — if you enabled them — your browser's push endpoint.
-- Cookies: a session cookie (httpOnly) and one holding your language choice. No advertising or tracking cookies.
-- Security records: the IP address on sign-in, registration and code requests (for rate limiting, deleted within hours) and server error logs (deleted within 30 days).
+The App Store, Google Play and any independent linked services have their own data practices, outside this policy.
 
-### Ratings and anonymity
+### What we collect, and from where
 
-Ratings are never shown attributed to a person in the interface. The database does record who rated whom — fraud detection, appeals and abuse review all require it.
+- Account and profile: name, username, email, a salted scrypt hash of your password, your bio and photo.
+- Verification/security: code hashes, session, IP, timestamps, sign-in, rate-limit, access and error logs.
+- User content: scores given/received, Vibe Tags, notes, how you know each other, revision history, messages, invites, notifications, friend/block records, reports and appeals.
+- Data from others: the ratings, notes and relationship context other users create about you.
+- Membership: plan, term, discount code, store product id and subscription status. Card/payment instrument data never reaches us.
+- Approximate location: only when Nearby is on, rounded to roughly 100 metres.
+- Technical data: the mandatory httpOnly session cookie, language preference, your device/browser's mandatory technical information and, if enabled, your push endpoint. No advertising/tracking cookies in the current design.
 
-Gold membership reveals who rated you. The rater cannot prevent that — visibility follows the rated person's plan. The exceptions: ratings the fraud detector has protected, and ratings written back when a “hide my identity” option existed. Neither is visible on any plan.
+### Purposes and legal basis
 
-### Why we process it
+We process data to run the account and contract; to provide the profile, score, messaging, notifications and membership; to prevent fraud, harassment and security incidents; to resolve complaints/appeals; to defend rights; and to meet legal obligations.
 
-To create your account, verify your email and keep you signed in; to build your profile and score; to detect fake ratings; to deliver notifications; to manage your membership and payment state; to review abuse reports; and to keep the service safe. Nothing else.
+Depending on activity in Türkiye, KVKK Art. 5/2-c (contract), 5/2-ç (legal obligation), 5/2-e (establishment/exercise/protection of a right) and, without prejudice to your fundamental rights, 5/2-f (legitimate interest) apply; in the EU/EEA, GDPR Art. 6(1)(b), (c), (f) apply. Approximate location rests on separate, revocable consent; declining it does not affect anything else.
 
-### Service providers
+Data another user creates about you is not collected from you directly. The social rating function is balanced against your rights via a legitimate-interest test aimed at preventing fraud and protecting rights. When it is matched to your profile, you are given notice with the source and basic processing information, plus access and objection tools. An objection does not trigger automatic deletion — lawfulness, accuracy claims, freedom of expression and personality/data rights are weighed by human review.
 
-We do not sell your data, share it with advertisers, or pass it to data brokers. A small number of providers run parts of the service:
+### Ratings, identity visibility and automation
 
-- Hosting: the app and database run on our own server.
-- Email delivery (Resend): your name and email address are passed to this provider to deliver verification and password-reset emails; its servers may be located abroad.
-- Traffic (Cloudflare): access to the site passes through this network.
-- Payments (App Store / Google Play): if you buy through a store, the store processes the payment; we only receive the subscription's status.
-- Nothing else leaves the service unless the law requires it.
+A rater's name is not shown in the general interface; identity is kept in the database for fraud detection, security and appeals. A Gold member can see who rated them. Ratings the fraud detector has protected, and ones submitted while a “hide my identity” option existed and used, are the exceptions. This rule is shown again right before a rating is submitted; absolute anonymity is not promised.
 
-### Retention
+An automated tool may reduce or discount a vote's weight. We aim not to produce legal or similarly significant effects from automated processing alone; an affected user may request human review and lodge an objection.
 
-We keep your data while your account exists. Deleting your account permanently removes your profile, every rating you gave and received, your invites, messages and notifications.
+### Recipients, and that we do not sell data
 
-Exceptions: a rating removed by moderation is hidden, not deleted — a decision nobody can look at again is a decision nobody can appeal. Server error logs live 30 days; rate-limit records, hours. Backups rotate on roughly a 30-day cycle, so a deleted account is fully gone once the last backup holding it expires.
+We do not sell personal data for money, pass it to data brokers, or — in the current model — share it for targeted/cross-context advertising. Purpose-limited disclosure may be made to:
 
-### Security
+- Our own server and hosting/database providers.
+- Resend: name, email and message technical data, for verification and password-reset delivery.
+- Cloudflare: IP, request and connection data, for traffic routing and security.
+- Apple/Google: the store processes your store purchase; we receive only product and subscription status.
+- Advisors, auditors, courts and competent authorities: to the extent of a valid request, obligation or the protection of rights.
+- Parties to a merger/investment/transfer: within privacy and legal limits, with appropriate notice on a completed transaction.
 
-Passwords are stored irreversibly (scrypt, with a per-user salt); no plaintext password is kept anywhere. The session cookie is httpOnly and cannot be read by JavaScript in the browser. All traffic is TLS-encrypted. Sign-in and code screens are rate-limited.
+### Transfers abroad
 
-### Contact
+Data may be transferred abroad due to Resend, Cloudflare, Apple, Google or their sub-processors. Transfers from Türkiye rely on an adequacy decision, an appropriate safeguard under KVKK Art. 9 (in particular the Board's standard contract, with the required notice), or a genuinely occasional statutory exception. Explicit consent is not the default basis for routine or continuous transfer.
 
-Write to destek@vibetag.app with any privacy question.
+For EU/EEA data, adequacy or European Commission SCCs apply, together with a transfer impact assessment and supplementary measures where required. Write to destek@vibetag.app for details on the mechanism used.
+
+### Retention and deletion
+
+Account data is kept for the life of the membership; error logs for at most 30 days as a rule; rate-limit IP records for hours; backups on roughly a 30-day rotation. Deleting your account removes your profile, messages, invites, notifications and ratings from active systems, or irreversibly anonymises them.
+
+Limited records tied to moderation, fraud, appeals, a legal request or a dispute may be kept, access-restricted, for as long as needed to review the decision and defend rights, bounded by the statute of limitations — never indefinitely.
+
+### Security and data breach
+
+We apply risk-proportionate TLS, salted scrypt password hashing, httpOnly cookies with appropriate secure/sameSite flags, access control, rate limiting, logging/monitoring, backups, updates, vendor management and incident response. We do not promise absolute security, and we do not disclaim our statutory security duties.
+
+We contain, assess and document a breach. Under KVKK, the Board is notified without delay and, as a rule, no later than 72 hours after we learn of it; affected people are notified as soon as reasonably possible. Under GDPR, a breach creating risk is notified to the authority within 72 hours where feasible; one creating high risk is notified to the individual without delay. Applicable US state breach rules are also monitored.
+
+### Your rights and requests
+
+Depending on where you are, you may have rights of access, copy, correction, erasure, restriction, portability, objection, withdrawing consent, moving an automated decision to human review, and complaint to an authority. KVKK Art. 11 applies in Türkiye; GDPR Art. 12–22 in the EU/EEA. Requests: destek@vibetag.app. We verify identity proportionately, respond within the legal timeframe, and give reasons for a refusal. Account deletion: Profile → Account → Delete my account.
+
+### US state privacy disclosure
+
+If CCPA/CPRA or another comprehensive state law applies, a resident may have rights to know/access, correct, delete, obtain a portable copy, opt out of sale/targeted advertising/profiling, and be free from discrimination. In the past 12 months, the categories under “What we collect, and from where” may have been collected for the purposes under “Purposes and legal basis” and disclosed for a business purpose to the recipients under “Recipients, and that we do not sell data”.
+
+In the current model we do not sell personal information or share it for cross-context behavioural advertising. If that changes, advance notice, an opt-out and support for an applicable legal preference signal will be provided first. Sensitive information is used only for expected service/security purposes. Requests: destek@vibetag.app and, if available, [TOLL-FREE NUMBER FOR US REQUESTS]. Applicability thresholds are reviewed regularly.
+
+### Children and changes
+
+The service is for 18+ only. We do not knowingly open an account for anyone under 18. If we learn of one, we suspend it, verify age, and delete the data except where the law requires otherwise. A parent/guardian may notify destek@vibetag.app. The 18+ line is enforced with an age declaration and risk-based age assurance; COPPA and EU children's rules are not assumed away.
+
+Material policy changes are announced in advance through an appropriate channel; where a new purpose needs consent, we ask for it again. Contact: destek@vibetag.app, [BUSINESS ADDRESS].
 
 ---
 
 ## Data Protection Notice (KVKK)
 
-*Yürürlük: 2026-08-20 · Adres: /legal/kvkk*
+*Yürürlük: 2026-08-24 · Adres: /legal/kvkk*
 
 Vibe Tag operates under Turkey's Personal Data Protection Law No. 6698 (KVKK). This is the English rendering of the Turkish notice, which governs.
 
 ### Data controller
 
-Vibe Tag. Contact: destek@vibetag.app. (Legal entity name, address and VERBİS registration will be added here before launch.)
+Data controller: [LEGAL ENTITY / BUSINESS NAME] (“Vibe Tag”). Address: [BUSINESS ADDRESS]; MERSİS: [MERSİS NUMBER — IF ANY]; VERBİS: [VERBİS REGISTRATION STATUS]; request email: destek@vibetag.app; registered e-mail/post/form: [KEP ADDRESS / POSTAL ADDRESS — IF ANY].
 
-### Categories of personal data
+### Categories of personal data processed
 
-The following categories are processed:
+- Identity/profile: name, username, bio, photo.
+- Contact: email and notification contact details.
+- User transaction/content: ratings and their revisions, tags/notes/relationship, messages, invites, notifications, friend/block records, reports/appeals.
+- Customer transaction: plan, term, code, store product/subscription status; no card data.
+- Transaction security: password/code hashes, session, IP, timestamps, error, access and security logs, mandatory cookies.
+- Location: approximately 100-metre-precision location, if the feature is selected.
+- Legal transaction/risk: authority requests, disputes, moderation evidence and decisions.
 
-- Identity: name, username.
-- Contact: email address.
-- Usage: ratings given and received with their revisions, messages, invites, notifications, friendship and block records.
-- Transactions: membership plan and its end date, discount-code redemptions, store subscription product, status and expiry. No payment-instrument data is processed.
-- Operational security: session records, IP addresses used for rate limiting, hashes of email verification codes, server error logs, cookies.
-- Location: approximate (~100 m) position, only if you enabled Nearby.
-- Image: your profile photo, if you uploaded one.
+### How data is obtained, and its sources
 
-### Purposes
+Data is obtained, automatically or partly automatically, through the registration, profile, message and rating screens; your device/browser; mandatory cookies; store verification; and support/complaint channels. The source of a rating, note or relationship context about you can be another user.
 
-Forming and performing the membership agreement, verifying membership by email, providing the service, computing your reputation profile, detecting fake ratings, managing membership and payment state, keeping the service safe, reviewing abuse reports, and meeting legal obligations.
+### Purpose and legal grounds
 
-### Legal basis
+Another user creating a rating about you does not rest on contract alone; a legitimate-interest balance for the social function, fraud prevention and protection of rights applies, with human review on appeal.
 
-Identity, contact, usage and transaction data are processed under Art. 5/2-c (necessary for a contract). Operational security data rests on Art. 5/2-f (legitimate interest) and Art. 5/2-ç (legal obligation).
-
-Location data rests solely on your explicit consent under Art. 5/1. Withholding it affects nothing else — Nearby simply stays off — and you can withdraw it any time from the People screen.
+- Membership and core service/subscription management: KVKK Art. 5/2-c.
+- Security, fraud and abuse prevention: Art. 5/2-f, subject to not harming fundamental rights and being proportionate.
+- Complaints, appeals, evidence and disputes: Art. 5/2-e and, where required, 5/2-ç.
+- Competent authority/statutory obligation: Art. 5/2-ç.
+- Approximate location for Nearby: separate and revocable explicit consent, Art. 5/1; declining does not affect other services.
 
 ### Transfers
 
-Your data is not transferred to third parties for marketing. Limited transfers exist to run the service: name and email address go to the email delivery provider (Resend), whose servers may be located abroad, to deliver verification and password-reset emails; site traffic passes through a content delivery network (Cloudflare). Cross-border transfers are conducted in line with the conditions of Art. 9 KVKK.
+Data is not transferred to third parties for marketing. Purpose-limited transfers may be made domestically to competent authorities/courts, lawyers/auditors and technical service providers. Name/email/technical data may go to Resend (possibly located abroad) for email; traffic/IP/security data to Cloudflare; and limited data required by the store to Apple/Google.
 
-If you purchase through a store, the payment is processed by that store (Apple / Google) under its own terms; we only receive the subscription's status. Disclosure to competent authorities on a lawful request is reserved.
+Cross-border transfer follows KVKK Art. 9: adequacy, the Board's standard contract, or another appropriate safeguard; absent those, only in a genuinely occasional statutory case. A standard contract is notified to the Authority within the legal period.
 
 ### Retention and destruction
 
-Data is kept for the life of the membership and permanently destroyed when the account is deleted. Ratings hidden by moderation are retained so the right to appeal stays real. Server error logs are destroyed within 30 days, rate-limit records within hours, and backups on roughly a 30-day rotation.
+Account data is kept for the life of the membership; error logs generally 30 days; rate-limit records hours; backups roughly 30 days. Active data is destroyed/anonymised on account deletion. Moderation, fraud and dispute records are kept, access-restricted, only as long as needed for appeal, evidence and limitation periods.
 
-### Your rights (Art. 11)
+### Your rights under KVKK Art. 11 and how to apply
 
-You may learn whether your data is processed and request information about it, learn the purpose and whether it is used accordingly, request correction of incomplete or inaccurate data, request erasure or destruction, request that these be notified to third parties the data was transferred to, object to a result reached solely by automated analysis, and claim compensation for damage.
+You have the right to learn whether your data is processed; to request information about it; to learn its purpose and whether it is used accordingly and who receives it; to request correction; where the conditions are met, to request erasure/destruction and that recipients be notified; to object to a result reached solely by automated analysis; and to request compensation for damage from unlawful processing.
 
-Write to destek@vibetag.app to exercise these; requests are answered within 30 days at the latest. You can also delete your account permanently in the app: Profile → Account → Delete my account.
+Apply via [KEP ADDRESS — IF ANY], [POSTAL ADDRESS], the destek@vibetag.app on file, or [APPLICATION FORM LINK — IF ANY], in line with the Communiqué. We respond as soon as possible and within 30 days at the latest; a cost may apply per the Board's tariff. Your right to complain to the Board within the statutory periods is reserved.
+
+### Security, breach, and data obtained from someone else
+
+We take risk-proportionate measures under KVKK Art. 12 and audit our processors. When unlawful acquisition is learned of, the Board is notified without delay and, as a rule, within 72 hours at the latest; affected individuals are notified as soon as reasonably possible.
+
+When another user creates data about you, you are given notice of the source and basic processing within a reasonable time, via the app or a profile notice; statutory exceptions apply. Requests for access, correction, objection or unlawful-content removal may be sent to destek@vibetag.app; a reasoned decision and the route to appeal are provided.
 
 ---
 
 ## Terms of Use
 
-*Yürürlük: 2026-08-20 · Adres: /legal/terms*
+*Yürürlük: 2026-08-24 · Adres: /legal/terms*
 
 Using Vibe Tag means accepting the terms below. The heart of the rules is one idea: say only as much about a person as you actually know.
 
-### Membership
+### Parties, acceptance and the service
 
-You must be at least 18 to use Vibe Tag. You confirm that the information you give at registration is accurate; an account does not open until its email address is verified.
+These terms are between [LEGAL ENTITY / BUSINESS NAME], [BUSINESS ADDRESS] (“Vibe Tag”) and the user. Opening an account means accepting these terms, the Privacy Policy, and the community/moderation rules. Mandatory consumer rights are reserved. Vibe Tag is a subjective social-rating platform; it is not a hiring, credit, insurance, housing, education, health, reference-check or other high-impact decision tool.
 
-Your account is personal and non-transferable. You are responsible for keeping your password secret and for everything done through your account; if you notice unauthorised access, reset your password and tell us.
+### Age and account security
 
-### Rating rules
+You must be at least 18; give accurate, current information; use one account per person; and neither transfer your account nor impersonate someone else without permission. Use a strong, unique password and report suspicious access to destek@vibetag.app. We do not attribute every action on your account to you unconditionally; unauthorised access is assessed against each party's fault and mandatory law.
 
-You may rate someone only in the context you actually know them from. “How do you know this person?” is mandatory and decides which criteria you can score.
+### Content rules
 
-You rate each person once. You may revise it once a month; every revision archives the previous version.
+You may rate only someone you genuinely know, in the context you know them from, to the extent of your honest opinion. You may not exceed the one-rating / monthly-update rule.
 
-Fake ratings, revenge ratings and arranged reciprocal ratings are prohibited. Automatic detection reduces the weight of such votes; votes found to be suspicious do not count at all.
+- Insult, defamation, harassment, stalking, threats, hate speech, violence, or degrading/sexual content is prohibited.
+- Knowingly false accusation, revenge, blackmail, and fake/coordinated/reciprocal or paid ratings are prohibited.
+- Unlawful disclosure of personal data, private life, correspondence, phone/email, address, or identity/financial/health information or images is prohibited.
+- Infringement of intellectual property or personality rights, spam, and harmful links/software are prohibited.
+- Bots, scraping, reverse engineering, unauthorised access, exceeding security or rate limits, and disrupting the service are prohibited.
+- Using the scores as the sole or determinative basis for a hiring, credit, insurance, housing or similarly high-impact decision is prohibited.
 
-### Content and responsibility
+### Intellectual property and content licence
 
-Every rating, note, message and image you post is your content, and legal responsibility for it is yours alone. Vibe Tag acts as a hosting provider under Turkish Law No. 5651; it has no obligation to pre-screen user content and does not guarantee its accuracy.
+You represent that you own the rights to your content and that it is lawful. Ownership stays with you. You grant a worldwide, non-exclusive, sub-licensable (limited to our service providers), royalty-free licence, lasting until the content is deleted, to the extent needed to run, display, format, secure, back up and review reports about the service. Statutory record/backup exceptions are reserved.
 
-Content reported as unlawful is reviewed and removed where warranted. If you believe content violates your rights, report it in the app or write to destek@vibetag.app.
+### Identity visibility
 
-You allow us to use your content to the extent needed to run the service — showing it on profiles and Vibe Cards, computing scores, keeping backups. We claim nothing beyond that.
+A rater is not shown by name in the general interface; identity is kept in the database. A Gold member can see who rated them. Ratings the fraud detector has protected, and ones submitted under a past “hide my identity” option, are the exceptions. This rule is shown with a visible notice before submission. Identity may be disclosed on a valid authority request.
 
-### Notes and messages
+### Reporting, removal and appeal
 
-Insults, harassment, hate speech, threats, exposing someone's personal data, and spam are prohibited. Notes may not contain phone numbers, email addresses or links. Anyone may rate anyone; each profile owner chooses who may add a written note to a rating (everyone, or only the people they invited and their friends).
+Content unlawful or against these terms can be reported through the in-app Report tool or destek@vibetag.app. A report should include the exact location/identity of the content, the grounds for the violation, contact information (statutory anonymity reserved), a good-faith statement, and evidence with any rights/authority documentation.
 
-Direct messages are open between friends. Premium members may write to people who rated them; the rater may only reply once written to.
+We confirm receipt, review impartially and carefully, and communicate the outcome within a reasonable time. In clear unlawfulness or urgent-harm risk, an immediate interim restriction may apply; otherwise we may request clarification, remove content, reduce visibility, exclude it from scoring, apply an account measure, or decide to take no action. Valid orders are complied with.
 
-### Moderation and termination
+Except where the law prohibits it or it would endanger safety, a restriction comes with reasoning covering its basis, scope, use of automation and how to appeal. You may request a free human review within 6 months of the decision notice, by writing to destek@vibetag.app. Retaliatory, repetitive or clearly unfounded requests may be proportionately limited.
 
-A rating found to break the rules stops counting towards scores. An account that breaks the rules may be suspended or closed without prior warning; no refund is made for unused membership time in that case.
+To the extent we qualify as a hosting provider under Law No. 5651, we have no obligation of prior review; we meet our duties on a proper notice or a competent decision. Where the DSA applies, notice-and-action, statements of reasons, internal complaints and other mandatory mechanisms are operated. This protection does not remove liability for our own content, design, knowledge or actions.
 
-Decisions are recorded and the content remains reviewable. If your account is suspended you can appeal by writing to destek@vibetag.app.
+### Moderation and account measures
 
-### Blocking
+Using human and automated tools, and weighing severity, repetition, context, harm, intent and history, we may apply a warning, a feature restriction, removal, exclusion from scoring, suspension or closure. Urgent safety, clear unlawfulness, fraud or an investigation may mean no prior warning is given. A blocked person cannot submit a new rating or revise one; their existing rating is not deleted solely because of the block, but it can still be reported.
 
-Someone you block cannot rate you again or revise an existing rating. Their existing rating is not deleted — otherwise blocking would become a way to erase low scores. Report a rating you believe is unfair.
+### Plans, store payments and refunds
 
-### Plans and payment
+Silver/Gold can be obtained through the App Store or Google Play, or granted by a promotion. Price, term, features and auto-renewal are shown on the purchase screen. Payment, billing, renewal and cancellation are technically handled by the store; card data never reaches us. If not cancelled through the store before the term ends, the store may renew it; deleting your account may not automatically cancel the subscription, and this is shown on the deletion screen.
 
-Paid plans (Silver, Gold) can be obtained only through the App Store and Google Play, with a discount code, or by a grant from us; there is no web checkout.
+Refunds are requested from the store you purchased through in the first instance. Mandatory rights under Law No. 6502, the Distance Contracts Regulation and rights at your place of residence are reserved. Where separate explicit consent is required to begin performance of digital content/service within the withdrawal period and to lose that right, it is obtained in the purchase flow itself — accepting these terms alone is not enough. If a core benefit of a paid period is materially reduced, an appropriate legal/store remedy is offered.
 
-For store purchases, billing, renewal and refunds are governed entirely by the store's (Apple's / Google's) own terms; refund requests go to the store. Your payment details never reach us.
+### Third-party services
 
-Discount codes have no cash value, are non-transferable and may be cancelled on abuse. Plan prices and contents may change; changes do not affect periods already paid for.
+The app, brand, software and design belong to Vibe Tag/its licensors. You are given a personal, limited, revocable, non-transferable right to use it. Except for statutory exceptions, copying, distributing, reverse-engineering and commercial use are prohibited.
 
-When a subscription ends, paid features close; your data and profile remain as they are, undeleted.
+Cloudflare's, Resend's, Apple's and Google's own terms may apply. We are not liable for an independent third-party outage beyond our control; our own vendor choices, data protection and mandatory duties are reserved. A purchase through Apple is a contract with Vibe Tag, not Apple; Apple may be a third-party beneficiary of store-specific terms. Use of Google Play is subject to Google Play's terms.
 
-### Nature of the service; no warranty
+### Termination and changes to the service
 
-Vibe Tag is not a reference check, a credit score or a hiring tool. The numbers here summarise subjective human opinion; their accuracy, currency and fitness for any purpose are not guaranteed. Every decision you make relying on them — and its consequences — is yours alone.
+The service may pause temporarily for maintenance, security or legal reasons; features may change with reasonable notice. You may delete your account and must separately cancel a store subscription. Substantial or repeated breach may lead to suspension/closure. An automatic “no refund ever” disproportionate to a consumer's fault is not applied; the specific event, period used, store and mandatory law are considered.
 
-The service is provided “as is”. We do not promise it will be uninterrupted, error-free or free of vulnerabilities; it may pause for maintenance, and features may change or be withdrawn.
+### Warranty and limitation of liability
 
-### Limitation of liability
+To the extent mandatory law allows, the service is provided as is; uninterrupted operation, error-freeness, absolute security or the accuracy of user content are not guaranteed. This does not remove the fitness of the promised core digital service, reasonable security, or a consumer's defect/conformity rights.
 
-To the maximum extent mandatory law allows: Vibe Tag is not liable for lost profits, reputational harm, lost data or indirect damage. Damage arising from user content, from other users' actions, or from third-party services (email delivery, the stores, infrastructure) failing or pausing is outside our responsibility.
+To the extent permitted by law, Vibe Tag is not liable for unforeseeable indirect damage, lost profit/opportunity, or damage arising solely from a third user's conduct, to the extent we are not at fault and have no duty involved. Protection for user-generated content depends on the applicable hosting-service conditions.
 
-In every case our total liability is capped at what you actually paid for the service in the 12 months before the event — zero if you use it free. Mandatory consumer-protection rules, intent and gross negligence are excepted.
+For non-consumers, the total contractual cap for direct damage is what was actually paid in the 12 months before the event; for free use, a reasonable [LIABILITY CAP FOR FREE USERS] is set before launch — a zero cap is not applied. The cap does not apply to intent/gross negligence, death/bodily injury, fraud, data/privacy liability that cannot be limited by law, intellectual-property liability, or a mandatory consumer right. It is invalid to the extent local law does not permit it.
 
 ### Indemnity
 
-You agree to cover damages — including third-party claims, administrative fines and reasonable attorney fees — arising from your breach of these terms, the content you post, or unlawful use of the service.
+A non-consumer user indemnifies Vibe Tag, in proportion to their fault, for finally established reasonable damage/costs arising from a claim against Vibe Tag due to the user's own unlawful content, a substantial breach, or infringement of a third party's rights. Vibe Tag notifies the claim without delay, cooperates, and does not settle in a way that creates an obligation for the user without their consent. This clause is not applied more broadly against a consumer than the law allows, and does not shift Vibe Tag's own fault onto the user.
 
-### Changes, governing law and venue
+### Governing law, disputes and changes
 
-We may update these terms; material changes are announced in the app and take effect on publication. Continuing to use the service after a change means accepting the current terms.
+A good-faith resolution is sought first via destek@vibetag.app. Turkish law applies. You may apply to the competent bodies under the law, including the consumer arbitration board/consumer court in Türkiye at your place of residence or where the transaction occurred. For non-consumers, the courts/enforcement offices of [VENUE CITY] have jurisdiction. A foreign consumer's non-waivable protections and jurisdiction at their place of residence are reserved. There is no mandatory arbitration or class-action waiver.
 
-These terms are governed by the law of the Republic of Türkiye; the courts and enforcement offices of Istanbul have jurisdiction. Your right to apply to consumer arbitration boards and consumer courts is reserved. If one clause is held invalid, the rest stand.
+Material changes are announced in advance through an appropriate channel; where new consent/explicit acceptance is required, it is obtained separately. Continued use alone is not sufficient where explicit acceptance is required. An invalid clause does not affect the rest; not exercising a right is not a waiver. Contact: destek@vibetag.app, [BUSINESS ADDRESS].
 
 ---
 

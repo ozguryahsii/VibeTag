@@ -54,8 +54,11 @@ docker exec vibetag-db-1 pg_dump -U vibetag vibetag | gzip \
 # 2 · the tag
 su vibetag -s /bin/bash -c 'cd /home/vibetag/app && git fetch --tags && git checkout vX.Y && git log --oneline -1'
 
-# 3 · build (≈4 min). First check swap (`free -m`) AND disk (`df -h /`) —
-#     builds eat ~2 GB of cache each; under 3 GB free, run
+# 3 · build (≈4 min). At several deploys a day a periodic cleanup always
+#     loses the race — the disk can fill between cron runs. The daemon carries
+#     a standing cache cap instead (see "Docker build-cache cap" below), so
+#     this check is a fallback, not the primary defense. Check swap
+#     (`free -m`) and disk (`df -h /`); under 3 GB free, run
 #     `docker builder prune -af` first. A full disk here once took the
 #     database down with it.
 cd /home/vibetag/app
@@ -77,7 +80,31 @@ mid-flight it feels: a server should never be running a commit that has no
 name, because "roll back to the previous one" then has no answer either.
 
 Version numbering: minor bump (`v1.2` → `v1.3`) for a normal feature package,
-patch (`v1.2.1`) for a fix on its own. Current: **v2.13.2**.
+patch (`v1.2.1`) for a fix on its own. Current: **v2.14**.
+
+## Docker build-cache cap — do not remove
+
+At several deploys a day, a periodic prune (cron, "check before each deploy")
+always eventually loses: the disk can fill in the gap between runs, and once
+it hit zero it took Postgres down with it. The fix that actually holds is a
+standing cap on the daemon itself, so the cache can never grow past it no
+matter how many builds run back to back — nothing to remember, nothing to
+schedule.
+
+`/etc/docker/daemon.json` on the server carries:
+
+```json
+{
+  "builder": { "gc": { "enabled": true, "defaultKeepStorage": "8GB" } }
+}
+```
+
+Docker enforces this automatically after every build — no cron, no manual
+step. If disk is ever tight again, this is the first thing to check
+(`cat /etc/docker/daemon.json`) before treating it as a one-off emergency.
+Raise `defaultKeepStorage` if the box's disk grows; do not delete the block to
+"fix" a build that's slow from cold cache — that trades the crash for a
+five-minute rebuild, which is the correct trade.
 
 ## Language
 

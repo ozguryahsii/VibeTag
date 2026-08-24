@@ -101,13 +101,13 @@ export const tr: Dictionary = {
   },
 
   auth: {
-    consentPrefix: "Şunları okudum ve kabul ediyorum:",
+    consentPrefix: "18 yaşın üzerindeyim ve şunları okudum ve kabul ediyorum:",
     consentAnd: "ve",
     consentSuffix: ".",
     loginKicker: "TEKRAR HOŞ GELDİN",
     registerKicker: "SOSYAL İMZANI OLUŞTUR",
     emailPlaceholder: "sen@ornek.com",
-    namePlaceholder: "Özgür Yahşi",
+    namePlaceholder: "Ayşe Yılmaz",
     usernamePlaceholder: "kullaniciadin",
     loginTitle: "Tekrar hoş geldin 👋",
     loginBody: "Vibe profilin seni bekliyor.",
@@ -118,7 +118,7 @@ export const tr: Dictionary = {
     username: "Kullanıcı adı",
     email: "E-posta",
     identifier: "E-posta veya kullanıcı adı",
-    identifierPlaceholder: "sen@ornek.com ya da ozguryahsi",
+    identifierPlaceholder: "sen@ornek.com ya da ayseyilmaz",
     password: "Şifre",
     passwordHint: "En az 6 karakter",
     signIn: "Giriş yap",
@@ -691,6 +691,8 @@ export const tr: Dictionary = {
       "Planlar App Store ve Google Play üzerinden satın alınacak. O zamana kadar aşağıya bir indirim kodu girerek geçebilirsin.",
     planNoteShell:
       "Planların yönetimi yakında uygulama içi satın alma ile burada olacak.",
+    trialNote:
+      "Silver ve Gold'u bir hafta ücretsiz deneyebilirsin. Yalnızca bir üyelik tipi ücretsiz denenebilir — birini bitirmeden diğerine geçemezsin.",
     privacy: "Gizlilik ve güvenlik",
     whoCanComment: "Sana kimler yorum yapabilir?",
     whoCanCommentBody:
@@ -707,6 +709,8 @@ export const tr: Dictionary = {
     deleteTitle: "Hesabını kalıcı olarak silmek üzeresin",
     deleteBody:
       "Profilin, aldığın ve verdiğin tüm değerlendirmeler, davetlerin ve bildirimlerin silinir. Bu işlem geri alınamaz.",
+    deleteStoreWarning:
+      "Silver veya Gold üyeliğin App Store ya da Google Play üzerinden aktifse, hesabını silmek aboneliği iptal etmez — mağaza seni yenilemeye devam edebilir. Aboneliği ayrıca mağaza ayarlarından iptal etmen gerekir.",
     deleteConfirm: "Onaylamak için {username} yaz",
     deleteCta: "Kalıcı olarak sil",
     deleting: "Siliniyor…",
@@ -738,6 +742,7 @@ export const tr: Dictionary = {
         name: "Free",
         tagline: "My Vibe",
         price: "₺0",
+        trial: null,
         perks: [
           "My Vibe profili",
           "Vibe Score ve Vibe Tags",
@@ -749,7 +754,8 @@ export const tr: Dictionary = {
       silver: {
         name: "Silver",
         tagline: "Vibe Insights",
-        price: "₺79/ay",
+        price: "₺69/ay",
+        trial: "İlk hafta ücretsiz",
         perks: [
           "Seni hangi çevrelerden tanıyorlar",
           "Güçlü yönler ve gelişim alanları",
@@ -761,7 +767,8 @@ export const tr: Dictionary = {
       gold: {
         name: "Gold",
         tagline: "Vibe Identity",
-        price: "₺149/ay",
+        price: "₺189/ay",
+        trial: "İlk hafta ücretsiz",
         perks: [
           "Silver'daki her şey",
           "Sana yapılan her değerlendirmenin sahibini gör",
@@ -785,7 +792,7 @@ export const tr: Dictionary = {
     kicker: "KÜÇÜK YAZILAR",
     updated: "Son güncelleme: {date}",
     draftNotice:
-      "Taslak. Bu metinler uygulamanın gerçekte ne yaptığını anlatıyor, ancak henüz bir hukukçu tarafından incelenmedi — nihai sözleşme değil, çalışma metni olarak değerlendir.",
+      "Henüz yürürlükte değil. Bu metinler bir avukat tarafından incelendi ve revize edildi, ancak köşeli parantez içindeki alanlar (şirket unvanı, adres, MERSİS/VERBİS gibi) gerçek bilgilerle doldurulana kadar nihai sözleşme sayılmaz — çalışma metni olarak değerlendir.",
     title: "Yasal",
     privacy: "Gizlilik Politikası",
     kvkk: "KVKK Aydınlatma Metni",

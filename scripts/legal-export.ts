@@ -57,36 +57,26 @@ w("Ekranda ne yazıyorsa burada da o yazıyor.");
 w();
 w(`Son güncelleme: **${docs[0].updated}** · İletişim adresi: **${SUPPORT_EMAIL}**`);
 w();
-w("## Avukatın bilmesi gereken notlar");
+w("## Durum");
 w();
 w(
-  "- Metinler **hukukçu tarafından hazırlanmadı.** Uygulamanın ne yaptığı doğru " +
-    "anlatılıyor — her cümle koddaki bir tabloya veya kontrole dayanıyor — ama " +
-    "hukuki denetimden geçmedi. Uygulamada da bunu söyleyen kalıcı bir uyarı var.",
+  "- Metinler **2026-08-24 tarihinde avukat tarafından incelendi ve revize edildi.** " +
+    "Bu dosya o revizyonun ta kendisidir. Henüz yürürlükte değil: köşeli parantezli " +
+    "alanlar (şirket unvanı, adres, MERSİS/VERBİS, ilgili e-postalar, yetkili mahkeme, " +
+    "ücretsiz kullanıcı sorumluluk tavanı) gerçek bilgilerle doldurulmadan yayımlanmaz. " +
+    "Uygulamada da bunu söyleyen kalıcı bir uyarı var.",
 );
 w(
-  "- **Tüzel kişi bilgileri eksik.** KVKK metninde veri sorumlusu olarak yalnızca " +
-    "«Vibe Tag» yazıyor; ticari unvan, adres, MERSİS ve VERBİS kaydı yayına " +
-    "çıkmadan önce eklenecek. Metinde bunu belirten bir parantez var.",
+  "- **Tüzel kişi bilgileri eksik.** Veri sorumlusu olarak yalnızca " +
+    "«[TÜZEL KİŞİ / İŞLETME UNVANI]» yazıyor; ticari unvan, adres, MERSİS ve VERBİS " +
+    "durumu doldurulacak. Metinde bunu belirten köşeli parantezler var.",
 );
 w(
-  "- **Sorumluluk sınırlaması bilinçli olarak yumuşak yazıldı** («emredici " +
-    "hukukun izin verdiği ölçüde»). Tüketici ve veri koruma yükümlülükleri " +
-    "sözleşmeyle kaldırılamıyor; bunu görmezden gelen bir madde ilk elenen madde " +
-    "olur ve metnin geri kalanının inandırıcılığını da götürür. Daha sert bir " +
-    "ifade tercih edilecekse sınırın nerede olduğunu avukat söylemeli.",
-);
-w(
-  "- **Anonimlik bir vaat değil, ürünün kuralı.** Değerlendirmeler arayüzde " +
-    "hiçbir zaman kişiye bağlanmıyor, ama veritabanında kimin kimi " +
-    "değerlendirdiği kayıtlı — sahtecilik tespiti, itiraz ve kötüye kullanım " +
-    "incelemesi için. Gold üyelik kendisini değerlendirenleri gösteriyor. Bu " +
-    "ayrımın metinde doğru kurulduğu ayrıca kontrol edilmeli.",
-);
-w(
-  "- **Ödeme bilgisi hiç bize ulaşmıyor.** Satın alma App Store ve Google Play " +
-    "üzerinden yapılıyor; bize sadece aboneliğin durumu geliyor. Cayma hakkı ve " +
-    "iade akışının mağaza kurallarıyla çelişmediği kontrol edilmeli.",
+  "- **Yayın öncesi doldurulacak diğer alanlar:** ilgili e-postalar (gizlilik, " +
+    "içerik bildirimleri, güvenlik, KVKK, itiraz, ABD talepleri, AB/AEA temsilcisi " +
+    "— tek adres mi yoksa ayrı ayrı mı olacağına karar verilecek), tüketici " +
+    "olmayanlar için yetkili mahkeme şehri, ücretsiz kullanıcılar için sorumluluk " +
+    "tavanı tutarı, ve varsa KEP/posta adresi.",
 );
 w();
 w("---");

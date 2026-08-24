@@ -4,7 +4,13 @@ import { useActionState, useState } from "react";
 import { deleteAccountAction, type SafetyState } from "@/lib/actions/safety";
 import { fill, useD } from "@/components/LocaleProvider";
 
-export function DeleteAccount({ username }: { username: string }) {
+export function DeleteAccount({
+  username,
+  plan,
+}: {
+  username: string;
+  plan: string;
+}) {
   const d = useD();
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState<SafetyState, FormData>(
@@ -34,6 +40,15 @@ export function DeleteAccount({ username }: { username: string }) {
       <p className="text-[12.5px] text-muted mt-2 leading-relaxed">
         {d.settings.deleteBody}
       </p>
+
+      {/* A store subscription outlives account deletion — the store, not
+          this delete, controls renewal. Only worth saying to someone it
+          could actually surprise. */}
+      {plan !== "FREE" && (
+        <p className="mt-3 rounded-[16px] border border-orange/25 bg-tagbg px-3.5 py-3 text-[12px] leading-relaxed text-orange">
+          {d.settings.deleteStoreWarning}
+        </p>
+      )}
 
       <label className="block mt-4">
         <span

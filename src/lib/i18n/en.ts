@@ -104,7 +104,7 @@ export const en = {
   },
 
   auth: {
-    consentPrefix: "I have read and accept the",
+    consentPrefix: "I am 18 or older, and I have read and accept the",
     consentAnd: "and the",
     consentSuffix: ".",
     loginKicker: "WELCOME BACK",
@@ -694,6 +694,8 @@ export const en = {
       "Plans will be purchased through the App Store and Google Play. Until then, a discount code below is the way in.",
     planNoteShell:
       "Plan management is coming here soon with in-app purchases.",
+    trialNote:
+      "Silver and Gold can both be tried free for a week. Only one plan may be trialled at a time — you can't run a Silver trial then a Gold one.",
     privacy: "Privacy and safety",
     whoCanComment: "Who can write you a note?",
     whoCanCommentBody:
@@ -710,6 +712,8 @@ export const en = {
     deleteTitle: "You are about to delete your account permanently",
     deleteBody:
       "Your profile, every rating you gave and received, your invites and notifications are deleted. This cannot be undone.",
+    deleteStoreWarning:
+      "If your Silver or Gold membership is active through the App Store or Google Play, deleting your account does not cancel it — the store can keep renewing it. Cancel the subscription separately in your store settings.",
     deleteConfirm: "Type {username} to confirm",
     deleteCta: "Delete permanently",
     deleting: "Deleting…",
@@ -741,6 +745,7 @@ export const en = {
         name: "Free",
         tagline: "My Vibe",
         price: "₺0",
+        trial: null,
         perks: [
           "My Vibe profile",
           "Vibe Score and Vibe Tags",
@@ -752,7 +757,8 @@ export const en = {
       silver: {
         name: "Silver",
         tagline: "Vibe Insights",
-        price: "₺79/mo",
+        price: "₺69/mo",
+        trial: "First week free",
         perks: [
           "Which circles know you",
           "Strong sides and growth areas",
@@ -764,7 +770,8 @@ export const en = {
       gold: {
         name: "Gold",
         tagline: "Vibe Identity",
-        price: "₺149/mo",
+        price: "₺189/mo",
+        trial: "First week free",
         perks: [
           "Everything in Silver",
           "See who wrote every rating you received",
@@ -788,7 +795,7 @@ export const en = {
     kicker: "THE FINE PRINT",
     updated: "Last updated {date}",
     draftNotice:
-      "Draft. These texts describe what the app actually does, but they have not been reviewed by a lawyer yet — treat them as a working document, not final terms.",
+      "Not yet in force. These texts were reviewed and revised by counsel, but the bracketed placeholders (company name, address, MERSİS/VERBİS and the rest) are not yet filled with real information — treat them as a working document, not final terms.",
     title: "Legal",
     privacy: "Privacy Policy",
     kvkk: "Data Protection Notice (KVKK)",

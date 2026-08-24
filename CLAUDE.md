@@ -77,7 +77,7 @@ mid-flight it feels: a server should never be running a commit that has no
 name, because "roll back to the previous one" then has no answer either.
 
 Version numbering: minor bump (`v1.2` → `v1.3`) for a normal feature package,
-patch (`v1.2.1`) for a fix on its own. Current: **v2.13.1**.
+patch (`v1.2.1`) for a fix on its own. Current: **v2.13.2**.
 
 ## Language
 

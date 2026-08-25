@@ -808,6 +808,8 @@ export const tr: Dictionary = {
       "Bu abonelik başka bir Vibe Tag hesabına ait. O hesapla giriş yap ya da destek@vibetag.app adresine yaz.",
     failed: "Satın alma tamamlanamadı. Biraz sonra tekrar dene.",
     manage: "Aboneliği yönet",
+    priceUnavailable:
+      "Fiyat şu anda mağazadan alınamıyor. Biraz sonra tekrar dene.",
     terms:
       "Abonelik her dönem sonunda otomatik yenilenir; en az 24 saat önce iptal etmezsen ücretlendirilir. Yönetim ve iptal, cihazının hesap ayarlarından yapılır.",
   },

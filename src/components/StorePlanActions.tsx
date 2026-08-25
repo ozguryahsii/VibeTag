@@ -32,18 +32,31 @@ export function StorePlanActions({
 }) {
   const d = useD();
   const router = useRouter();
+  // Three states, not two. "No price yet" and "the store has nothing for this
+  // id" look identical on screen, and the second one is a configuration fault
+  // somebody has to be told about — a card that silently drops its own buy
+  // button is the kind of failure that gets shipped.
   const [price, setPrice] = useState<string | null>(null);
+  const [lookup, setLookup] = useState<"loading" | "ready" | "empty">("loading");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      if (!(await billingAvailable())) return;
+      if (!(await billingAvailable())) {
+        if (!cancelled) setLookup("empty");
+        return;
+      }
       const products = await fetchProducts([productId]);
       if (cancelled) return;
       const found = products.find((p) => p.identifier === productId);
-      if (found) setPrice(found.priceString);
+      if (found) {
+        setPrice(found.priceString);
+        setLookup("ready");
+      } else {
+        setLookup("empty");
+      }
     })();
     return () => {
       cancelled = true;
@@ -60,7 +73,22 @@ export function StorePlanActions({
     if (outcome.kind === "OK") router.refresh();
   }
 
-  if (active || !price) return null;
+  if (active || lookup === "loading") return null;
+
+  /*
+   * The store knows nothing about this product id. Every cause is on the
+   * store's side — the paid-apps agreement not active yet, the product not
+   * out of "Missing Metadata", a freshly created product Apple has not
+   * propagated — and none of them is something the reader can fix. Say the
+   * price is unavailable rather than pretending the plan is not for sale.
+   */
+  if (!price) {
+    return (
+      <p className="mt-4 text-[12px] text-muted leading-relaxed">
+        {d.store.priceUnavailable}
+      </p>
+    );
+  }
 
   return (
     <div className="mt-4">

@@ -22,19 +22,18 @@ ve sunucunun okuduğu `VibeTagShell` user-agent damgası.
 | Android Studio (Android derlemesi için) | Mac'e kurulabilir, aynı makine yeter |
 | Paket kimliği | `net.vibetag.app` — **Play'e ilk yüklemeden sonra asla değişemez.** Değiştirmek istiyorsan şimdi söyle. |
 
-## 1 · İnceleme hesabı (iki mağaza için de şart)
+## 1 · İnceleme hesabı — ✅ **kuruldu (v2.13, 2026-08-24)**
 
-İncelemeciler bizim e-postamızı okuyamaz; zorunlu OTP = otomatik ret.
-Sunucuda bir kez:
+İncelemeciler bizim e-postamızı okuyamaz; zorunlu OTP = otomatik ret. Bu yüzden
+tek bir hesabın sabit bir kodla girebildiği bir kapı var (`src/lib/otp.ts`).
+Hesap açıldı, sunucudaki `.env`'e `REVIEW_ACCOUNT_EMAIL` ve
+`REVIEW_ACCOUNT_OTP` girildi ve giriş **gerçek bir denemeyle doğrulandı**.
 
-1. Uygulamada normal yoldan bir hesap aç: ör. `review@vibetag.net`.
-2. Sunucudaki `.env`'e ekle ve yeniden başlat:
-   ```
-   REVIEW_ACCOUNT_EMAIL="review@vibetag.net"
-   REVIEW_ACCOUNT_OTP="742916"        # 6 haneli, kendin seç
-   ```
-3. Bu e-posta + şifre + sabit kodu her iki mağazanın "review notes" alanına
-   yaz. Sadece bu hesap bu kodla girebilir; ikisi de boşsa bu yol hiç yok.
+Deploy bu değerleri silmez — `.env` sunucuda duruyor, build'den etkilenmiyor.
+
+Geriye kalan tek iş: bu e-posta + şifre + sabit kodu App Store Connect'teki
+**App Review Information** alanına (Play tarafında da "review notes") yazmak.
+Değerler sunucudaki `.env` dosyasında.
 
 ## 2 · iOS — ilk derleme ve TestFlight
 

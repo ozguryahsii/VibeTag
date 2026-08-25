@@ -100,9 +100,26 @@ Topladığımız veri, hepsi hesaba bağlı, hiçbiri reklam/izleme için değil
   içinden hesap silme var (Ayarlar) — Apple 5.1.1(v) şartı, karşılanıyor ✅.
 - Gizlilik politikası URL'i: `https://vibetag.net/legal/privacy`.
 
-### Yaş sınıflandırması
-Sosyal ağ + kullanıcılar arası mesajlaşma → Apple'da 13+ çıkar ("Made for
-Kids" değil), Google'ın ankettinde de sosyal/iletişim işaretle.
+### Yaş sınıflandırması — **18+**
+Kullanım Koşulları ve KVKK metinleri "Hizmet yalnızca 18+ içindir" diyor, kayıt
+ekranındaki onay kutusu da 18 yaş beyanı alıyor. Mağaza formundaki cevap bununla
+**aynı** olmak zorunda: anketi doldururken kullanıcı üretimi içerik, kontrolsüz
+kullanıcılar arası mesajlaşma ve moderasyonsuz profil içeriği sorularına dürüst
+cevap ver — sonuç 18+ çıkar. "Made for Kids" **hayır**.
+
+Buradaki tek gerçek risk tutarsızlık: metinlerde 18+ deyip formda 13+ işaretlemek,
+incelemecinin gördüğü ilk çelişki olur.
+
+### Apple 1.2 — kullanıcı üretimi içerik şartları
+UGC barındıran her uygulamadan istenen dört şey; dördü de kodda var, incelemeciye
+nerede olduklarını yazmak yeterli:
+
+| Şart | Nerede |
+|---|---|
+| Uygunsuz içeriği süzme | Moderasyon kuyruğu (`/moderation`), admin hesabı |
+| İçerik/kullanıcı şikâyeti | Değerlendirme, sohbet ve profil üzerinden şikâyet (`Report`) |
+| Kötüye kullanan kullanıcıyı engelleme | Ayarlar → Engellenenler, profilden engelle |
+| Yayımlanmış iletişim bilgisi | `/legal/privacy` içinde ad, adres ve destek e-postası |
 
 ### İhracat uyumluluğu (Apple)
 Sadece HTTPS kullanılıyor → "standard encryption, exempt" seçeneği.

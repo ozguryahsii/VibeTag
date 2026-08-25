@@ -5,6 +5,12 @@ import { prisma } from "@/lib/db";
 import { dictionaryFor } from "@/lib/i18n";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
 import { renderNotification } from "@/lib/notifications";
+import { apnsConfigured, sendApns } from "@/lib/apns";
+import {
+  apnsPayload,
+  apnsTokenIsDead,
+  type DevicePlatform,
+} from "@/lib/device-push";
 
 /**
  * Web Push.
@@ -54,6 +60,29 @@ export async function removeSubscription(endpoint: string): Promise<void> {
 }
 
 /**
+ * Register a native app install.
+ *
+ * The token is unique across accounts rather than per account, so a phone
+ * that changes hands is re-pointed at whoever signed in last instead of
+ * delivering one person's notifications to another.
+ */
+export async function saveDeviceToken(
+  userId: string,
+  platform: DevicePlatform,
+  token: string,
+): Promise<void> {
+  await prisma.deviceToken.upsert({
+    where: { token },
+    update: { userId, platform, lastSeenAt: new Date() },
+    create: { userId, platform, token },
+  });
+}
+
+export async function removeDeviceToken(token: string): Promise<void> {
+  await prisma.deviceToken.deleteMany({ where: { token } });
+}
+
+/**
  * Deliver one stored notification to every device this person has registered.
  *
  * Failures are swallowed on purpose: a push that does not arrive must never
@@ -65,17 +94,35 @@ export async function pushNotification(
   n: { type: string; vars: string; href: string | null },
   locale: string = DEFAULT_LOCALE,
 ): Promise<void> {
+  // Two independent transports, and neither one's absence may silence the
+  // other: somebody using only the iPhone app has no Web Push subscription,
+  // and a deployment with no VAPID keys still has to reach them.
+  if (!pushConfigured && !apnsConfigured) return;
+
+  const d = dictionaryFor(isLocale(locale) ? locale : DEFAULT_LOCALE);
+  const copy = renderNotification(n, d);
+
+  await Promise.all([
+    pushToBrowsers(userId, copy, n.href),
+    pushToDevices(userId, copy, n.href),
+  ]);
+}
+
+/** Web Push — browsers, and PWAs installed from one. */
+async function pushToBrowsers(
+  userId: string,
+  copy: { title: string; body: string },
+  href: string | null,
+): Promise<void> {
   if (!pushConfigured) return;
 
   const subs = await prisma.pushSubscription.findMany({ where: { userId } });
   if (subs.length === 0) return;
 
-  const d = dictionaryFor(isLocale(locale) ? locale : DEFAULT_LOCALE);
-  const copy = renderNotification(n, d);
   const payload = JSON.stringify({
     title: copy.title,
     body: copy.body,
-    url: n.href ?? "/home",
+    url: href ?? "/home",
   });
 
   await Promise.all(
@@ -93,6 +140,47 @@ export async function pushNotification(
         if (status === 404 || status === 410) {
           await removeSubscription(s.endpoint);
         }
+      }
+    }),
+  );
+}
+
+/**
+ * APNs — the iOS app shell.
+ *
+ * Android tokens are stored but not sent to: FCM needs a Firebase project and
+ * a `google-services.json` in the shell, neither of which exists yet. They
+ * are kept rather than dropped so that turning FCM on later is a sending
+ * change, not a "ask every Android user to re-enable notifications" change.
+ */
+async function pushToDevices(
+  userId: string,
+  copy: { title: string; body: string },
+  href: string | null,
+): Promise<void> {
+  if (!apnsConfigured) return;
+
+  const devices = await prisma.deviceToken.findMany({
+    where: { userId, platform: "APNS" },
+  });
+  if (devices.length === 0) return;
+
+  const payload = apnsPayload(copy, href);
+
+  await Promise.all(
+    devices.map(async (device) => {
+      try {
+        const result = await sendApns(device.token, payload);
+        if (
+          apnsTokenIsDead(result.status, result.reason, {
+            environmentMatches: result.environmentMatches,
+          })
+        ) {
+          await removeDeviceToken(device.token);
+        }
+      } catch {
+        // An unreachable Apple is not the caller's problem, and it is
+        // certainly not a reason to delete somebody's phone.
       }
     }),
   );

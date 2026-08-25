@@ -792,6 +792,9 @@ export const en = {
     denied:
       "Notifications are blocked for this site. You can allow them again from your browser settings.",
     unsupported: "This browser cannot show notifications.",
+    deniedApp:
+      "Notifications are off. You can turn them back on in your phone's Settings → Vibe Tag → Notifications.",
+    onApp: "Notifications are on for this device.",
   },
 
   legal: {

@@ -48,16 +48,44 @@ export function AuthShell({
   );
 }
 
+/**
+ * Fields where a capital letter is somebody's phone deciding for them.
+ *
+ * iOS capitalises the first letter of a text field by default, and inside the
+ * app shell there is no address bar to make that obvious. On a password it is
+ * silent and fatal — "Sifre1" is not "sifre1", and all the person sees is
+ * "wrong password" for a password they typed correctly. On a handle or an
+ * address it is merely wrong-looking, since sign-in lower-cases what it gets
+ * (see lib/identity.ts), but wrong-looking is enough to make somebody retype
+ * a correct answer.
+ *
+ * A name is the exception and is deliberately absent: capitalising "özgür" is
+ * the keyboard being helpful.
+ */
+const NO_AUTOCAPITALISE = new Set([
+  "identifier",
+  "username",
+  "email",
+  "password",
+  "newPassword",
+]);
+
 export function AuthField({
   label,
   ...props
 }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+  const plain = NO_AUTOCAPITALISE.has(String(props.name ?? ""));
   return (
     <label className="block">
       <span className="block text-[11px] font-extrabold tracking-[0.12em] uppercase text-muted mb-2 ml-1">
         {label}
       </span>
       <input
+        // Defaults first, so an individual field can still override them.
+        autoCapitalize={plain ? "none" : undefined}
+        autoCorrect={plain ? "off" : undefined}
+        spellCheck={plain ? false : undefined}
+        inputMode={props.type === "email" ? "email" : undefined}
         {...props}
         className="w-full rounded-[18px] border border-line bg-warmwhite px-4 h-13 text-[15px] font-medium outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition shadow-[0_8px_24px_rgba(93,58,42,0.035)]"
       />

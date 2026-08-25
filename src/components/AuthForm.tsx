@@ -6,25 +6,12 @@ import { loginAction, registerAction, type FormState } from "@/lib/actions/auth"
 import { Wordmark } from "@/components/Logo";
 import { LangToggle } from "@/components/LangToggle";
 import { useD } from "@/components/LocaleProvider";
+// One field component, not two: this screen and the reset screens were
+// carrying byte-identical copies, which is how one of them keeps the
+// keyboard behaviour the other one fixed.
+import { AuthField as Field } from "@/components/AuthShell";
 
 const initial: FormState = {};
-
-function Field({
-  label,
-  ...props
-}: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <label className="block">
-      <span className="block text-[11px] font-extrabold tracking-[0.12em] uppercase text-muted mb-2 ml-1">
-        {label}
-      </span>
-      <input
-        {...props}
-        className="w-full rounded-[18px] border border-line bg-warmwhite px-4 h-13 text-[15px] font-medium outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition shadow-[0_8px_24px_rgba(93,58,42,0.035)]"
-      />
-    </label>
-  );
-}
 
 function Submit({ label }: { label: string }) {
   return (

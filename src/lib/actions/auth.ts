@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { redeemInviteFor } from "@/lib/invite";
-import { loginWhere } from "@/lib/identity";
+import { loginWhere, normalizeUsername } from "@/lib/identity";
 import { guard } from "@/lib/rate-limit";
 import { resendWaitSeconds, sendOtp } from "@/lib/otp";
 import { getDict } from "@/lib/i18n/server";
@@ -27,13 +27,6 @@ function pick<T>(arr: T[], seed: string): T {
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
   return arr[h % arr.length];
-}
-
-function normalizeUsername(raw: string): string {
-  return raw
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9_.]/g, "");
 }
 
 export async function registerAction(

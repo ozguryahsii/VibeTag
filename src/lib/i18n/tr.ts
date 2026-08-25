@@ -789,6 +789,9 @@ export const tr: Dictionary = {
     denied:
       "Bu site için bildirimler engellenmiş. Tarayıcı ayarlarından yeniden izin verebilirsin.",
     unsupported: "Bu tarayıcı bildirim gösteremiyor.",
+    deniedApp:
+      "Bildirimler kapalı. Telefonun Ayarlar → Vibe Tag → Bildirimler bölümünden yeniden açabilirsin.",
+    onApp: "Bu cihazda bildirimler açık.",
   },
 
   legal: {

@@ -9,6 +9,7 @@ import { mainPhotoId, photoLimit } from "@/lib/photos";
 import { canStartTrial, trialStateFor } from "@/lib/trial";
 import { DeleteAccount } from "@/components/DeleteAccount";
 import { PushToggle } from "@/components/PushToggle";
+import { NativePushToggle } from "@/components/NativePushToggle";
 import { RedeemCode } from "@/components/RedeemCode";
 import { Avatar } from "@/components/Avatar";
 import { IconGlyph } from "@/components/Icon";
@@ -200,11 +201,17 @@ export default async function SettingsPage() {
         )}
       </div>
 
-      {/* Only offered when push is actually configured for this deployment. */}
-      {pushKey && (
+      {/*
+        Two transports, one switch. Inside the app shell Web Push cannot work
+        at all (WKWebView has no Push API), so the native toggle is shown
+        there regardless of whether VAPID keys exist; on the web the browser
+        toggle appears only when they do, since without them it could not do
+        anything.
+      */}
+      {(inShell || pushKey) && (
         <div className="mt-7">
           <SectionTitle>{d.nav.notifications}</SectionTitle>
-          <PushToggle publicKey={pushKey} />
+          {inShell ? <NativePushToggle /> : <PushToggle publicKey={pushKey!} />}
         </div>
       )}
 

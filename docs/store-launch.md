@@ -163,9 +163,49 @@ Sunucu altyapısı hazır ve uyuyor; sırası gelince:
    `cordova-plugin-purchase`) + üyelik ekranına satın alma butonları — bu
    kısım benim işim, sırası gelince söyle.
 
-Faz 2'nin diğer parçası **gerçek push bildirimleri**: web push WKWebView'da
-çalışmaz; APNs/FCM için kabuğa `@capacitor/push-notifications` + sunucuya
-küçük bir ekleme gerekir. O da bende.
+## 7b · Push bildirimleri — kod tarafı **hazır**, senden iki şey gerekiyor
+
+Web push WKWebView içinde çalışmaz (Apple yalnızca Safari'de ve ana ekrana
+eklenmiş PWA'da destekliyor). Bu yüzden uygulama içindeki bildirim yolu APNs.
+Yapılanlar:
+
+- Kabukta `@capacitor/push-notifications` kurulu, `AppDelegate.swift` cihaz
+  token'ını Capacitor'a aktarıyor (bu iki metot olmadan `register()` sessizce
+  hiçbir şey döndürmez).
+- Sunucuda `DeviceToken` tablosu, `POST /api/push/device` ucu ve `lib/apns.ts`
+  gönderimi var. Kimlik bilgileri yoksa katman tamamen atıl — tıpkı VAPID'siz
+  web push gibi.
+- Ayarlar → Bildirimler bölümü kabuk içinde native anahtarı gösteriyor. İzin
+  **açılışta değil, dokununca** isteniyor: iOS uygulamaya bir kez sorma hakkı
+  verir, beklenmedik bir izin penceresi o hakkı "hayır"a harcar.
+
+**Senden gereken 1 — Xcode'da yetenek.** Xcode → App hedefi → Signing &
+Capabilities → **+ Capability → Push Notifications**. Tek tık; bu olmadan
+imzalama entitlement'ı oluşmaz ve `register()` hata döner.
+
+**Senden gereken 2 — APNs anahtarı.** developer.apple.com → Certificates,
+Identifiers & Profiles → Keys → **+** → "Apple Push Notifications service
+(APNs)". İnen `AuthKey_XXXX.p8` dosyası **yalnızca bir kez** indirilebilir,
+sakla. Sunucudaki `.env`'e:
+
+```
+APNS_KEY_P8="-----BEGIN PRIVATE KEY-----
+...
+-----END PRIVATE KEY-----"
+APNS_KEY_ID="ABCD123456"      # anahtarın yanında yazan 10 karakter
+APNS_TEAM_ID="XYZ7890123"     # hesap sayfasındaki takım kimliği
+APNS_BUNDLE_ID="net.vibetag.app"
+APNS_ENV="sandbox"            # Xcode'dan kablolu telefonda test ederken
+```
+
+`APNS_ENV` önemli: Xcode'dan çalıştırdığın derlemenin token'ı **sandbox**,
+TestFlight ve App Store derlemelerininki **production**. Yanlış olanına
+gönderirsen Apple 400 döner ve bu hata bozuk anahtar gibi görünür.
+
+**Android tarafı henüz bağlı değil.** FCM için Firebase projesi ve
+`google-services.json` gerekiyor; token'lar yine de kaydediliyor, böylece
+Firebase eklendiğinde bu bir gönderim değişikliği olacak, "tüm Android
+kullanıcıları bildirimleri yeniden açsın" değil.
 
 ## 8 · Görseller
 

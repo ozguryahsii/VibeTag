@@ -16,3 +16,22 @@ export function loginWhere(raw: string): Prisma.UserWhereInput {
   const value = raw.trim().toLowerCase();
   return value.includes("@") ? { email: value } : { username: value };
 }
+
+/**
+ * The handle to store, built from whatever was typed at registration.
+ *
+ * Lower-casing here is what makes `loginWhere` safe: it can compare with a
+ * plain equality match, because every handle in the column was written
+ * through this function. The two must never disagree about case — a handle
+ * stored with a capital letter would be unreachable at sign-in, and nothing
+ * on screen would explain why.
+ *
+ * Unlike `loginWhere`, this *does* strip characters, because it is building
+ * an identifier rather than matching one.
+ */
+export function normalizeUsername(raw: string): string {
+  return raw
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9_.]/g, "");
+}

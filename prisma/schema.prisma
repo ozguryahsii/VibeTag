@@ -128,6 +128,7 @@ model User {
   grantsHeld      InviteGrant[]      @relation("GrantsHeld")
   notifications   Notification[]
   pushSubs        PushSubscription[]
+  deviceTokens    DeviceToken[]
   blocksMade      Block[]            @relation("BlocksMade")
   blocksAgainst   Block[]            @relation("BlocksAgainst")
   reportsFiled    Report[]           @relation("ReportsFiled")
@@ -336,6 +337,36 @@ model PushSubscription {
   auth     String
 
   createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// A native app install that can receive push.
+///
+/// Separate from PushSubscription on purpose. Web Push is a subscription
+/// object owned by a browser and addressed by an endpoint URL; this is a
+/// device token owned by APNs or FCM and addressed by an opaque string. They
+/// expire differently, they are revoked differently, and the code that talks
+/// to them shares nothing — collapsing them into one table would mean a
+/// column that is meaningless for half its rows.
+model DeviceToken {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// APNS | FCM — which service this token is addressed to.
+  platform String
+
+  /// Unique across accounts, not per account: a phone handed to somebody else
+  /// keeps the same token, and the row is re-pointed at whoever signed in
+  /// last. Two accounts sharing one token would mean one person getting the
+  /// other's notifications.
+  token String @unique
+
+  /// Refreshed on every registration, so a token that stops being reported
+  /// can be recognised as stale rather than merely old.
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
 
   @@index([userId])
 }
@@ -690,10 +721,10 @@ model ProfilePhoto {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   /// JPEG data URL today, object-storage URL when photos move out of the DB.
-  url String
+  url      String
   /// Upload order. The profile picture is whichever url User.avatarUrl holds;
   /// every other photo is a side circle, oldest first.
-  position Int @default(0)
+  position Int    @default(0)
 
   createdAt DateTime @default(now())
 

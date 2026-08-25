@@ -66,5 +66,12 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<!-- The app implements no encryption of its own: it talks HTTPS and the
+	     system provides that. Declaring it here answers App Store Connect's
+	     export-compliance question at upload time instead of once per build,
+	     which is a question that blocks a build from reaching TestFlight
+	     until somebody notices it is waiting. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

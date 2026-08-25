@@ -25,6 +25,27 @@ export function planForProduct(productId: string): Plan | null {
   return STORE_PRODUCTS[productId] ?? null;
 }
 
+/**
+ * What the app offers for sale, per plan.
+ *
+ * The reverse of `planForProduct`, and deliberately not derived from it:
+ * SILVER maps to two product ids and only one of them is what a purchase
+ * button should buy. Yearly is listed in STORE_PRODUCTS so a yearly
+ * subscription bought later still grants its plan, but no yearly price has
+ * been decided and nothing sells one yet.
+ *
+ * FREE has nothing to sell, which is why this is not a total map — a button
+ * for it would be a button that cannot do anything.
+ */
+export const PURCHASABLE: Partial<Record<Plan, string>> = {
+  SILVER: "net.vibetag.silver.monthly",
+  GOLD: "net.vibetag.gold.monthly",
+};
+
+export function productForPlan(plan: string): string | null {
+  return PURCHASABLE[plan as Plan] ?? null;
+}
+
 export type StorePlatform = "APPLE" | "GOOGLE";
 
 /** What a store's server API told us about one subscription, normalised. */

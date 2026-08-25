@@ -799,6 +799,19 @@ export const tr: Dictionary = {
     askLater: "Şimdi değil",
   },
 
+  store: {
+    subscribeFor: "{price} · Abone ol",
+    restore: "Satın alımları geri yükle",
+    restored: "Aboneliğin geri yüklendi.",
+    nothingToRestore: "Bu Apple Kimliği'nde geri yüklenecek bir abonelik yok.",
+    otherAccount:
+      "Bu abonelik başka bir Vibe Tag hesabına ait. O hesapla giriş yap ya da destek@vibetag.app adresine yaz.",
+    failed: "Satın alma tamamlanamadı. Biraz sonra tekrar dene.",
+    manage: "Aboneliği yönet",
+    terms:
+      "Abonelik her dönem sonunda otomatik yenilenir; en az 24 saat önce iptal etmezsen ücretlendirilir. Yönetim ve iptal, cihazının hesap ayarlarından yapılır.",
+  },
+
   legal: {
     kicker: "KÜÇÜK YAZILAR",
     updated: "Son güncelleme: {date}",

@@ -147,21 +147,37 @@ Sunucu `VibeTagShell` user-agent'ını görünce:
   IAP entegre olunca bu bölüm satın alma ekranına dönüşecek.
 - Geri kalan her şey web ile birebir aynı.
 
-## 7 · Faz 2 — satın almalar (uygulamalar yayında olduktan sonra)
+## 7 · Satın almalar — kod tarafı **hazır**
 
-Sunucu altyapısı hazır ve uyuyor; sırası gelince:
+Kabukta `@capgo/native-purchases` (StoreKit 2 / Play Billing, aracı servis yok)
+kurulu. Üyelik ekranı kabuk içinde:
 
-1. İki mağazada da abonelikleri **tam olarak şu ürün kimlikleriyle** oluştur
-   (`src/lib/store-products.ts` ile sözleşme):
-   `net.vibetag.silver.monthly` · `net.vibetag.silver.yearly` ·
-   `net.vibetag.gold.monthly` · `net.vibetag.gold.yearly`
-2. Sunucu `.env`'ine `APPLE_*`, `GOOGLE_PLAY_*`, `STORE_WEBHOOK_KEY`
-   değerlerini gir (`.env.example`'da tek tek açıklandı).
-3. Webhook URL'leri: Apple → `https://vibetag.net/api/store/apple?key=…`,
-   Google (Pub/Sub push) → `https://vibetag.net/api/store/google?key=…`.
-4. Kabuğa IAP eklentisi (`@revenuecat/purchases-capacitor` veya
-   `cordova-plugin-purchase`) + üyelik ekranına satın alma butonları — bu
-   kısım benim işim, sırası gelince söyle.
+- **Fiyatı mağazadan çeker.** Kendi metnimizi göstermiyoruz: mağaza,
+  kullanıcının hesabının para biriminde ve kendi yuvarlamasıyla tahsil eder;
+  sabit "₺69/ay" euro ile ödeyen birinin yanında hem yalan olur hem 3.1.2
+  gerekçesiyle rettir. Fiyat çekilemezse buton hiç çıkmaz.
+- **Satın alma butonu** → StoreKit → makbuz `/api/store/verify`'a gider →
+  sunucu Apple'a sorar. İstemcinin söylediği hiçbir şeye güvenilmiyor.
+- **"Satın alımları geri yükle"** butonu var — 3.1.1 gereği zorunlu ve en sık
+  ret sebeplerinden biri. Aynı uca giden idempotent bir çağrı.
+- **Aboneliği yönet** butonu, mağazanın kendi ekranını açıyor.
+- Otomatik yenileme açıklaması ile Kullanım Şartları ve Gizlilik bağlantıları
+  satın alma butonunun hemen altında (3.1.2).
+
+Web'de satın alma yolu **yok** ve olmayacak: ödemeler yalnızca App Store ve
+Google Play üzerinden. Web'de fiyatlar bilgi amaçlı görünür.
+
+**App Store Connect'te oluşturulacak ürünler** (`src/lib/store-products.ts`
+ile birebir aynı olmalı):
+`net.vibetag.silver.monthly` · `net.vibetag.gold.monthly`
+Yıllıklar (`…yearly`) kodda tanımlı ama fiyata karar verilmedi, satılmıyor.
+
+**Sunucu `.env`'ine girilecekler** (`.env.example`'da tek tek açıklandı):
+`APPLE_*`, `GOOGLE_PLAY_*`, `STORE_WEBHOOK_KEY`. Webhook adresleri:
+Apple → `https://vibetag.net/api/store/apple?key=…`,
+Google (Pub/Sub push) → `https://vibetag.net/api/store/google?key=…`
+
+**Android tarafı henüz bağlı değil**: Play Console hesabı ve ürünler yok.
 
 ## 7b · Push bildirimleri — kod tarafı **hazır**, senden iki şey gerekiyor
 

@@ -170,7 +170,12 @@ export async function appleEntitlement(
     return {
       platform: "APPLE",
       productId: String(txn.productId ?? ""),
-      storeRef: originalTransactionId,
+      // Apple's own id for the *first* transaction in this subscription,
+      // not whatever the client happened to hand us. A renewal carries a new
+      // transactionId, and Apple's endpoint accepts either — so trusting the
+      // client's value would file every renewal as a separate purchase and
+      // leave the original row stranded.
+      storeRef: String(txn.originalTransactionId ?? originalTransactionId),
       active: last.status === 1 || last.status === 3,
       expiresAt: txn.expiresDate ? new Date(Number(txn.expiresDate)) : null,
       // offerType 1 is the introductory offer. Newer payloads also carry

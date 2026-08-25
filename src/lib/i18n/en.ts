@@ -802,6 +802,19 @@ export const en = {
     askLater: "Not now",
   },
 
+  store: {
+    subscribeFor: "{price} · Subscribe",
+    restore: "Restore purchases",
+    restored: "Your subscription has been restored.",
+    nothingToRestore: "There is no subscription to restore on this Apple ID.",
+    otherAccount:
+      "This subscription belongs to a different Vibe Tag account. Sign in with that account, or write to destek@vibetag.app.",
+    failed: "The purchase could not be completed. Please try again shortly.",
+    manage: "Manage subscription",
+    terms:
+      "Subscriptions renew automatically each period and are charged unless cancelled at least 24 hours before renewal. Manage or cancel in your device's account settings.",
+  },
+
   legal: {
     kicker: "THE FINE PRINT",
     updated: "Last updated {date}",

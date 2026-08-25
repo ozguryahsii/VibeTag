@@ -4,6 +4,8 @@ import {
   entitlementStatus,
   planForProduct,
   planWriteFor,
+  productForPlan,
+  PURCHASABLE,
 } from "@/lib/store-products";
 
 const NOW = new Date("2026-08-20T12:00:00Z");
@@ -109,5 +111,42 @@ describe("status recording", () => {
     expect(entitlementStatus({ active: false, expiresAt: inDays(20) }, NOW)).toBe(
       "REVOKED",
     );
+  });
+});
+
+/**
+ * What a purchase button is allowed to buy.
+ *
+ * Not derived from STORE_PRODUCTS on purpose: SILVER maps to two product ids
+ * there and only one of them is for sale. A button wired to the wrong id
+ * fails at the store with a message nobody can act on, and a button wired to
+ * a plan with nothing to sell is a button that does nothing at all.
+ */
+describe("what the app offers for sale", () => {
+  it("sells the monthly subscription for each paid plan", () => {
+    expect(productForPlan("SILVER")).toBe("net.vibetag.silver.monthly");
+    expect(productForPlan("GOLD")).toBe("net.vibetag.gold.monthly");
+  });
+
+  it("has nothing to sell for Free", () => {
+    expect(productForPlan("FREE")).toBeNull();
+    expect(productForPlan("NONSENSE")).toBeNull();
+  });
+
+  /*
+   * Yearly ids stay in STORE_PRODUCTS so a yearly subscription bought later
+   * still grants its plan — but no yearly price has been decided, so nothing
+   * may offer one yet.
+   */
+  it("offers nothing yearly while no yearly price exists", () => {
+    for (const id of Object.values(PURCHASABLE)) {
+      expect(id).not.toContain("yearly");
+    }
+  });
+
+  it("only ever offers ids the server already knows how to honour", () => {
+    for (const id of Object.values(PURCHASABLE)) {
+      expect(planForProduct(id!)).not.toBeNull();
+    }
   });
 });

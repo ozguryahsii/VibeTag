@@ -7,6 +7,9 @@ import { ProfileEditor } from "@/components/ProfileEditor";
 import { PhotoVault } from "@/components/PhotoVault";
 import { mainPhotoId, photoLimit } from "@/lib/photos";
 import { canStartTrial, trialStateFor } from "@/lib/trial";
+import { productForPlan } from "@/lib/store-products";
+import { StorePlanActions } from "@/components/StorePlanActions";
+import { StoreAccountActions } from "@/components/StoreAccountActions";
 import { DeleteAccount } from "@/components/DeleteAccount";
 import { PushToggle } from "@/components/PushToggle";
 import { NativePushToggle } from "@/components/NativePushToggle";
@@ -175,10 +178,25 @@ export default async function SettingsPage() {
                     {d.settings.activePlan}
                   </p>
                 )}
+
+                {/*
+                  Inside the shell the price comes from the store and arrives
+                  with a button beside it. On the web there is no purchase
+                  path at all — payments go through the App Store and Google
+                  Play only — so the card stays informational there.
+                */}
+                {inShell && productForPlan(p.key) && (
+                  <StorePlanActions
+                    plan={plan.name}
+                    productId={productForPlan(p.key)!}
+                    active={active}
+                  />
+                )}
               </div>
             );
           })}
         </div>
+        {inShell && <StoreAccountActions subscribed={user.plan !== "FREE"} />}
         <p className="text-[11.5px] text-muted mt-3 px-1 leading-relaxed">
           {inShell ? d.settings.planNoteShell : d.settings.planNote}
         </p>

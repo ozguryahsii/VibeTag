@@ -10,6 +10,7 @@
  *   npm run legal --silent -- --json  > legal.json
  */
 import {
+  FREE_TIER_LIABILITY_CAP_TR,
   LEGAL_SLUGS,
   OPERATOR_ADDRESS,
   OPERATOR_NAME,
@@ -73,22 +74,36 @@ w(
 );
 w(
   "- **Veri sorumlusu şahıstır, tüzel kişi değildir.** Doldurulan bilgiler: " +
-    `işleten **${OPERATOR_NAME}**, tebligat adresi **${OPERATOR_ADDRESS}**, ` +
-    `tüketici olmayan uyuşmazlıklarda yetkili mahkeme **${VENUE_CITY}** ` +
-    "(tüketicinin kendi yerleşim yerindeki hakem heyeti/tüketici mahkemesine " +
-    "başvurma hakkı ayrıca saklı tutuldu). MERSİS, VERBİS ve KEP alanları " +
-    "«varsa / gerekiyorsa» notuyla duruyor, çünkü şahıs işletmesinde bunlar " +
-    "bulunmayabilir — avukatın bu üçü için «yok» demesi yeterli, o zaman " +
-    "satırlar tamamen kaldırılır.",
+    `işleten **${OPERATOR_NAME}** (gerçek kişi), tebligat ve posta adresi ` +
+    `**${OPERATOR_ADDRESS}**, tüketici olmayan uyuşmazlıklarda yetkili mahkeme ` +
+    `**${VENUE_CITY}** (tüketicinin kendi yerleşim yerindeki hakem heyetine ya ` +
+    "da tüketici mahkemesine başvurma hakkı ayrıca saklı tutuldu). MERSİS, " +
+    "VERBİS ve KEP alanları kaldırıldı: metin artık bunların bulunmadığını, " +
+    "VERBİS bakımından gerçek kişi istisnasında olunduğunu açıkça yazıyor. " +
+    "**Avukatın teyit etmesi istenen nokta budur.**",
 );
 w(
-  "- **Hâlâ açık olan alanlar:** ücretsiz kullanıcılar için sorumluluk tavanı " +
-    "tutarı, ilgili e-postalar (şu an hepsi tek adrese bakıyor), ve mağazalarda " +
-    "hangi ülkelerde yayına çıkılacağı — yalnızca Türkiye seçilirse ABD " +
-    "(ücretsiz telefon hattı) ve AB/AEA (GDPR m.27 temsilcisi) alanlarının " +
-    "doldurulmasına gerek kalmaz.",
+  "- **Ücret ödenmemiş kullanımda sorumluluk tavanı " +
+    `${FREE_TIER_LIABILITY_CAP_TR}** olarak belirlendi ve tavan hesap başına ` +
+    "değil **kişi başına** yazıldı: aynı gerçek kişinin açtığı tüm hesaplardan " +
+    "ve birbirine bağlı olaylardan doğan talepler tek bir tavana tabi, birden " +
+    "fazla hesap açmak tavanı çoğaltmıyor. Sıfır tavan uygulanmıyor (TBK m.115 " +
+    "ve haksız şart denetimi karşısında geçersiz olurdu); kasıt/ağır ihmal, " +
+    "ölüm/bedensel zarar, dolandırıcılık ve emredici tüketici hakları tavanın " +
+    "dışında tutuldu.",
 );
-w();
+w(
+  "- **ABD (CCPA/CPRA) ücretsiz telefon hattı kaldırıldı:** münhasıran çevrim " +
+    "içi faaliyet gösterilen ve ilgili kişiyle doğrudan ilişki bulunan hâlde " +
+    "yalnızca e-posta sunulması yeterli olduğundan metin bunu yazıyor. " +
+    "**Bu da avukat teyidi bekleyen bir noktadır.**",
+);
+w(
+  "- **Tek açık alan: AB/AEA temsilcisi.** Uygulama tüm dünyada yayımlanacağı " +
+    "için GDPR m.27 uyarınca AB/AEA'da yerleşik bir temsilci atanması ve adının " +
+    "gizlilik politikasında yazması gerekiyor. Bu bir arama değil, bir atama " +
+    "işlemi — isim gelene kadar metinlerin üzerindeki uyarı kalkmıyor.",
+);w();
 w("---");
 w();
 

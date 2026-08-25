@@ -9,8 +9,10 @@ Son güncelleme: **2026-08-24** · İletişim adresi: **destek@vibetag.app**
 ## Durum
 
 - Metinler **2026-08-24 tarihinde avukat tarafından incelendi ve revize edildi.** Bu dosya o revizyonun ta kendisidir. Henüz yürürlükte değil: köşeli parantezli alanlar gerçek bilgilerle doldurulmadan yayımlanmaz. Uygulamada da bunu söyleyen kalıcı bir uyarı var.
-- **Veri sorumlusu şahıstır, tüzel kişi değildir.** Doldurulan bilgiler: işleten **Özgür Adnan Yahşi**, tebligat adresi **Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli**, tüketici olmayan uyuşmazlıklarda yetkili mahkeme **Ankara** (tüketicinin kendi yerleşim yerindeki hakem heyeti/tüketici mahkemesine başvurma hakkı ayrıca saklı tutuldu). MERSİS, VERBİS ve KEP alanları «varsa / gerekiyorsa» notuyla duruyor, çünkü şahıs işletmesinde bunlar bulunmayabilir — avukatın bu üçü için «yok» demesi yeterli, o zaman satırlar tamamen kaldırılır.
-- **Hâlâ açık olan alanlar:** ücretsiz kullanıcılar için sorumluluk tavanı tutarı, ilgili e-postalar (şu an hepsi tek adrese bakıyor), ve mağazalarda hangi ülkelerde yayına çıkılacağı — yalnızca Türkiye seçilirse ABD (ücretsiz telefon hattı) ve AB/AEA (GDPR m.27 temsilcisi) alanlarının doldurulmasına gerek kalmaz.
+- **Veri sorumlusu şahıstır, tüzel kişi değildir.** Doldurulan bilgiler: işleten **Özgür Adnan Yahşi** (gerçek kişi), tebligat ve posta adresi **Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli**, tüketici olmayan uyuşmazlıklarda yetkili mahkeme **Ankara** (tüketicinin kendi yerleşim yerindeki hakem heyetine ya da tüketici mahkemesine başvurma hakkı ayrıca saklı tutuldu). MERSİS, VERBİS ve KEP alanları kaldırıldı: metin artık bunların bulunmadığını, VERBİS bakımından gerçek kişi istisnasında olunduğunu açıkça yazıyor. **Avukatın teyit etmesi istenen nokta budur.**
+- **Ücret ödenmemiş kullanımda sorumluluk tavanı 1.000 TL** olarak belirlendi ve tavan hesap başına değil **kişi başına** yazıldı: aynı gerçek kişinin açtığı tüm hesaplardan ve birbirine bağlı olaylardan doğan talepler tek bir tavana tabi, birden fazla hesap açmak tavanı çoğaltmıyor. Sıfır tavan uygulanmıyor (TBK m.115 ve haksız şart denetimi karşısında geçersiz olurdu); kasıt/ağır ihmal, ölüm/bedensel zarar, dolandırıcılık ve emredici tüketici hakları tavanın dışında tutuldu.
+- **ABD (CCPA/CPRA) ücretsiz telefon hattı kaldırıldı:** münhasıran çevrim içi faaliyet gösterilen ve ilgili kişiyle doğrudan ilişki bulunan hâlde yalnızca e-posta sunulması yeterli olduğundan metin bunu yazıyor. **Bu da avukat teyidi bekleyen bir noktadır.**
+- **Tek açık alan: AB/AEA temsilcisi.** Uygulama tüm dünyada yayımlanacağı için GDPR m.27 uyarınca AB/AEA'da yerleşik bir temsilci atanması ve adının gizlilik politikasında yazması gerekiyor. Bu bir arama değil, bir atama işlemi — isim gelene kadar metinlerin üzerindeki uyarı kalkmıyor.
 
 ---
 
@@ -24,7 +26,7 @@ Vibe Tag reklam amaçlı veri satmaz. Hizmet, güvenlik, moderasyon ve yasal yü
 
 ### Kimiz ve kapsam
 
-Bu politika, Özgür Adnan Yahşi (“Vibe Tag”, “biz”) tarafından sunulan Vibe Tag uygulaması ve bağlantılı hizmetlerde kişisel verilerin işlenmesini açıklar. Veri sorumlusu/işletmeci: Özgür Adnan Yahşi; adres: Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli; MERSİS: [MERSİS NO — VARSA]; VERBİS: [VERBİS KAYDI — GEREKİYORSA]; gizlilik: destek@vibetag.app; içerik bildirimleri: destek@vibetag.app. GDPR m.27 temsilcisi gerekiyorsa: [AB/AEA TEMSİLCİSİ].
+Bu politika, Özgür Adnan Yahşi (“Vibe Tag”, “biz”) tarafından sunulan Vibe Tag uygulaması ve bağlantılı hizmetlerde kişisel verilerin işlenmesini açıklar. Veri sorumlusu/işletmeci, gerçek kişi olarak Özgür Adnan Yahşi’dir; adres: Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli; gizlilik: destek@vibetag.app; içerik bildirimleri: destek@vibetag.app. Veri sorumlusunun MERSİS ve VERBİS kaydı ile KEP adresi bulunmamaktadır. GDPR m.27 temsilcisi gerekiyorsa: [AB/AEA TEMSİLCİSİ].
 
 App Store, Google Play ve bağlantı verilen bağımsız hizmetlerin kendi veri uygulamaları bu politikanın dışındadır.
 
@@ -89,7 +91,7 @@ Bulunduğun yere göre erişim, kopya, düzeltme, silme, kısıtlama, taşınabi
 
 CCPA/CPRA veya başka kapsamlı eyalet kanunu uygulanıyorsa eyalet sakini bilme/erişim, düzeltme, silme, taşınabilir kopya, satış/hedefli reklam/profillemeden vazgeçme ve ayrımcılığa uğramama haklarına sahip olabilir. Son 12 ayda “Topladığımız veriler ve kaynaklar” kategorileri, “Amaçlar ve hukuki dayanak” amaçlarıyla toplanmış ve “Alıcılar ve satış yapılmaması” bölümündeki alıcılara iş amacıyla açıklanmış olabilir.
 
-Mevcut modelde kişisel bilgiyi satmıyor ve çapraz bağlam davranışsal reklam için paylaşmıyoruz. Bu faaliyet başlarsa önceden bildirim, opt-out ve uygulanabilir yasal tercih sinyali desteği sağlanır. Hassas bilgi yalnızca beklenen hizmet/güvenlik için kullanılır. Talep: destek@vibetag.app ve varsa [ABD BAŞVURULARI İÇİN ÜCRETSİZ TELEFON]. Kapsam eşikleri düzenli doğrulanır.
+Mevcut modelde kişisel bilgiyi satmıyor ve çapraz bağlam davranışsal reklam için paylaşmıyoruz. Bu faaliyet başlarsa önceden bildirim, opt-out ve uygulanabilir yasal tercih sinyali desteği sağlanır. Hassas bilgi yalnızca beklenen hizmet/güvenlik için kullanılır. Talepler destek@vibetag.app adresine iletilir. Münhasıran çevrim içi faaliyet gösterdiğimiz ve ilgili kişiyle doğrudan ilişkimiz bulunduğu için, kanunen yalnızca bir e-posta adresi sunulması yeterlidir; ücretsiz telefon hattı işletilmemektedir. Kapsam eşikleri düzenli doğrulanır.
 
 ### Çocuklar ve değişiklikler
 
@@ -107,7 +109,7 @@ Hizmet yalnızca 18+ içindir. 18 yaş altından bilerek hesap açmayız. Böyle
 
 ### Veri sorumlusu
 
-Veri sorumlusu: Özgür Adnan Yahşi (“Vibe Tag”). Adres: Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli; MERSİS: [MERSİS NO — VARSA]; VERBİS: [VERBİS KAYDI — GEREKİYORSA]; başvuru e-postası: destek@vibetag.app; posta: Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli; KEP: [KEP ADRESİ — VARSA].
+Veri sorumlusu, tüzel kişi değil gerçek kişidir: Özgür Adnan Yahşi (“Vibe Tag”). Tebligat ve posta adresi: Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli. Başvuru e-postası: destek@vibetag.app. Veri sorumlusunun MERSİS kaydı, kayıtlı elektronik posta (KEP) adresi ve VERBİS kaydı bulunmamaktadır; 6698 sayılı Kanun ve Kurul kararları uyarınca VERBİS kayıt yükümlülüğünden istisna tutulan gerçek kişi veri sorumlusu konumundadır.
 
 ### İşlenen veri kategorileri
 
@@ -147,7 +149,7 @@ Hesap verileri üyelik boyunca; hata kayıtları kural olarak 30 gün; hız sın
 
 Verinin işlenip işlenmediğini öğrenme; bilgi isteme; amacı/uygun kullanımı ve alıcıları öğrenme; düzeltme; şartları varsa silme/yok etme ve alıcılara bildirim; münhasıran otomatik analizle aleyhe sonuca itiraz ve hukuka aykırı işleme zararının giderilmesini isteme hakların vardır.
 
-Başvuru [KEP ADRESİ — VARSA], Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli posta adresi, sistemde kayıtlı destek@vibetag.app veya [BAŞVURU FORMU BAĞLANTISI — VARSA] ile Tebliğ'e uygun yapılabilir. En kısa sürede ve en geç 30 günde yanıtlanır; maliyet varsa Kurul tarifesi uygulanabilir. Kanuni sürelerle Kurula şikâyet hakkın saklıdır.
+Başvurunu, Veri Sorumlusuna Başvuru Usul ve Esasları Hakkında Tebliğ'e uygun olarak Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli adresine ıslak imzalı yazılı dilekçeyle ya da sistemimizde kayıtlı destek@vibetag.app adresinden elektronik olarak iletebilirsin; başvuruda ad, soyad, adres ve talep konusunun yer alması gerekir. En kısa sürede ve en geç 30 günde yanıtlanır; maliyet varsa Kurul tarifesi uygulanabilir. Kanuni sürelerle Kurula şikâyet hakkın saklıdır.
 
 ### Güvenlik, ihlal ve başkasından alınan veri
 
@@ -226,7 +228,7 @@ Emredici hukukun izin verdiği ölçüde hizmet mevcut hâliyle sunulur; kesinti
 
 Kanunen izin verilen ölçüde Vibe Tag; öngörülemeyen dolaylı zarar, kâr/fırsat kaybı veya salt üçüncü kullanıcı davranışından, kendi kusuru ve yükümlülüğü bulunmadığı ölçüde sorumlu değildir. Kullanıcı içeriği koruması aracı hizmet koşullarına bağlıdır.
 
-Tüketici olmayanlarda doğrudan zarar için toplam sözleşmesel tavan, olaydan önceki 12 ayda fiilen ödenen ücrettir; ücretsiz kullanım için yayın öncesi makul [ÜCRETSİZ KULLANIM İÇİN SORUMLULUK TAVANI] belirlenir, sıfır tavan uygulanmaz. Sınır; kasıt/ağır ihmal, ölüm/bedensel zarar, dolandırıcılık, kanunen sınırlandırılamayan veri/gizlilik ve fikri mülkiyet sorumluluğu ile emredici tüketici hakkına uygulanmaz. Yerel hukuk izin vermiyorsa o ölçüde geçersizdir.
+Tüketici olmayanlarda doğrudan zarar için toplam sözleşmesel tavan, olaydan önceki 12 ayda fiilen ödenen ücrettir; hiç ücret ödenmemiş kullanımda bu tavan 1.000 TL’dir. Sıfır tavan uygulanmaz. Tavan hesap başına değil kişi başınadır: aynı gerçek kişi tarafından açılan hesapların tamamından ve aynı olay ya da birbirine bağlı olaylar zincirinden doğan taleplerin tümü tek ve aynı tavana tabidir; birden fazla hesap açılmış olması tavanı çoğaltmaz. Sınır; kasıt/ağır ihmal, ölüm/bedensel zarar, dolandırıcılık, kanunen sınırlandırılamayan veri/gizlilik ve fikri mülkiyet sorumluluğu ile emredici tüketici hakkına uygulanmaz. Yerel hukuk izin vermiyorsa o ölçüde geçersizdir.
 
 ### Tazmin
 
@@ -250,7 +252,7 @@ Vibe Tag does not sell data for advertising. The service processes what it needs
 
 ### Who we are and scope
 
-This policy explains how personal data is processed in the Vibe Tag app and connected services, offered by Özgür Adnan Yahşi (“Vibe Tag”, “we”). Data controller/operator: Özgür Adnan Yahşi; address: Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli; MERSİS: [MERSİS NUMBER — IF ANY]; VERBİS: [VERBİS REGISTRATION — IF REQUIRED]; privacy: destek@vibetag.app; content notices: destek@vibetag.app. GDPR Art. 27 representative, if required: [EU/EEA REPRESENTATIVE].
+This policy explains how personal data is processed in the Vibe Tag app and connected services, offered by Özgür Adnan Yahşi (“Vibe Tag”, “we”). Data controller/operator: Özgür Adnan Yahşi, a natural person; address: Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli; privacy: destek@vibetag.app; content notices: destek@vibetag.app. The controller has no MERSİS or VERBİS registration and no registered electronic mail (KEP) address. GDPR Art. 27 representative, if required: [EU/EEA REPRESENTATIVE].
 
 The App Store, Google Play and any independent linked services have their own data practices, outside this policy.
 
@@ -315,7 +317,7 @@ Depending on where you are, you may have rights of access, copy, correction, era
 
 If CCPA/CPRA or another comprehensive state law applies, a resident may have rights to know/access, correct, delete, obtain a portable copy, opt out of sale/targeted advertising/profiling, and be free from discrimination. In the past 12 months, the categories under “What we collect, and from where” may have been collected for the purposes under “Purposes and legal basis” and disclosed for a business purpose to the recipients under “Recipients, and that we do not sell data”.
 
-In the current model we do not sell personal information or share it for cross-context behavioural advertising. If that changes, advance notice, an opt-out and support for an applicable legal preference signal will be provided first. Sensitive information is used only for expected service/security purposes. Requests: destek@vibetag.app and, if available, [TOLL-FREE NUMBER FOR US REQUESTS]. Applicability thresholds are reviewed regularly.
+In the current model we do not sell personal information or share it for cross-context behavioural advertising. If that changes, advance notice, an opt-out and support for an applicable legal preference signal will be provided first. Sensitive information is used only for expected service/security purposes. Requests go to destek@vibetag.app. Because we operate exclusively online and have a direct relationship with the consumer, an email address is the only method the law requires us to offer; we do not run a toll-free line. Applicability thresholds are reviewed regularly.
 
 ### Children and changes
 
@@ -333,7 +335,7 @@ Vibe Tag operates under Turkey's Personal Data Protection Law No. 6698 (KVKK). T
 
 ### Data controller
 
-Data controller: Özgür Adnan Yahşi (“Vibe Tag”). Address: Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli; MERSİS: [MERSİS NUMBER — IF ANY]; VERBİS: [VERBİS REGISTRATION — IF REQUIRED]; request email: destek@vibetag.app; post: Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli; registered e-mail (KEP): [KEP ADDRESS — IF ANY].
+The data controller is a natural person, not a legal entity: Özgür Adnan Yahşi (“Vibe Tag”). Address for notices and post: Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli. Request email: destek@vibetag.app. The controller has no MERSİS number, no registered electronic mail (KEP) address and no VERBİS registration; as a natural-person controller he falls within the exemption from the VERBİS registration obligation under Law no. 6698 and the Board’s decisions.
 
 ### Categories of personal data processed
 
@@ -373,7 +375,7 @@ Account data is kept for the life of the membership; error logs generally 30 day
 
 You have the right to learn whether your data is processed; to request information about it; to learn its purpose and whether it is used accordingly and who receives it; to request correction; where the conditions are met, to request erasure/destruction and that recipients be notified; to object to a result reached solely by automated analysis; and to request compensation for damage from unlawful processing.
 
-Apply via [KEP ADDRESS — IF ANY], the postal address Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli, the destek@vibetag.app on file, or [APPLICATION FORM LINK — IF ANY], in line with the Communiqué. We respond as soon as possible and within 30 days at the latest; a cost may apply per the Board's tariff. Your right to complain to the Board within the statutory periods is reserved.
+You may apply in line with the Communiqué on the Procedures and Principles of Application to the Data Controller: by signed written petition to Şeker Mah. Ordu Cad. No: 7 FA, Alpullu, Babaeski / Kırklareli, or electronically from the destek@vibetag.app on file. Your application must state your name, address and what you are asking for. We respond as soon as possible and within 30 days at the latest; a cost may apply per the Board's tariff. Your right to complain to the Board within the statutory periods is reserved.
 
 ### Security, breach, and data obtained from someone else
 
@@ -452,7 +454,7 @@ To the extent mandatory law allows, the service is provided as is; uninterrupted
 
 To the extent permitted by law, Vibe Tag is not liable for unforeseeable indirect damage, lost profit/opportunity, or damage arising solely from a third user's conduct, to the extent we are not at fault and have no duty involved. Protection for user-generated content depends on the applicable hosting-service conditions.
 
-For non-consumers, the total contractual cap for direct damage is what was actually paid in the 12 months before the event; for free use, a reasonable [LIABILITY CAP FOR FREE USERS] is set before launch — a zero cap is not applied. The cap does not apply to intent/gross negligence, death/bodily injury, fraud, data/privacy liability that cannot be limited by law, intellectual-property liability, or a mandatory consumer right. It is invalid to the extent local law does not permit it.
+For non-consumers, the total contractual cap for direct damage is what was actually paid in the 12 months before the event; where no fee was paid, that cap is TRY 1,000. A zero cap is not applied. The cap applies per person, not per account: all claims arising from every account opened by the same natural person, and from the same event or a connected series of events, are subject to one and the same cap; opening more than one account does not multiply it. The cap does not apply to intent/gross negligence, death/bodily injury, fraud, data/privacy liability that cannot be limited by law, intellectual-property liability, or a mandatory consumer right. It is invalid to the extent local law does not permit it.
 
 ### Indemnity
 

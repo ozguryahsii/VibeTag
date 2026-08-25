@@ -8,20 +8,19 @@ import type { Locale } from "@/lib/i18n/config";
  * closely — structure, legal bases, the ABD/DSA sections, the breach and
  * automation language are theirs, not a paraphrase.
  *
- * It is **not yet in force.** Who operates the service, where notice reaches
- * him and which courts hear a non-consumer dispute are now answered — see
- * `OPERATOR_NAME`, `OPERATOR_ADDRESS` and `VENUE_CITY` below. Vibe Tag is run
- * by an individual, so the remaining brackets are worded for a sole trader:
- * MERSİS, VERBİS and KEP all carry an *if any / if required* note because a
- * private individual below the registration thresholds has none of them.
+ * It is **not yet in force**, but one bracket away. Vibe Tag is run by an
+ * individual, and the facts that follow from that are all answered now: who
+ * operates it, where notice reaches him, which courts hear a non-consumer
+ * dispute, what the liability ceiling is for use nobody paid for, and that
+ * there is no MERSİS number, no KEP address and no VERBİS registration to
+ * cite. Every request goes to one mailbox.
  *
- * Still open, and each one is a decision rather than a lookup: the liability
- * cap for free users, whether one mailbox handles every kind of request, and
- * whether the US and EU/EEA clauses are needed at all — they are only needed
- * if the apps are published outside Türkiye. The standing notice on the page
- * says the texts are unpublished, and it stays until every bracket is filled
- * and counsel has signed off on the filled version. A placeholder shipped as
- * if it were an answer is worse than an honest gap.
+ * What is left is `[AB/AEA TEMSİLCİSİ]` / `[EU/EEA REPRESENTATIVE]`, and it
+ * is an appointment rather than a lookup: the apps are published worldwide,
+ * so GDPR art. 27 requires a representative established in the EU/EEA, named
+ * in the privacy policy. The standing notice on the page stays until that
+ * name is in and counsel has signed off on the filled version — a placeholder
+ * shipped as if it were an answer is worse than an honest gap.
  *
  * When the product changes, these change with it. The rule of thumb: if a new
  * column stores something about a person, it belongs in the data list below.
@@ -65,6 +64,23 @@ export const OPERATOR_ADDRESS =
  */
 export const VENUE_CITY = "Ankara";
 
+/**
+ * The liability ceiling for use that was never paid for.
+ *
+ * A zero cap is not an option: under TBK art. 115 a clause excluding
+ * liability for intent or gross negligence is void outright, and a consumer
+ * clause that excludes all liability is an unfair term — struck out entirely,
+ * leaving *unlimited* liability behind it. A modest stated figure is the
+ * safer instrument, not the riskier one.
+ *
+ * Per person, not per account. Opening a second account is a thing anyone can
+ * do in a minute; if the cap attached to accounts it would multiply by
+ * whatever number somebody felt like registering, which is the same as having
+ * no cap at all.
+ */
+export const FREE_TIER_LIABILITY_CAP_TR = "1.000 TL";
+export const FREE_TIER_LIABILITY_CAP_EN = "TRY 1,000";
+
 const UPDATED = "2026-08-24";
 
 // ------------------------------------------------------------------ Turkish
@@ -79,7 +95,7 @@ const trPrivacy: LegalDoc = {
     {
       heading: "Kimiz ve kapsam",
       body: [
-        `Bu politika, ${OPERATOR_NAME} (“Vibe Tag”, “biz”) tarafından sunulan Vibe Tag uygulaması ve bağlantılı hizmetlerde kişisel verilerin işlenmesini açıklar. Veri sorumlusu/işletmeci: ${OPERATOR_NAME}; adres: ${OPERATOR_ADDRESS}; MERSİS: [MERSİS NO — VARSA]; VERBİS: [VERBİS KAYDI — GEREKİYORSA]; gizlilik: {email}; içerik bildirimleri: {email}. GDPR m.27 temsilcisi gerekiyorsa: [AB/AEA TEMSİLCİSİ].`,
+        `Bu politika, ${OPERATOR_NAME} (“Vibe Tag”, “biz”) tarafından sunulan Vibe Tag uygulaması ve bağlantılı hizmetlerde kişisel verilerin işlenmesini açıklar. Veri sorumlusu/işletmeci, gerçek kişi olarak ${OPERATOR_NAME}’dir; adres: ${OPERATOR_ADDRESS}; gizlilik: {email}; içerik bildirimleri: {email}. Veri sorumlusunun MERSİS ve VERBİS kaydı ile KEP adresi bulunmamaktadır. GDPR m.27 temsilcisi gerekiyorsa: [AB/AEA TEMSİLCİSİ].`,
         "App Store, Google Play ve bağlantı verilen bağımsız hizmetlerin kendi veri uygulamaları bu politikanın dışındadır.",
       ],
     },
@@ -156,7 +172,7 @@ const trPrivacy: LegalDoc = {
       heading: "ABD eyalet gizlilik açıklaması",
       body: [
         "CCPA/CPRA veya başka kapsamlı eyalet kanunu uygulanıyorsa eyalet sakini bilme/erişim, düzeltme, silme, taşınabilir kopya, satış/hedefli reklam/profillemeden vazgeçme ve ayrımcılığa uğramama haklarına sahip olabilir. Son 12 ayda “Topladığımız veriler ve kaynaklar” kategorileri, “Amaçlar ve hukuki dayanak” amaçlarıyla toplanmış ve “Alıcılar ve satış yapılmaması” bölümündeki alıcılara iş amacıyla açıklanmış olabilir.",
-        "Mevcut modelde kişisel bilgiyi satmıyor ve çapraz bağlam davranışsal reklam için paylaşmıyoruz. Bu faaliyet başlarsa önceden bildirim, opt-out ve uygulanabilir yasal tercih sinyali desteği sağlanır. Hassas bilgi yalnızca beklenen hizmet/güvenlik için kullanılır. Talep: {email} ve varsa [ABD BAŞVURULARI İÇİN ÜCRETSİZ TELEFON]. Kapsam eşikleri düzenli doğrulanır.",
+        "Mevcut modelde kişisel bilgiyi satmıyor ve çapraz bağlam davranışsal reklam için paylaşmıyoruz. Bu faaliyet başlarsa önceden bildirim, opt-out ve uygulanabilir yasal tercih sinyali desteği sağlanır. Hassas bilgi yalnızca beklenen hizmet/güvenlik için kullanılır. Talepler {email} adresine iletilir. Münhasıran çevrim içi faaliyet gösterdiğimiz ve ilgili kişiyle doğrudan ilişkimiz bulunduğu için, kanunen yalnızca bir e-posta adresi sunulması yeterlidir; ücretsiz telefon hattı işletilmemektedir. Kapsam eşikleri düzenli doğrulanır.",
       ],
     },
     {
@@ -178,7 +194,7 @@ const trKvkk: LegalDoc = {
     {
       heading: "Veri sorumlusu",
       body: [
-        `Veri sorumlusu: ${OPERATOR_NAME} (“Vibe Tag”). Adres: ${OPERATOR_ADDRESS}; MERSİS: [MERSİS NO — VARSA]; VERBİS: [VERBİS KAYDI — GEREKİYORSA]; başvuru e-postası: {email}; posta: ${OPERATOR_ADDRESS}; KEP: [KEP ADRESİ — VARSA].`,
+        `Veri sorumlusu, tüzel kişi değil gerçek kişidir: ${OPERATOR_NAME} (“Vibe Tag”). Tebligat ve posta adresi: ${OPERATOR_ADDRESS}. Başvuru e-postası: {email}. Veri sorumlusunun MERSİS kaydı, kayıtlı elektronik posta (KEP) adresi ve VERBİS kaydı bulunmamaktadır; 6698 sayılı Kanun ve Kurul kararları uyarınca VERBİS kayıt yükümlülüğünden istisna tutulan gerçek kişi veri sorumlusu konumundadır.`,
       ],
     },
     {
@@ -230,7 +246,7 @@ const trKvkk: LegalDoc = {
       heading: "KVKK m.11 hakları ve başvuru",
       body: [
         "Verinin işlenip işlenmediğini öğrenme; bilgi isteme; amacı/uygun kullanımı ve alıcıları öğrenme; düzeltme; şartları varsa silme/yok etme ve alıcılara bildirim; münhasıran otomatik analizle aleyhe sonuca itiraz ve hukuka aykırı işleme zararının giderilmesini isteme hakların vardır.",
-        `Başvuru [KEP ADRESİ — VARSA], ${OPERATOR_ADDRESS} posta adresi, sistemde kayıtlı {email} veya [BAŞVURU FORMU BAĞLANTISI — VARSA] ile Tebliğ'e uygun yapılabilir. En kısa sürede ve en geç 30 günde yanıtlanır; maliyet varsa Kurul tarifesi uygulanabilir. Kanuni sürelerle Kurula şikâyet hakkın saklıdır.`,
+        `Başvurunu, Veri Sorumlusuna Başvuru Usul ve Esasları Hakkında Tebliğ'e uygun olarak ${OPERATOR_ADDRESS} adresine ıslak imzalı yazılı dilekçeyle ya da sistemimizde kayıtlı {email} adresinden elektronik olarak iletebilirsin; başvuruda ad, soyad, adres ve talep konusunun yer alması gerekir. En kısa sürede ve en geç 30 günde yanıtlanır; maliyet varsa Kurul tarifesi uygulanabilir. Kanuni sürelerle Kurula şikâyet hakkın saklıdır.`,
       ],
     },
     {
@@ -328,7 +344,7 @@ const trTerms: LegalDoc = {
       body: [
         "Emredici hukukun izin verdiği ölçüde hizmet mevcut hâliyle sunulur; kesintisizlik, hatasızlık, mutlak güvenlik veya kullanıcı içeriği doğruluğu garanti edilmez. Bu, vaat edilen temel dijital hizmet uygunluğunu, makul güvenliği veya tüketicinin ayıp/uygunluk haklarını kaldırmaz.",
         "Kanunen izin verilen ölçüde Vibe Tag; öngörülemeyen dolaylı zarar, kâr/fırsat kaybı veya salt üçüncü kullanıcı davranışından, kendi kusuru ve yükümlülüğü bulunmadığı ölçüde sorumlu değildir. Kullanıcı içeriği koruması aracı hizmet koşullarına bağlıdır.",
-        "Tüketici olmayanlarda doğrudan zarar için toplam sözleşmesel tavan, olaydan önceki 12 ayda fiilen ödenen ücrettir; ücretsiz kullanım için yayın öncesi makul [ÜCRETSİZ KULLANIM İÇİN SORUMLULUK TAVANI] belirlenir, sıfır tavan uygulanmaz. Sınır; kasıt/ağır ihmal, ölüm/bedensel zarar, dolandırıcılık, kanunen sınırlandırılamayan veri/gizlilik ve fikri mülkiyet sorumluluğu ile emredici tüketici hakkına uygulanmaz. Yerel hukuk izin vermiyorsa o ölçüde geçersizdir.",
+        `Tüketici olmayanlarda doğrudan zarar için toplam sözleşmesel tavan, olaydan önceki 12 ayda fiilen ödenen ücrettir; hiç ücret ödenmemiş kullanımda bu tavan ${FREE_TIER_LIABILITY_CAP_TR}\u2019dir. Sıfır tavan uygulanmaz. Tavan hesap başına değil kişi başınadır: aynı gerçek kişi tarafından açılan hesapların tamamından ve aynı olay ya da birbirine bağlı olaylar zincirinden doğan taleplerin tümü tek ve aynı tavana tabidir; birden fazla hesap açılmış olması tavanı çoğaltmaz. Sınır; kasıt/ağır ihmal, ölüm/bedensel zarar, dolandırıcılık, kanunen sınırlandırılamayan veri/gizlilik ve fikri mülkiyet sorumluluğu ile emredici tüketici hakkına uygulanmaz. Yerel hukuk izin vermiyorsa o ölçüde geçersizdir.`,
       ],
     },
     {
@@ -359,7 +375,7 @@ const enPrivacy: LegalDoc = {
     {
       heading: "Who we are and scope",
       body: [
-        `This policy explains how personal data is processed in the Vibe Tag app and connected services, offered by ${OPERATOR_NAME} (“Vibe Tag”, “we”). Data controller/operator: ${OPERATOR_NAME}; address: ${OPERATOR_ADDRESS}; MERSİS: [MERSİS NUMBER — IF ANY]; VERBİS: [VERBİS REGISTRATION — IF REQUIRED]; privacy: {email}; content notices: {email}. GDPR Art. 27 representative, if required: [EU/EEA REPRESENTATIVE].`,
+        `This policy explains how personal data is processed in the Vibe Tag app and connected services, offered by ${OPERATOR_NAME} (“Vibe Tag”, “we”). Data controller/operator: ${OPERATOR_NAME}, a natural person; address: ${OPERATOR_ADDRESS}; privacy: {email}; content notices: {email}. The controller has no MERSİS or VERBİS registration and no registered electronic mail (KEP) address. GDPR Art. 27 representative, if required: [EU/EEA REPRESENTATIVE].`,
         "The App Store, Google Play and any independent linked services have their own data practices, outside this policy.",
       ],
     },
@@ -436,7 +452,7 @@ const enPrivacy: LegalDoc = {
       heading: "US state privacy disclosure",
       body: [
         "If CCPA/CPRA or another comprehensive state law applies, a resident may have rights to know/access, correct, delete, obtain a portable copy, opt out of sale/targeted advertising/profiling, and be free from discrimination. In the past 12 months, the categories under “What we collect, and from where” may have been collected for the purposes under “Purposes and legal basis” and disclosed for a business purpose to the recipients under “Recipients, and that we do not sell data”.",
-        "In the current model we do not sell personal information or share it for cross-context behavioural advertising. If that changes, advance notice, an opt-out and support for an applicable legal preference signal will be provided first. Sensitive information is used only for expected service/security purposes. Requests: {email} and, if available, [TOLL-FREE NUMBER FOR US REQUESTS]. Applicability thresholds are reviewed regularly.",
+        "In the current model we do not sell personal information or share it for cross-context behavioural advertising. If that changes, advance notice, an opt-out and support for an applicable legal preference signal will be provided first. Sensitive information is used only for expected service/security purposes. Requests go to {email}. Because we operate exclusively online and have a direct relationship with the consumer, an email address is the only method the law requires us to offer; we do not run a toll-free line. Applicability thresholds are reviewed regularly.",
       ],
     },
     {
@@ -459,7 +475,7 @@ const enKvkk: LegalDoc = {
     {
       heading: "Data controller",
       body: [
-        `Data controller: ${OPERATOR_NAME} (“Vibe Tag”). Address: ${OPERATOR_ADDRESS}; MERSİS: [MERSİS NUMBER — IF ANY]; VERBİS: [VERBİS REGISTRATION — IF REQUIRED]; request email: {email}; post: ${OPERATOR_ADDRESS}; registered e-mail (KEP): [KEP ADDRESS — IF ANY].`,
+        `The data controller is a natural person, not a legal entity: ${OPERATOR_NAME} (“Vibe Tag”). Address for notices and post: ${OPERATOR_ADDRESS}. Request email: {email}. The controller has no MERSİS number, no registered electronic mail (KEP) address and no VERBİS registration; as a natural-person controller he falls within the exemption from the VERBİS registration obligation under Law no. 6698 and the Board\u2019s decisions.`,
       ],
     },
     {
@@ -511,7 +527,7 @@ const enKvkk: LegalDoc = {
       heading: "Your rights under KVKK Art. 11 and how to apply",
       body: [
         "You have the right to learn whether your data is processed; to request information about it; to learn its purpose and whether it is used accordingly and who receives it; to request correction; where the conditions are met, to request erasure/destruction and that recipients be notified; to object to a result reached solely by automated analysis; and to request compensation for damage from unlawful processing.",
-        `Apply via [KEP ADDRESS — IF ANY], the postal address ${OPERATOR_ADDRESS}, the {email} on file, or [APPLICATION FORM LINK — IF ANY], in line with the Communiqué. We respond as soon as possible and within 30 days at the latest; a cost may apply per the Board's tariff. Your right to complain to the Board within the statutory periods is reserved.`,
+        `You may apply in line with the Communiqué on the Procedures and Principles of Application to the Data Controller: by signed written petition to ${OPERATOR_ADDRESS}, or electronically from the {email} on file. Your application must state your name, address and what you are asking for. We respond as soon as possible and within 30 days at the latest; a cost may apply per the Board's tariff. Your right to complain to the Board within the statutory periods is reserved.`,
       ],
     },
     {
@@ -609,7 +625,7 @@ const enTerms: LegalDoc = {
       body: [
         "To the extent mandatory law allows, the service is provided as is; uninterrupted operation, error-freeness, absolute security or the accuracy of user content are not guaranteed. This does not remove the fitness of the promised core digital service, reasonable security, or a consumer's defect/conformity rights.",
         "To the extent permitted by law, Vibe Tag is not liable for unforeseeable indirect damage, lost profit/opportunity, or damage arising solely from a third user's conduct, to the extent we are not at fault and have no duty involved. Protection for user-generated content depends on the applicable hosting-service conditions.",
-        "For non-consumers, the total contractual cap for direct damage is what was actually paid in the 12 months before the event; for free use, a reasonable [LIABILITY CAP FOR FREE USERS] is set before launch — a zero cap is not applied. The cap does not apply to intent/gross negligence, death/bodily injury, fraud, data/privacy liability that cannot be limited by law, intellectual-property liability, or a mandatory consumer right. It is invalid to the extent local law does not permit it.",
+        `For non-consumers, the total contractual cap for direct damage is what was actually paid in the 12 months before the event; where no fee was paid, that cap is ${FREE_TIER_LIABILITY_CAP_EN}. A zero cap is not applied. The cap applies per person, not per account: all claims arising from every account opened by the same natural person, and from the same event or a connected series of events, are subject to one and the same cap; opening more than one account does not multiply it. The cap does not apply to intent/gross negligence, death/bodily injury, fraud, data/privacy liability that cannot be limited by law, intellectual-property liability, or a mandatory consumer right. It is invalid to the extent local law does not permit it.`,
       ],
     },
     {

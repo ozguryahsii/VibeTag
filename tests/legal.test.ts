@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  FREE_TIER_LIABILITY_CAP_EN,
+  FREE_TIER_LIABILITY_CAP_TR,
   LEGAL_SLUGS,
   OPERATOR_ADDRESS,
   OPERATOR_NAME,
@@ -72,19 +74,7 @@ describe("the operator is identified everywhere it has to be", () => {
  */
 const OPEN_PLACEHOLDERS = [
   "[AB/AEA TEMSİLCİSİ]",
-  "[ABD BAŞVURULARI İÇİN ÜCRETSİZ TELEFON]",
-  "[APPLICATION FORM LINK — IF ANY]",
-  "[BAŞVURU FORMU BAĞLANTISI — VARSA]",
   "[EU/EEA REPRESENTATIVE]",
-  "[KEP ADDRESS — IF ANY]",
-  "[KEP ADRESİ — VARSA]",
-  "[LIABILITY CAP FOR FREE USERS]",
-  "[MERSİS NO — VARSA]",
-  "[MERSİS NUMBER — IF ANY]",
-  "[TOLL-FREE NUMBER FOR US REQUESTS]",
-  "[VERBİS KAYDI — GEREKİYORSA]",
-  "[VERBİS REGISTRATION — IF REQUIRED]",
-  "[ÜCRETSİZ KULLANIM İÇİN SORUMLULUK TAVANI]",
 ];
 
 describe("placeholders still waiting on a real answer", () => {
@@ -102,5 +92,69 @@ describe("placeholders still waiting on a real answer", () => {
         /TÜZEL KİŞİ|LEGAL ENTITY|İŞLETME ADRESİ|BUSINESS ADDRESS/,
       );
     }
+  });
+});
+
+/**
+ * The liability cap is a ceiling on what Vibe Tag can owe, and the two ways
+ * it fails are both invisible on screen.
+ *
+ * Written per account, it multiplies by however many accounts somebody cares
+ * to register — a cap that anyone can raise is not a cap. Written as zero, it
+ * is void under TBK art. 115 and as an unfair consumer term, and a void cap
+ * leaves unlimited liability behind it. So the clause has to say a real
+ * figure, and has to say the figure attaches to the person.
+ */
+describe("the liability cap for unpaid use", () => {
+  it("states a figure rather than an unfilled promise", () => {
+    expect(textOf("terms", "tr")).toContain(FREE_TIER_LIABILITY_CAP_TR);
+    expect(textOf("terms", "en")).toContain(FREE_TIER_LIABILITY_CAP_EN);
+  });
+
+  it("refuses a zero cap in both languages", () => {
+    expect(textOf("terms", "tr")).toContain("Sıfır tavan uygulanmaz");
+    expect(textOf("terms", "en")).toContain("A zero cap is not applied");
+  });
+
+  it("attaches the cap to the person, not to the account", () => {
+    const tr = textOf("terms", "tr");
+    expect(tr).toContain("hesap başına değil kişi başınadır");
+    // The point of the rule: a second account must not buy a second ceiling.
+    expect(tr).toContain("birden fazla hesap açılmış olması tavanı çoğaltmaz");
+
+    const en = textOf("terms", "en");
+    expect(en).toContain("per person, not per account");
+    expect(en).toContain("opening more than one account does not multiply it");
+  });
+
+  /*
+   * The carve-outs are what keeps the cap enforceable at all; a cap that
+   * also covered intent or a mandatory consumer right would be struck out
+   * whole, taking the figure with it.
+   */
+  it("keeps the cap off intent, gross negligence and consumer rights", () => {
+    expect(textOf("terms", "tr")).toMatch(/kasıt\/ağır ihmal/);
+    expect(textOf("terms", "tr")).toMatch(/emredici tüketici hakk/);
+    expect(textOf("terms", "en")).toMatch(/intent\/gross negligence/);
+    expect(textOf("terms", "en")).toMatch(/mandatory consumer right/);
+  });
+});
+
+/**
+ * A controller with no MERSİS, KEP or VERBİS entry says so rather than
+ * leaving the reader to wonder whether it was withheld. If a registration is
+ * ever taken out, these assertions are the reminder that three documents
+ * currently claim otherwise.
+ */
+describe("registrations a sole trader does not have", () => {
+  it("says plainly that there are none", () => {
+    expect(textOf("privacy", "tr")).toContain(
+      "MERSİS ve VERBİS kaydı ile KEP adresi bulunmamaktadır",
+    );
+    expect(textOf("kvkk", "tr")).toContain("VERBİS kaydı bulunmamaktadır");
+    expect(textOf("privacy", "en")).toContain(
+      "no MERSİS or VERBİS registration",
+    );
+    expect(textOf("kvkk", "en")).toContain("no VERBİS registration");
   });
 });

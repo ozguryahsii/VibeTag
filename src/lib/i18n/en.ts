@@ -798,7 +798,7 @@ export const en = {
     kicker: "THE FINE PRINT",
     updated: "Last updated {date}",
     draftNotice:
-      "Not yet in force. These texts were reviewed and revised by counsel, but the bracketed placeholders (company name, address, MERSİS/VERBİS and the rest) are not yet filled with real information — treat them as a working document, not final terms.",
+      "Not yet in force. These texts were reviewed and revised by counsel, and the operator, address and venue are now filled in. The placeholders still in brackets (the liability cap, MERSİS/VERBİS/KEP and the rest) are not yet answered — treat this as a working document, not final terms.",
     title: "Legal",
     privacy: "Privacy Policy",
     kvkk: "Data Protection Notice (KVKK)",

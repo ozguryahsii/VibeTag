@@ -9,7 +9,13 @@
  *   npm run legal --silent            > docs/legal.md
  *   npm run legal --silent -- --json  > legal.json
  */
-import { LEGAL_SLUGS, legalDoc } from "../src/lib/legal";
+import {
+  LEGAL_SLUGS,
+  OPERATOR_ADDRESS,
+  OPERATOR_NAME,
+  VENUE_CITY,
+  legalDoc,
+} from "../src/lib/legal";
 import { SUPPORT_EMAIL } from "../src/lib/support";
 import type { Locale } from "../src/lib/i18n/config";
 
@@ -66,19 +72,21 @@ w(
     "söyleyen kalıcı bir uyarı var.",
 );
 w(
-  "- **Veri sorumlusu şahıstır, tüzel kişi değildir.** Köşeli parantezler buna " +
-    "göre yazıldı: «[AD SOYAD veya TİCARİ UNVAN]» ticari unvan alınmadıysa " +
-    "doğrudan ad soyad ile doldurulur; MERSİS, VERBİS ve KEP alanları «varsa / " +
-    "gerekiyorsa» notuyla duruyor, çünkü şahıs işletmesinde bunlar bulunmayabilir.",
+  "- **Veri sorumlusu şahıstır, tüzel kişi değildir.** Doldurulan bilgiler: " +
+    `işleten **${OPERATOR_NAME}**, tebligat adresi **${OPERATOR_ADDRESS}**, ` +
+    `tüketici olmayan uyuşmazlıklarda yetkili mahkeme **${VENUE_CITY}** ` +
+    "(tüketicinin kendi yerleşim yerindeki hakem heyeti/tüketici mahkemesine " +
+    "başvurma hakkı ayrıca saklı tutuldu). MERSİS, VERBİS ve KEP alanları " +
+    "«varsa / gerekiyorsa» notuyla duruyor, çünkü şahıs işletmesinde bunlar " +
+    "bulunmayabilir — avukatın bu üçü için «yok» demesi yeterli, o zaman " +
+    "satırlar tamamen kaldırılır.",
 );
 w(
-  "- **Yayın öncesi doldurulacak alanlar:** ad soyad ya da ticari unvan, tebligat " +
-    "adresi (KVKK m.10 aydınlatma yükümlülüğü bunu zorunlu kılar; ev adresi " +
-    "yayımlamamak için sanal ofis ya da mali müşavir adresi tercih edilebilir), " +
-    "tüketici olmayanlar için yetkili mahkeme şehri, ücretsiz kullanıcılar için " +
-    "sorumluluk tavanı tutarı, ilgili e-postalar (tek adres mi ayrı adresler mi), " +
-    "ve mağazalarda hangi ülkelerde yayına çıkılacağı — yalnızca Türkiye " +
-    "seçilirse ABD ve AB/AEA alanlarının doldurulmasına gerek kalmaz.",
+  "- **Hâlâ açık olan alanlar:** ücretsiz kullanıcılar için sorumluluk tavanı " +
+    "tutarı, ilgili e-postalar (şu an hepsi tek adrese bakıyor), ve mağazalarda " +
+    "hangi ülkelerde yayına çıkılacağı — yalnızca Türkiye seçilirse ABD " +
+    "(ücretsiz telefon hattı) ve AB/AEA (GDPR m.27 temsilcisi) alanlarının " +
+    "doldurulmasına gerek kalmaz.",
 );
 w();
 w("---");

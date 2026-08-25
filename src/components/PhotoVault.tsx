@@ -121,7 +121,11 @@ export function PhotoVault({
       <input
         ref={fileRef}
         type="file"
-        accept="image/*"
+        // Named rather than `image/*`, so the picker offers what we can
+        // actually decode. HEIC is listed on purpose: leave it out and iOS
+        // silently transcodes to JPEG, which is fine but doubles the wait on
+        // a large photo for no gain.
+        accept="image/jpeg,image/png,image/heic,image/heif,image/webp,image/avif,image/gif"
         hidden
         onChange={(e) => {
           const file = e.target.files?.[0];

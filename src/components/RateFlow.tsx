@@ -20,6 +20,7 @@ import { Avatar } from "@/components/ui";
 import { IconGlyph, TagIcon, TraitIcon } from "@/components/Icon";
 import { groupIconFor, relationshipIconFor } from "@/lib/icons";
 import { fill, useD, useLocale } from "@/components/LocaleProvider";
+import { NativePushPrompt } from "@/components/NativePushPrompt";
 import {
   groupBlurb,
   groupLabel,
@@ -546,7 +547,16 @@ function Success({
         }}
       />
 
-      <div className="mt-8 grid gap-3 w-full max-w-[20rem]">
+      {/*
+        The second moment to ask about notifications: somebody who has just
+        rated a person is about to start expecting something back. Silent on
+        the web and for anyone who has already answered.
+      */}
+      <div className="mt-7 w-full max-w-[20rem] text-left">
+        <NativePushPrompt />
+      </div>
+
+      <div className="mt-6 grid gap-3 w-full max-w-[20rem]">
         <Link
           href={`/u/${target.username}`}
           className="h-13 grid place-items-center rounded-full grad-score text-white font-bold text-[15px]"

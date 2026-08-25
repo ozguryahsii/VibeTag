@@ -178,6 +178,14 @@ Yapılanlar:
 - Ayarlar → Bildirimler bölümü kabuk içinde native anahtarı gösteriyor. İzin
   **açılışta değil, dokununca** isteniyor: iOS uygulamaya bir kez sorma hakkı
   verir, beklenmedik bir izin penceresi o hakkı "hayır"a harcar.
+- Kimse ayarlara girip anahtarı aramayacağı için iki yerde de **yumuşak
+  soru** var: ana ekranda ve bir kişiyi değerlendirdikten hemen sonra. Bu kart
+  sistem penceresini açmaz — "aç" diyene açar. "Şimdi değil" diyene üç gün
+  sonra bir kez daha sorar, ikinci retten sonra susar (`lib/push-prompt.ts`).
+- Bildirime dokunmak, bildirimin işaret ettiği ekranı açar: mesaj bildirimi
+  doğrudan o sohbete gider. Dinleyici uygulama genelinde
+  (`NativePushBridge`), yoksa uygulama sadece kaldığı yerde açılır ve
+  bildirim hiçbir şey yapmamış gibi görünür.
 
 **Senden gereken 1 — Xcode'da yetenek.** Xcode → App hedefi → Signing &
 Capabilities → **+ Capability → Push Notifications**. Tek tık; bu olmadan

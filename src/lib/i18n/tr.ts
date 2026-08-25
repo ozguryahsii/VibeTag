@@ -792,6 +792,11 @@ export const tr: Dictionary = {
     deniedApp:
       "Bildirimler kapalı. Telefonun Ayarlar → Vibe Tag → Bildirimler bölümünden yeniden açabilirsin.",
     onApp: "Bu cihazda bildirimler açık.",
+    askTitle: "Haberin olsun mu?",
+    askBody:
+      "Biri seni değerlendirdiğinde, arkadaş olarak eklediğinde ya da sana yazdığında bildirim gönderelim. İstediğin an Ayarlar'dan kapatabilirsin.",
+    askYes: "Bildirimleri aç",
+    askLater: "Şimdi değil",
   },
 
   legal: {

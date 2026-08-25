@@ -795,6 +795,11 @@ export const en = {
     deniedApp:
       "Notifications are off. You can turn them back on in your phone's Settings → Vibe Tag → Notifications.",
     onApp: "Notifications are on for this device.",
+    askTitle: "Want to know when it happens?",
+    askBody:
+      "We can let you know when someone rates you, adds you, or writes to you. You can turn it off again in Settings whenever you like.",
+    askYes: "Turn on notifications",
+    askLater: "Not now",
   },
 
   legal: {

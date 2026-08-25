@@ -15,6 +15,7 @@ import { generateVibeSummary } from "@/lib/insights";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ICONS, iconFor } from "@/lib/icons";
 import { Avatar, Button, Card, EmptyState, Meter, SectionTitle, TagPill } from "@/components/ui";
+import { NativePushPrompt } from "@/components/NativePushPrompt";
 
 function greetingKey(): "greetingNight" | "greetingMorning" | "greetingDay" | "greetingEvening" {
   const h = new Date().getHours();
@@ -133,6 +134,17 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+      {/*
+        The soft ask for notifications. Renders nothing on the web, nothing
+        once permission has been answered either way, and nothing again for
+        somebody who has said "not now" twice — see lib/push-prompt.ts. It
+        sits below the card rather than above it so the first thing on the
+        home screen is still the person's own card.
+      */}
+      <div className="mt-4">
+        <NativePushPrompt />
+      </div>
 
       {profile.tags.length === 0 && (
         <section className="mt-7 reveal" style={{ animationDelay: "120ms" }}>

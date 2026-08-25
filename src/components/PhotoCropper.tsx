@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useD } from "@/components/LocaleProvider";
+import { decodeImageFile, type DecodedImage } from "@/components/decode-image";
 
 /**
  * Choose which part of a photo becomes the profile picture.
@@ -50,7 +51,7 @@ export function PhotoCropper({
 }) {
   const d = useD();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const bitmapRef = useRef<ImageBitmap | null>(null);
+  const bitmapRef = useRef<DecodedImage | null>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -65,13 +66,13 @@ export function PhotoCropper({
 
   useEffect(() => {
     let cancelled = false;
-    createImageBitmap(file)
-      .then((bitmap) => {
+    decodeImageFile(file)
+      .then((image) => {
         if (cancelled) {
-          bitmap.close?.();
+          image.close();
           return;
         }
-        bitmapRef.current = bitmap;
+        bitmapRef.current = image;
         setZoom(1);
         setRing({ x: STAGE / 2, y: STAGE / 2 });
         setReady(true);
@@ -79,7 +80,7 @@ export function PhotoCropper({
       .catch(() => setFailed(true));
     return () => {
       cancelled = true;
-      bitmapRef.current?.close?.();
+      bitmapRef.current?.close();
       bitmapRef.current = null;
     };
   }, [file]);
@@ -134,7 +135,7 @@ export function PhotoCropper({
 
     ctx.fillStyle = "#F4EDE4";
     ctx.fillRect(0, 0, STAGE, STAGE);
-    ctx.drawImage(bitmap, f.x, f.y, f.w, f.h);
+    ctx.drawImage(bitmap.source, f.x, f.y, f.w, f.h);
 
     // Everything outside the ring dims; the ring itself is drawn on top so
     // the edge of the selection is unmistakable.
@@ -233,7 +234,7 @@ export function PhotoCropper({
     if (!ctx) return;
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, OUT, OUT);
-    ctx.drawImage(bitmap, sx, sy, side, side, 0, 0, OUT, OUT);
+    ctx.drawImage(bitmap.source, sx, sy, side, side, 0, 0, OUT, OUT);
     onDone(out.toDataURL("image/jpeg", QUALITY));
   }
 

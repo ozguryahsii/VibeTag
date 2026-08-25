@@ -3,14 +3,26 @@
 Notes for Claude working in this repo. Product documentation lives in
 `README.md`; this file is only about how we work together.
 
-## Tagging — do this at the end of every piece of work
+## Tagging — only when Özgür asks for it
+
+**Wait for his go-ahead. Do not propose a tag on your own.** Finish the work,
+run the gates, commit and push to the branch, and then stop and say what is
+still open. He decides when a version is cut, and he says so.
+
+This rule replaced the opposite one on 2026-08-25, after three tags went out
+in a row for work whose questions were still unanswered — while the server
+was still two versions behind and none of them had been deployed. A tag is
+supposed to mark a decided state. Handing him a tag for an undecided one puts
+the queue on his desk instead of taking it off, and buries the thing that
+actually needed doing.
+
+The rest of this section is what a tag looks like **when he asks for one.**
 
 **The session cannot push tags.** The git credential here is scoped to the
 branch `claude/app-development-m2v29w`; `git push origin <tag>` returns
 HTTP 403. This is an environment limit, not something to retry.
 
-So Özgür creates the tags. **Every time a change is finished and pushed, end
-the reply with three blocks — no exceptions, no waiting to be asked:**
+So Özgür creates them, and when he asks, he gets three blocks:
 
 **1. Commands to create the tag.** Point at the exact commit, not at a branch
 name, so the tag lands where it should even if the branch moves:

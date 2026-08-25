@@ -8,19 +8,23 @@ import type { Locale } from "@/lib/i18n/config";
  * closely — structure, legal bases, the ABD/DSA sections, the breach and
  * automation language are theirs, not a paraphrase.
  *
- * It is **not yet in force**, but one bracket away. Vibe Tag is run by an
- * individual, and the facts that follow from that are all answered now: who
- * operates it, where notice reaches him, which courts hear a non-consumer
- * dispute, what the liability ceiling is for use nobody paid for, and that
- * there is no MERSİS number, no KEP address and no VERBİS registration to
- * cite. Every request goes to one mailbox.
+ * **In force from 2026-08-25.** Every blank is filled: who operates the
+ * service, where notice reaches him, which courts hear a non-consumer
+ * dispute, the liability ceiling for use nobody paid for, and that there is
+ * no MERSİS number, no KEP address and no VERBİS registration to cite. Every
+ * request goes to one mailbox. The standing draft notice that used to sit
+ * above these texts is gone with the last bracket.
  *
- * What is left is `[AB/AEA TEMSİLCİSİ]` / `[EU/EEA REPRESENTATIVE]`, and it
- * is an appointment rather than a lookup: the apps are published worldwide,
- * so GDPR art. 27 requires a representative established in the EU/EEA, named
- * in the privacy policy. The standing notice on the page stays until that
- * name is in and counsel has signed off on the filled version — a placeholder
- * shipped as if it were an answer is worse than an honest gap.
+ * No GDPR art. 27 representative is named, and that is a decision rather than
+ * an omission. The apps ship worldwide, so the obligation is arguably live;
+ * Özgür chose on 2026-08-25 not to appoint one for launch, having been told
+ * plainly what art. 27 requires and what the alternatives were. What the text
+ * must never do is paper over that — a policy naming a representative who
+ * does not exist would be a false statement made to exactly the people it is
+ * written for. So the sentence is gone rather than filled with a fiction, and
+ * EU/EEA requests are pointed at the mailbox that genuinely answers them. If
+ * a representative is ever appointed, the sentence comes back with a real
+ * name in it.
  *
  * When the product changes, these change with it. The rule of thumb: if a new
  * column stores something about a person, it belongs in the data list below.
@@ -81,7 +85,7 @@ export const VENUE_CITY = "Ankara";
 export const FREE_TIER_LIABILITY_CAP_TR = "1.000 TL";
 export const FREE_TIER_LIABILITY_CAP_EN = "TRY 1,000";
 
-const UPDATED = "2026-08-24";
+const UPDATED = "2026-08-25";
 
 // ------------------------------------------------------------------ Turkish
 
@@ -95,7 +99,7 @@ const trPrivacy: LegalDoc = {
     {
       heading: "Kimiz ve kapsam",
       body: [
-        `Bu politika, ${OPERATOR_NAME} (“Vibe Tag”, “biz”) tarafından sunulan Vibe Tag uygulaması ve bağlantılı hizmetlerde kişisel verilerin işlenmesini açıklar. Veri sorumlusu/işletmeci, gerçek kişi olarak ${OPERATOR_NAME}’dir; adres: ${OPERATOR_ADDRESS}; gizlilik: {email}; içerik bildirimleri: {email}. Veri sorumlusunun MERSİS ve VERBİS kaydı ile KEP adresi bulunmamaktadır. GDPR m.27 temsilcisi gerekiyorsa: [AB/AEA TEMSİLCİSİ].`,
+        `Bu politika, ${OPERATOR_NAME} (“Vibe Tag”, “biz”) tarafından sunulan Vibe Tag uygulaması ve bağlantılı hizmetlerde kişisel verilerin işlenmesini açıklar. Veri sorumlusu/işletmeci, gerçek kişi olarak ${OPERATOR_NAME}’dir; adres: ${OPERATOR_ADDRESS}; gizlilik: {email}; içerik bildirimleri: {email}. Veri sorumlusunun MERSİS ve VERBİS kaydı ile KEP adresi bulunmamaktadır. AB/AEA'da yerleşik kullanıcılar dâhil tüm veri sahibi talepleri doğrudan {email} adresinden karşılanır.`,
         "App Store, Google Play ve bağlantı verilen bağımsız hizmetlerin kendi veri uygulamaları bu politikanın dışındadır.",
       ],
     },
@@ -375,7 +379,7 @@ const enPrivacy: LegalDoc = {
     {
       heading: "Who we are and scope",
       body: [
-        `This policy explains how personal data is processed in the Vibe Tag app and connected services, offered by ${OPERATOR_NAME} (“Vibe Tag”, “we”). Data controller/operator: ${OPERATOR_NAME}, a natural person; address: ${OPERATOR_ADDRESS}; privacy: {email}; content notices: {email}. The controller has no MERSİS or VERBİS registration and no registered electronic mail (KEP) address. GDPR Art. 27 representative, if required: [EU/EEA REPRESENTATIVE].`,
+        `This policy explains how personal data is processed in the Vibe Tag app and connected services, offered by ${OPERATOR_NAME} (“Vibe Tag”, “we”). Data controller/operator: ${OPERATOR_NAME}, a natural person; address: ${OPERATOR_ADDRESS}; privacy: {email}; content notices: {email}. The controller has no MERSİS or VERBİS registration and no registered electronic mail (KEP) address. Data-subject requests, including those from users in the EU/EEA, are handled directly at {email}.`,
         "The App Store, Google Play and any independent linked services have their own data practices, outside this policy.",
       ],
     },

@@ -49,15 +49,6 @@ export default async function LegalPage({
         {fill(d.legal.updated, { date: doc.updated })}
       </p>
 
-      {/*
-       * Standing notice. These texts describe the product accurately, which is
-       * the useful half; a lawyer still has to sign them, and pretending
-       * otherwise would be the exact kind of claim this app exists to avoid.
-       */}
-      <p className="mt-5 rounded-[18px] border border-orange/25 bg-tagbg px-4 py-3.5 text-[12px] text-orange leading-relaxed">
-        {d.legal.draftNotice}
-      </p>
-
       <p className="mt-6 text-[14px] leading-relaxed text-ink/85">
         {withEmail(doc.intro)}
       </p>

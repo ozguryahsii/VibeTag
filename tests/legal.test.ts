@@ -64,26 +64,18 @@ describe("the operator is identified everywhere it has to be", () => {
 });
 
 /**
- * The unfilled blanks, tracked deliberately.
+ * Nothing is left blank.
  *
- * Not a style rule — the page carries a standing "not yet in force" notice,
- * and this list is what that notice is about. A new bracket appearing
- * unnoticed would ship a placeholder as though it were an answer; a filled
- * one silently regressing to a bracket would do the same. Both are caught by
- * pinning the set exactly.
+ * The texts went into force on 2026-08-25 with the standing draft notice
+ * removed, so a bracket surviving anywhere now ships as though it were an
+ * answer — to the one audience that reads these documents when something has
+ * already gone wrong.
  */
-const OPEN_PLACEHOLDERS = [
-  "[AB/AEA TEMSİLCİSİ]",
-  "[EU/EEA REPRESENTATIVE]",
-];
-
-describe("placeholders still waiting on a real answer", () => {
-  it("is exactly the set we know about", () => {
-    const found = new Set<string>();
-    for (const { text } of all) {
-      for (const m of text.matchAll(/\[[^\]]+\]/g)) found.add(m[0]);
+describe("no unfilled blanks remain", () => {
+  it("has no bracketed placeholder in any document", () => {
+    for (const { slug, locale, text } of all) {
+      expect(text.match(/\[[^\]]+\]/g), `${slug}/${locale}`).toBeNull();
     }
-    expect([...found].sort()).toEqual([...OPEN_PLACEHOLDERS].sort());
   });
 
   it("no longer asks a sole trader for company-only facts", () => {
@@ -93,18 +85,26 @@ describe("placeholders still waiting on a real answer", () => {
       );
     }
   });
+
+  /*
+   * No GDPR art. 27 representative has been appointed. Naming one anyway
+   * would be a false statement made to precisely the people the policy is
+   * for, and it would read as complete — which is why it is asserted rather
+   * than left to a careful reading. If one is ever appointed, this test is
+   * where the claim becomes allowed again.
+   */
+  it("claims no EU/EEA representative, and routes those requests to the mailbox", () => {
+    expect(textOf("privacy", "tr")).not.toMatch(/m\.\s?27|temsilcisi:/);
+    expect(textOf("privacy", "tr")).toContain(
+      "AB/AEA'da yerleşik kullanıcılar dâhil tüm veri sahibi talepleri doğrudan {email} adresinden karşılanır",
+    );
+    expect(textOf("privacy", "en")).not.toMatch(/Art\.\s?27|representative:/);
+    expect(textOf("privacy", "en")).toContain(
+      "including those from users in the EU/EEA, are handled directly at {email}",
+    );
+  });
 });
 
-/**
- * The liability cap is a ceiling on what Vibe Tag can owe, and the two ways
- * it fails are both invisible on screen.
- *
- * Written per account, it multiplies by however many accounts somebody cares
- * to register — a cap that anyone can raise is not a cap. Written as zero, it
- * is void under TBK art. 115 and as an unfair consumer term, and a void cap
- * leaves unlimited liability behind it. So the clause has to say a real
- * figure, and has to say the figure attaches to the person.
- */
 describe("the liability cap for unpaid use", () => {
   it("states a figure rather than an unfilled promise", () => {
     expect(textOf("terms", "tr")).toContain(FREE_TIER_LIABILITY_CAP_TR);

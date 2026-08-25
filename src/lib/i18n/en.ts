@@ -797,8 +797,6 @@ export const en = {
   legal: {
     kicker: "THE FINE PRINT",
     updated: "Last updated {date}",
-    draftNotice:
-      "Not yet in force. These texts were reviewed and revised by counsel, and the operator, address, venue and liability cap are now filled in. What remains is appointing an EU/EEA representative; until that name is in the text, this is not a final agreement — treat it as a working document.",
     title: "Legal",
     privacy: "Privacy Policy",
     kvkk: "Data Protection Notice (KVKK)",

@@ -794,8 +794,6 @@ export const tr: Dictionary = {
   legal: {
     kicker: "KÜÇÜK YAZILAR",
     updated: "Son güncelleme: {date}",
-    draftNotice:
-      "Henüz yürürlükte değil. Bu metinler bir avukat tarafından incelendi ve revize edildi; işleten, adres, yetkili mahkeme ve sorumluluk tavanı bilgileri dolduruldu. Geriye yalnızca AB/AEA temsilcisinin atanması kaldı; o isim metne işlenene kadar nihai sözleşme sayılmaz — çalışma metni olarak değerlendir.",
     title: "Yasal",
     privacy: "Gizlilik Politikası",
     kvkk: "KVKK Aydınlatma Metni",

@@ -64,46 +64,55 @@ w("Ekranda ne yazıyorsa burada da o yazıyor.");
 w();
 w(`Son güncelleme: **${docs[0].updated}** · İletişim adresi: **${SUPPORT_EMAIL}**`);
 w();
-w("## Durum");
-w();
+w("## Durum")
+w()
 w(
-  "- Metinler **2026-08-24 tarihinde avukat tarafından incelendi ve revize edildi.** " +
-    "Bu dosya o revizyonun ta kendisidir. Henüz yürürlükte değil: köşeli parantezli " +
-    "alanlar gerçek bilgilerle doldurulmadan yayımlanmaz. Uygulamada da bunu " +
-    "söyleyen kalıcı bir uyarı var.",
+  "- Metinler **2026-08-24 tarihinde avukat tarafından incelendi ve revize " +
+    "edildi**; bu dosya o revizyonun, boşlukları doldurulmuş hâlidir. " +
+    "**2026-08-25 itibarıyla yürürlüktedir** — uygulamadaki «henüz yürürlükte " +
+    "değil» uyarısı kaldırıldı, köşeli parantezli tek bir alan kalmadı.",
 );
 w(
-  "- **Veri sorumlusu şahıstır, tüzel kişi değildir.** Doldurulan bilgiler: " +
-    `işleten **${OPERATOR_NAME}** (gerçek kişi), tebligat ve posta adresi ` +
+  "- **Veri sorumlusu şahıstır, tüzel kişi değildir.** İşleten " +
+    `**${OPERATOR_NAME}** (gerçek kişi), tebligat ve posta adresi ` +
     `**${OPERATOR_ADDRESS}**, tüketici olmayan uyuşmazlıklarda yetkili mahkeme ` +
     `**${VENUE_CITY}** (tüketicinin kendi yerleşim yerindeki hakem heyetine ya ` +
     "da tüketici mahkemesine başvurma hakkı ayrıca saklı tutuldu). MERSİS, " +
     "VERBİS ve KEP alanları kaldırıldı: metin artık bunların bulunmadığını, " +
-    "VERBİS bakımından gerçek kişi istisnasında olunduğunu açıkça yazıyor. " +
-    "**Avukatın teyit etmesi istenen nokta budur.**",
+    "VERBİS bakımından gerçek kişi istisnasında olunduğunu açıkça yazıyor.",
 );
 w(
   "- **Ücret ödenmemiş kullanımda sorumluluk tavanı " +
-    `${FREE_TIER_LIABILITY_CAP_TR}** olarak belirlendi ve tavan hesap başına ` +
-    "değil **kişi başına** yazıldı: aynı gerçek kişinin açtığı tüm hesaplardan " +
-    "ve birbirine bağlı olaylardan doğan talepler tek bir tavana tabi, birden " +
-    "fazla hesap açmak tavanı çoğaltmıyor. Sıfır tavan uygulanmıyor (TBK m.115 " +
-    "ve haksız şart denetimi karşısında geçersiz olurdu); kasıt/ağır ihmal, " +
-    "ölüm/bedensel zarar, dolandırıcılık ve emredici tüketici hakları tavanın " +
-    "dışında tutuldu.",
+    `${FREE_TIER_LIABILITY_CAP_TR}** ve tavan hesap başına değil **kişi ` +
+    "başına**: aynı gerçek kişinin açtığı tüm hesaplardan ve birbirine bağlı " +
+    "olaylardan doğan talepler tek bir tavana tabi, birden fazla hesap açmak " +
+    "tavanı çoğaltmıyor. Sıfır tavan uygulanmıyor (TBK m.115 ve haksız şart " +
+    "denetimi karşısında geçersiz olurdu); kasıt/ağır ihmal, ölüm/bedensel " +
+    "zarar, dolandırıcılık ve emredici tüketici hakları tavanın dışında.",
+);
+w();
+w("### Avukatın teyit etmesi istenen üç nokta");
+w();
+w(
+  "1. **VERBİS.** Metin, gerçek kişi veri sorumlusu olarak kayıt " +
+    "yükümlülüğünden istisna tutulduğunu yazıyor. Uygulamanın kişiler " +
+    "hakkında değerlendirme tutması bu değerlendirmeyi değiştirir mi?",
 );
 w(
-  "- **ABD (CCPA/CPRA) ücretsiz telefon hattı kaldırıldı:** münhasıran çevrim " +
-    "içi faaliyet gösterilen ve ilgili kişiyle doğrudan ilişki bulunan hâlde " +
-    "yalnızca e-posta sunulması yeterli olduğundan metin bunu yazıyor. " +
-    "**Bu da avukat teyidi bekleyen bir noktadır.**",
+  "2. **ABD (CCPA/CPRA) ücretsiz telefon hattı.** Münhasıran çevrim içi " +
+    "faaliyet gösterilen ve ilgili kişiyle doğrudan ilişki bulunan hâlde " +
+    "yalnızca e-posta sunulmasının yeterli olduğu kabulüyle telefon satırı " +
+    "kaldırıldı.",
 );
 w(
-  "- **Tek açık alan: AB/AEA temsilcisi.** Uygulama tüm dünyada yayımlanacağı " +
-    "için GDPR m.27 uyarınca AB/AEA'da yerleşik bir temsilci atanması ve adının " +
-    "gizlilik politikasında yazması gerekiyor. Bu bir arama değil, bir atama " +
-    "işlemi — isim gelene kadar metinlerin üzerindeki uyarı kalkmıyor.",
-);w();
+  "3. **GDPR m.27 — AB/AEA temsilcisi.** Uygulama tüm dünyada yayımlanacak " +
+    "ancak temsilci atanmadı; bu, riski bilinerek alınmış ticari bir karardır " +
+    "(2026-08-25). Metin **olmayan bir temsilciyi varmış gibi göstermiyor**: " +
+    "ilgili cümle tamamen çıkarıldı ve AB/AEA talepleri doğrudan destek " +
+    "e-postasına yönlendirildi. Temsilci ileride atanırsa cümle gerçek bir " +
+    "isimle geri gelir.",
+);
+w();
 w("---");
 w();
 

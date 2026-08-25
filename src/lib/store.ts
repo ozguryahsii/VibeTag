@@ -10,6 +10,7 @@ import {
   type Entitlement,
   type StorePlatform,
 } from "@/lib/store-products";
+import { trialWriteFor } from "@/lib/trial";
 
 /**
  * The store side of billing: Apple App Store Server API and Google Play
@@ -172,6 +173,12 @@ export async function appleEntitlement(
       storeRef: originalTransactionId,
       active: last.status === 1 || last.status === 3,
       expiresAt: txn.expiresDate ? new Date(Number(txn.expiresDate)) : null,
+      // offerType 1 is the introductory offer. Newer payloads also carry
+      // offerDiscountType, which distinguishes a free trial from a discounted
+      // intro price — read both, since only the free one spends a trial.
+      inTrial:
+        Number(txn.offerType) === 1 ||
+        String(txn.offerDiscountType ?? "") === "FREE_TRIAL",
       environment,
     };
   }
@@ -231,7 +238,11 @@ export async function googleEntitlement(
   const data = (await res.json()) as {
     subscriptionState?: string;
     testPurchase?: unknown;
-    lineItems?: { productId?: string; expiryTime?: string }[];
+    lineItems?: {
+      productId?: string;
+      expiryTime?: string;
+      offerDetails?: { offerId?: string };
+    }[];
   };
   const line = data.lineItems?.[0];
   if (!line?.productId) return null;
@@ -245,6 +256,11 @@ export async function googleEntitlement(
       state === "SUBSCRIPTION_STATE_ACTIVE" ||
       state === "SUBSCRIPTION_STATE_IN_GRACE_PERIOD",
     expiresAt: line.expiryTime ? new Date(line.expiryTime) : null,
+    // Play has no "isTrial" field on subscriptionsv2; a trial arrives as an
+    // applied offer on the base plan. That holds only because the free trial
+    // is the sole offer we create — if a discount offer is ever added, this
+    // needs the offerId checked by name rather than by presence.
+    inTrial: Boolean(line.offerDetails?.offerId),
     environment: data.testPurchase !== undefined ? "Sandbox" : "Production",
   };
 }
@@ -315,19 +331,32 @@ export async function syncEntitlement(
 
   const current = await prisma.user.findUnique({
     where: { id: owner },
-    select: { plan: true, planUntil: true },
+    select: {
+      plan: true,
+      planUntil: true,
+      trialConsumedAt: true,
+      trialPlan: true,
+    },
   });
   if (!current) return { ok: false, reason: "NOT_FOUND" };
 
   const write = planWriteFor(ent, current, now);
-  if (write) {
+  // The trial is spent the first time a store reports one, whatever the plan
+  // write turns out to be — someone whose plan is already higher still used
+  // their one free week getting there.
+  const trial = trialWriteFor(ent, plan, current, now);
+
+  if (write || trial) {
     await prisma.user.update({
       where: { id: owner },
-      data: { plan: write.plan, planUntil: write.planUntil },
+      data: {
+        ...(write ? { plan: write.plan, planUntil: write.planUntil } : {}),
+        ...(trial ?? {}),
+      },
     });
-    if (write.plan !== "FREE" && current.plan !== write.plan) {
-      await notify(owner, "PLAN_GRANTED", { href: "/settings" });
-    }
+  }
+  if (write && write.plan !== "FREE" && current.plan !== write.plan) {
+    await notify(owner, "PLAN_GRANTED", { href: "/settings" });
   }
 
   const after = write ?? { plan: current.plan, planUntil: current.planUntil };

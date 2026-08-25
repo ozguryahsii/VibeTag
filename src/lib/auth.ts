@@ -61,6 +61,9 @@ export type SessionUser = {
   avatarUrl: string | null;
   avatarColor: string;
   plan: Plan;
+  /// The one free trial, and where it went. See `lib/trial.ts`.
+  trialConsumedAt: Date | null;
+  trialPlan: string | null;
   isVerified: boolean;
   emailVerifiedAt: Date | null;
   phoneVerifiedAt: Date | null;
@@ -100,6 +103,8 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     avatarUrl: u.avatarUrl,
     avatarColor: u.avatarColor,
     plan: u.plan as Plan,
+    trialConsumedAt: u.trialConsumedAt,
+    trialPlan: u.trialPlan,
     isVerified: u.isVerified,
     emailVerifiedAt: u.emailVerifiedAt,
     phoneVerifiedAt: u.phoneVerifiedAt,

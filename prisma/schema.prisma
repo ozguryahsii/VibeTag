@@ -43,6 +43,18 @@ model User {
   /// happens to look at it is not an expiry.
   planUntil DateTime?
 
+  /// The one free trial, spent.
+  ///
+  /// One per person for the lifetime of the account, across every plan: a
+  /// week of Silver and then a week of Gold is two free weeks, which is not
+  /// what a trial is for. Set the first time a store tells us a subscription
+  /// is in its introductory period, and never cleared — that is the whole
+  /// point of it.
+  trialConsumedAt DateTime?
+  /// Which plan the trial was spent on, so the membership screen can say so
+  /// rather than showing a bare "no longer eligible".
+  trialPlan       String?
+
   /// Trust signal used by fake-rating detection and shown as ✅ on profiles.
   /// True once any verification has been passed — today that means email.
   isVerified Boolean @default(false)

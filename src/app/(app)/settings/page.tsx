@@ -6,6 +6,7 @@ import { setCommentPolicyAction, toggleBlockAction } from "@/lib/actions/safety"
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { PhotoVault } from "@/components/PhotoVault";
 import { mainPhotoId, photoLimit } from "@/lib/photos";
+import { canStartTrial, trialStateFor } from "@/lib/trial";
 import { DeleteAccount } from "@/components/DeleteAccount";
 import { PushToggle } from "@/components/PushToggle";
 import { RedeemCode } from "@/components/RedeemCode";
@@ -114,6 +115,10 @@ export default async function SettingsPage() {
           {PLAN_KEYS.map((p) => {
             const plan = d.settings.plans[p.dict];
             const active = user.plan === p.key;
+            // One trial per account, not one per plan: once it is spent the
+            // badge has to stop appearing on *every* card, or the screen is
+            // promising something the rule will refuse.
+            const trial = trialStateFor(user, p.key);
             return (
               <div
                 key={p.key}
@@ -138,9 +143,14 @@ export default async function SettingsPage() {
                       <span className="block text-[14px] font-extrabold">
                         {plan.price}
                       </span>
-                      {plan.trial && (
+                      {trial.kind === "OFFER" && plan.trial && (
                         <span className="block text-[10.5px] font-bold text-orange">
                           {plan.trial}
+                        </span>
+                      )}
+                      {trial.kind === "SPENT" && (
+                        <span className="block text-[10.5px] font-semibold text-muted">
+                          {d.settings.trialSpentShort}
                         </span>
                       )}
                     </div>
@@ -173,7 +183,14 @@ export default async function SettingsPage() {
         </p>
         {!inShell && (
           <p className="text-[11.5px] text-muted mt-1.5 px-1 leading-relaxed">
-            {d.settings.trialNote}
+            {canStartTrial(user)
+              ? d.settings.trialNote
+              : fill(d.settings.trialSpent, {
+                  plan:
+                    d.settings.plans[
+                      (user.trialPlan ?? "").toLowerCase() as "silver" | "gold"
+                    ]?.name ?? user.trialPlan ?? "",
+                })}
           </p>
         )}
         {!inShell && (

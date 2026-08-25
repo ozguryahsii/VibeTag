@@ -695,7 +695,10 @@ export const en = {
     planNoteShell:
       "Plan management is coming here soon with in-app purchases.",
     trialNote:
-      "Silver and Gold can both be tried free for a week. Only one plan may be trialled at a time — you can't run a Silver trial then a Gold one.",
+      "You can try Silver or Gold free for a week. There is one trial per account: whichever you pick spends it, and the other plan cannot be trialled free afterwards.",
+    trialSpent:
+      "You used your free trial on {plan}. A trial is one per account, so this plan starts paid.",
+    trialSpentShort: "Trial already used",
     privacy: "Privacy and safety",
     whoCanComment: "Who can write you a note?",
     whoCanCommentBody:

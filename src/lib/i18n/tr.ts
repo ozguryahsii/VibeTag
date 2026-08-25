@@ -692,7 +692,10 @@ export const tr: Dictionary = {
     planNoteShell:
       "Planların yönetimi yakında uygulama içi satın alma ile burada olacak.",
     trialNote:
-      "Silver ve Gold'u bir hafta ücretsiz deneyebilirsin. Yalnızca bir üyelik tipi ücretsiz denenebilir — birini bitirmeden diğerine geçemezsin.",
+      "Silver veya Gold'u bir hafta ücretsiz deneyebilirsin. Deneme hakkı hesap başına birdir: hangisini denersen dene, o hakkını kullanmış olursun — sonradan diğerini ücretsiz deneyemezsin.",
+    trialSpent:
+      "Ücretsiz deneme hakkını {plan} üyelikte kullandın. Deneme hesap başına bir kezdir, o yüzden bu plan doğrudan ücretlidir.",
+    trialSpentShort: "Deneme hakkın kullanıldı",
     privacy: "Gizlilik ve güvenlik",
     whoCanComment: "Sana kimler yorum yapabilir?",
     whoCanCommentBody:

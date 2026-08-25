@@ -35,6 +35,9 @@ export type Entitlement = {
   storeRef: string;
   active: boolean;
   expiresAt: Date | null;
+  /// True while the subscription is in its free introductory period. This is
+  /// what spends somebody's one trial — see `lib/trial.ts`.
+  inTrial: boolean;
   environment: string;
 };
 

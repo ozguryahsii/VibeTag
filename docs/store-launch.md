@@ -189,14 +189,17 @@ Identifiers & Profiles → Keys → **+** → "Apple Push Notifications service
 sakla. Sunucudaki `.env`'e:
 
 ```
-APNS_KEY_P8="-----BEGIN PRIVATE KEY-----
-...
------END PRIVATE KEY-----"
+APNS_KEY_P8="<base64 -w0 AuthKey_XXXXXXXXXX.p8 çıktısı — tek satır>"
 APNS_KEY_ID="ABCD123456"      # anahtarın yanında yazan 10 karakter
 APNS_TEAM_ID="XYZ7890123"     # hesap sayfasındaki takım kimliği
 APNS_BUNDLE_ID="net.vibetag.app"
 APNS_ENV="sandbox"            # Xcode'dan kablolu telefonda test ederken
 ```
+
+`.p8` çok satırlı bir dosya ve çok satırlı değerler `.env` ayrıştırıcılarında
+sık sık bozulur — bozulunca da hata "anahtar yanlış" gibi görünür. Bu yüzden
+`APNS_KEY_P8` üç biçimi de kabul ediyor: dosyanın kendisi, satır sonları
+`\n` olarak düzleştirilmiş hâli, ve **base64'ü**. Sunucuda base64 kullan.
 
 `APNS_ENV` önemli: Xcode'dan çalıştırdığın derlemenin token'ı **sandbox**,
 TestFlight ve App Store derlemelerininki **production**. Yanlış olanına

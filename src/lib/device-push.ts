@@ -94,3 +94,34 @@ export function apnsTokenIsDead(
   }
   return false;
 }
+
+/**
+ * The APNs signing key, however it survived the trip into an env var.
+ *
+ * A .p8 is a multi-line PEM file, and every way of getting one into a
+ * deployed environment mangles it differently: Docker Compose's env_file
+ * parser has only handled quoted multi-line values since v2.17, shell
+ * exports collapse the newlines, and a dashboard field turns them into a
+ * literal backslash-n. All three produce a key that fails to parse with an
+ * error that reads like a wrong key rather than a mangled one.
+ *
+ * So three shapes are accepted and normalised to the same PEM:
+ *
+ *   - the file as-is, newlines intact
+ *   - the same thing with literal `\n` where the newlines were
+ *   - base64 of the whole file, which is one line and survives everything
+ *     (`base64 -w0 AuthKey_XXXXXXXXXX.p8`)
+ *
+ * Returns null for anything that is not a private key, so an unconfigured
+ * deployment stays inert instead of throwing on first notification.
+ */
+export function decodeApnsKey(raw: string | undefined | null): string | null {
+  const value = (raw ?? "").trim();
+  if (!value) return null;
+
+  const pem = value.includes("BEGIN")
+    ? value.replace(/\\n/g, "\n")
+    : Buffer.from(value, "base64").toString("utf8");
+
+  return pem.includes("BEGIN") && pem.includes("PRIVATE KEY") ? pem : null;
+}

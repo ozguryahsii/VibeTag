@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   DEVICE_PLATFORMS,
+  decodeApnsKey,
   apnsPayload,
   apnsTokenIsDead,
   isDevicePlatform,
@@ -128,5 +129,43 @@ describe("deciding a token is dead", () => {
   it("keeps the token on other 400s", () => {
     expect(apnsTokenIsDead(400, "BadTopic")).toBe(false);
     expect(apnsTokenIsDead(400, "PayloadEmpty")).toBe(false);
+  });
+});
+
+/**
+ * Getting the signing key into a deployed environment is where this fails in
+ * practice, not in the crypto. Every transport mangles a PEM differently and
+ * every failure surfaces as the same unhelpful "wrong key" — so the shapes
+ * are normalised here, and the normalisation is tested.
+ */
+describe("reading the APNs signing key", () => {
+  const PEM =
+    "-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49\nAgEGCCqGSM49AwEHBHkw\n-----END PRIVATE KEY-----\n";
+
+  it("takes the .p8 exactly as downloaded", () => {
+    expect(decodeApnsKey(PEM)).toContain("BEGIN PRIVATE KEY");
+  });
+
+  it("repairs newlines that were flattened to a literal backslash-n", () => {
+    const flattened = PEM.replace(/\n/g, "\\n");
+    expect(decodeApnsKey(flattened)).toBe(PEM);
+  });
+
+  it("takes base64 of the whole file, which is what survives a .env", () => {
+    const b64 = Buffer.from(PEM).toString("base64");
+    expect(decodeApnsKey(b64)).toBe(PEM);
+  });
+
+  /*
+   * An unconfigured deployment must stay inert rather than throw on the first
+   * notification somebody triggers — the same contract web push has without
+   * VAPID keys.
+   */
+  it("returns null for anything that is not a key", () => {
+    expect(decodeApnsKey(undefined)).toBeNull();
+    expect(decodeApnsKey("")).toBeNull();
+    expect(decodeApnsKey("   ")).toBeNull();
+    expect(decodeApnsKey("not-a-key")).toBeNull();
+    expect(decodeApnsKey(Buffer.from("hello").toString("base64"))).toBeNull();
   });
 });

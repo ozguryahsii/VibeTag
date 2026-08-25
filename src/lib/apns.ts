@@ -2,6 +2,7 @@ import "server-only";
 
 import http2 from "node:http2";
 import { createPrivateKey, sign as cryptoSign } from "node:crypto";
+import { decodeApnsKey } from "@/lib/device-push";
 
 /**
  * Apple Push Notification service.
@@ -15,7 +16,9 @@ import { createPrivateKey, sign as cryptoSign } from "node:crypto";
  * (Certificates, Identifiers & Profiles → Keys → + → Apple Push Notifications
  * service):
  *
- *   APNS_KEY_P8    the contents of the downloaded AuthKey_XXXX.p8
+ *   APNS_KEY_P8    the downloaded AuthKey_XXXX.p8 — the file as-is, or
+ *                  base64 of it (`base64 -w0 AuthKey_XXXX.p8`), which is one
+ *                  line and survives .env parsing everywhere
  *   APNS_KEY_ID    the 10-character key id shown next to it
  *   APNS_TEAM_ID   the 10-character team id from the account page
  *   APNS_BUNDLE_ID net.vibetag.app  (the topic; defaults to this)
@@ -30,7 +33,7 @@ import { createPrivateKey, sign as cryptoSign } from "node:crypto";
  * JWT. A dependency here would be more code to audit than the code it saves.
  */
 
-const keyP8 = process.env.APNS_KEY_P8?.trim();
+const keyP8 = decodeApnsKey(process.env.APNS_KEY_P8);
 const keyId = process.env.APNS_KEY_ID?.trim();
 const teamId = process.env.APNS_TEAM_ID?.trim();
 const bundleId = process.env.APNS_BUNDLE_ID?.trim() || "net.vibetag.app";

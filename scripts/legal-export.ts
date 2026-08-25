@@ -62,21 +62,23 @@ w();
 w(
   "- Metinler **2026-08-24 tarihinde avukat tarafından incelendi ve revize edildi.** " +
     "Bu dosya o revizyonun ta kendisidir. Henüz yürürlükte değil: köşeli parantezli " +
-    "alanlar (şirket unvanı, adres, MERSİS/VERBİS, ilgili e-postalar, yetkili mahkeme, " +
-    "ücretsiz kullanıcı sorumluluk tavanı) gerçek bilgilerle doldurulmadan yayımlanmaz. " +
-    "Uygulamada da bunu söyleyen kalıcı bir uyarı var.",
+    "alanlar gerçek bilgilerle doldurulmadan yayımlanmaz. Uygulamada da bunu " +
+    "söyleyen kalıcı bir uyarı var.",
 );
 w(
-  "- **Tüzel kişi bilgileri eksik.** Veri sorumlusu olarak yalnızca " +
-    "«[TÜZEL KİŞİ / İŞLETME UNVANI]» yazıyor; ticari unvan, adres, MERSİS ve VERBİS " +
-    "durumu doldurulacak. Metinde bunu belirten köşeli parantezler var.",
+  "- **Veri sorumlusu şahıstır, tüzel kişi değildir.** Köşeli parantezler buna " +
+    "göre yazıldı: «[AD SOYAD veya TİCARİ UNVAN]» ticari unvan alınmadıysa " +
+    "doğrudan ad soyad ile doldurulur; MERSİS, VERBİS ve KEP alanları «varsa / " +
+    "gerekiyorsa» notuyla duruyor, çünkü şahıs işletmesinde bunlar bulunmayabilir.",
 );
 w(
-  "- **Yayın öncesi doldurulacak diğer alanlar:** ilgili e-postalar (gizlilik, " +
-    "içerik bildirimleri, güvenlik, KVKK, itiraz, ABD talepleri, AB/AEA temsilcisi " +
-    "— tek adres mi yoksa ayrı ayrı mı olacağına karar verilecek), tüketici " +
-    "olmayanlar için yetkili mahkeme şehri, ücretsiz kullanıcılar için sorumluluk " +
-    "tavanı tutarı, ve varsa KEP/posta adresi.",
+  "- **Yayın öncesi doldurulacak alanlar:** ad soyad ya da ticari unvan, tebligat " +
+    "adresi (KVKK m.10 aydınlatma yükümlülüğü bunu zorunlu kılar; ev adresi " +
+    "yayımlamamak için sanal ofis ya da mali müşavir adresi tercih edilebilir), " +
+    "tüketici olmayanlar için yetkili mahkeme şehri, ücretsiz kullanıcılar için " +
+    "sorumluluk tavanı tutarı, ilgili e-postalar (tek adres mi ayrı adresler mi), " +
+    "ve mağazalarda hangi ülkelerde yayına çıkılacağı — yalnızca Türkiye " +
+    "seçilirse ABD ve AB/AEA alanlarının doldurulmasına gerek kalmaz.",
 );
 w();
 w("---");

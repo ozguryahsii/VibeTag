@@ -8,14 +8,17 @@ import type { Locale } from "@/lib/i18n/config";
  * closely — structure, legal bases, the ABD/DSA sections, the breach and
  * automation language are theirs, not a paraphrase.
  *
- * It is **not yet in force.** Bracketed placeholders — `[LEGAL ENTITY NAME]`
- * and the rest — stand in for facts only Özgür can supply: the registered
- * business name and address, MERSİS/VERBİS status, which mailbox handles
- * which kind of request, the jurisdiction for disputes, the liability cap
- * for free users. The standing notice on the page says so, and it stays
- * until every bracket is filled and counsel has signed off on the filled
- * version — a placeholder shipped as if it were an answer is worse than an
- * honest gap.
+ * It is **not yet in force.** Bracketed placeholders stand in for facts only
+ * Özgür can supply. They are deliberately worded for a sole trader, not a
+ * company: `[AD SOYAD veya TİCARİ UNVAN]` takes his own name unless he
+ * registers a trading name, `[TEBLİGAT ADRESİ]` an address that can receive
+ * legal notice, and MERSİS/VERBİS/KEP are marked *if any* because a private
+ * individual may have none of them. What is left after that is the venue
+ * city for non-consumer disputes, the liability cap for free users, and
+ * which mailbox handles which kind of request. The standing notice on the
+ * page says the texts are unpublished, and it stays until every bracket is
+ * filled and counsel has signed off on the filled version — a placeholder
+ * shipped as if it were an answer is worse than an honest gap.
  *
  * When the product changes, these change with it. The rule of thumb: if a new
  * column stores something about a person, it belongs in the data list below.
@@ -50,7 +53,7 @@ const trPrivacy: LegalDoc = {
     {
       heading: "Kimiz ve kapsam",
       body: [
-        "Bu politika, [TÜZEL KİŞİ / İŞLETME UNVANI] (“Vibe Tag”, “biz”) tarafından sunulan Vibe Tag uygulaması ve bağlantılı hizmetlerde kişisel verilerin işlenmesini açıklar. Veri sorumlusu/işletmeci: [TÜZEL KİŞİ / İŞLETME UNVANI]; adres: [İŞLETME ADRESİ]; MERSİS: [MERSİS NO — VARSA]; VERBİS: [VERBİS KAYIT DURUMU]; gizlilik: {email}; içerik bildirimleri: {email}. GDPR m.27 temsilcisi gerekiyorsa: [AB/AEA TEMSİLCİSİ].",
+        "Bu politika, [AD SOYAD veya TİCARİ UNVAN] (“Vibe Tag”, “biz”) tarafından sunulan Vibe Tag uygulaması ve bağlantılı hizmetlerde kişisel verilerin işlenmesini açıklar. Veri sorumlusu/işletmeci: [AD SOYAD veya TİCARİ UNVAN]; adres: [TEBLİGAT ADRESİ]; MERSİS: [MERSİS NO — VARSA]; VERBİS: [VERBİS KAYDI — GEREKİYORSA]; gizlilik: {email}; içerik bildirimleri: {email}. GDPR m.27 temsilcisi gerekiyorsa: [AB/AEA TEMSİLCİSİ].",
         "App Store, Google Play ve bağlantı verilen bağımsız hizmetlerin kendi veri uygulamaları bu politikanın dışındadır.",
       ],
     },
@@ -134,7 +137,7 @@ const trPrivacy: LegalDoc = {
       heading: "Çocuklar ve değişiklikler",
       body: [
         "Hizmet yalnızca 18+ içindir. 18 yaş altından bilerek hesap açmayız. Böyle bir hesabı öğrenirsek askıya alır, doğrular ve kanunen gerekenler dışında veriyi sileriz. Ebeveyn/vasi {email}'dan bildirebilir. 18+ sınırı yaş beyanı ve risk bazlı yaş güvencesiyle uygulanır; COPPA ve AB çocuk kuralları bertaraf edilmiş varsayılmaz.",
-        "Önemli politika değişikliklerini önceden uygun yöntemle bildirir; rıza gereken yeni amaçta yeniden rıza alırız. İletişim: {email}, [İŞLETME ADRESİ].",
+        "Önemli politika değişikliklerini önceden uygun yöntemle bildirir; rıza gereken yeni amaçta yeniden rıza alırız. İletişim: {email}, [TEBLİGAT ADRESİ].",
       ],
     },
   ],
@@ -149,7 +152,7 @@ const trKvkk: LegalDoc = {
     {
       heading: "Veri sorumlusu",
       body: [
-        "Veri sorumlusu: [TÜZEL KİŞİ / İŞLETME UNVANI] (“Vibe Tag”). Adres: [İŞLETME ADRESİ]; MERSİS: [MERSİS NO — VARSA]; VERBİS: [VERBİS KAYIT DURUMU]; başvuru e-postası: {email}; KEP/posta/form: [KEP / POSTA ADRESİ — VARSA].",
+        "Veri sorumlusu: [AD SOYAD veya TİCARİ UNVAN] (“Vibe Tag”). Adres: [TEBLİGAT ADRESİ]; MERSİS: [MERSİS NO — VARSA]; VERBİS: [VERBİS KAYDI — GEREKİYORSA]; başvuru e-postası: {email}; KEP/posta/form: [KEP / POSTA ADRESİ — VARSA].",
       ],
     },
     {
@@ -224,7 +227,7 @@ const trTerms: LegalDoc = {
     {
       heading: "Taraflar, kabul ve hizmet",
       body: [
-        "Bu şartlar [TÜZEL KİŞİ / İŞLETME UNVANI], [İŞLETME ADRESİ] (“Vibe Tag”) ile kullanıcı arasındadır. Hesap açarak bu şartları, Gizlilik Politikasını ve topluluk/moderasyon kurallarını kabul edersin. Emredici tüketici hakları saklıdır. Vibe Tag öznel sosyal değerlendirme platformudur; işe alım, kredi, sigorta, konut, eğitim, sağlık, referans veya yüksek etkili karar aracı değildir.",
+        "Bu şartlar [AD SOYAD veya TİCARİ UNVAN], [TEBLİGAT ADRESİ] (“Vibe Tag”) ile kullanıcı arasındadır. Hesap açarak bu şartları, Gizlilik Politikasını ve topluluk/moderasyon kurallarını kabul edersin. Emredici tüketici hakları saklıdır. Vibe Tag öznel sosyal değerlendirme platformudur; işe alım, kredi, sigorta, konut, eğitim, sağlık, referans veya yüksek etkili karar aracı değildir.",
       ],
     },
     {
@@ -312,7 +315,7 @@ const trTerms: LegalDoc = {
       heading: "Hukuk, uyuşmazlık ve değişiklik",
       body: [
         "Önce {email} üzerinden iyi niyetli çözüm aranır. Türkiye hukuku uygulanır. Türkiye'deki tüketici, yerleşim veya işlem yerindeki hakem heyeti/tüketici mahkemesi dâhil kanunen yetkili mercilere başvurabilirsin. Tüketici olmayanlarda [YETKİLİ MAHKEME ŞEHRİ] mahkeme/icra daireleri yetkilidir. Yabancı tüketicinin ikamet yerindeki vazgeçilemeyen koruma ve yetki hakları saklıdır. Zorunlu tahkim veya toplu dava feragati yoktur.",
-        "Önemli değişiklikler önceden uygun yöntemle bildirilir; yeni rıza/açık kabul gerekiyorsa ayrıca alınır. Sırf kullanıma devam, açık kabul gereken durumda yeterli değildir. Geçersiz hüküm diğerlerini etkilemez; hak kullanılmaması feragat değildir. İletişim: {email}, [İŞLETME ADRESİ].",
+        "Önemli değişiklikler önceden uygun yöntemle bildirilir; yeni rıza/açık kabul gerekiyorsa ayrıca alınır. Sırf kullanıma devam, açık kabul gereken durumda yeterli değildir. Geçersiz hüküm diğerlerini etkilemez; hak kullanılmaması feragat değildir. İletişim: {email}, [TEBLİGAT ADRESİ].",
       ],
     },
   ],
@@ -330,7 +333,7 @@ const enPrivacy: LegalDoc = {
     {
       heading: "Who we are and scope",
       body: [
-        "This policy explains how personal data is processed in the Vibe Tag app and connected services, offered by [LEGAL ENTITY / BUSINESS NAME] (“Vibe Tag”, “we”). Data controller/operator: [LEGAL ENTITY / BUSINESS NAME]; address: [BUSINESS ADDRESS]; MERSİS: [MERSİS NUMBER — IF ANY]; VERBİS: [VERBİS REGISTRATION STATUS]; privacy: {email}; content notices: {email}. GDPR Art. 27 representative, if required: [EU/EEA REPRESENTATIVE].",
+        "This policy explains how personal data is processed in the Vibe Tag app and connected services, offered by [FULL NAME or REGISTERED BUSINESS NAME] (“Vibe Tag”, “we”). Data controller/operator: [FULL NAME or REGISTERED BUSINESS NAME]; address: [ADDRESS FOR NOTICES]; MERSİS: [MERSİS NUMBER — IF ANY]; VERBİS: [VERBİS REGISTRATION — IF REQUIRED]; privacy: {email}; content notices: {email}. GDPR Art. 27 representative, if required: [EU/EEA REPRESENTATIVE].",
         "The App Store, Google Play and any independent linked services have their own data practices, outside this policy.",
       ],
     },
@@ -414,7 +417,7 @@ const enPrivacy: LegalDoc = {
       heading: "Children and changes",
       body: [
         "The service is for 18+ only. We do not knowingly open an account for anyone under 18. If we learn of one, we suspend it, verify age, and delete the data except where the law requires otherwise. A parent/guardian may notify {email}. The 18+ line is enforced with an age declaration and risk-based age assurance; COPPA and EU children's rules are not assumed away.",
-        "Material policy changes are announced in advance through an appropriate channel; where a new purpose needs consent, we ask for it again. Contact: {email}, [BUSINESS ADDRESS].",
+        "Material policy changes are announced in advance through an appropriate channel; where a new purpose needs consent, we ask for it again. Contact: {email}, [ADDRESS FOR NOTICES].",
       ],
     },
   ],
@@ -430,7 +433,7 @@ const enKvkk: LegalDoc = {
     {
       heading: "Data controller",
       body: [
-        "Data controller: [LEGAL ENTITY / BUSINESS NAME] (“Vibe Tag”). Address: [BUSINESS ADDRESS]; MERSİS: [MERSİS NUMBER — IF ANY]; VERBİS: [VERBİS REGISTRATION STATUS]; request email: {email}; registered e-mail/post/form: [KEP ADDRESS / POSTAL ADDRESS — IF ANY].",
+        "Data controller: [FULL NAME or REGISTERED BUSINESS NAME] (“Vibe Tag”). Address: [ADDRESS FOR NOTICES]; MERSİS: [MERSİS NUMBER — IF ANY]; VERBİS: [VERBİS REGISTRATION — IF REQUIRED]; request email: {email}; registered e-mail/post/form: [KEP ADDRESS / POSTAL ADDRESS — IF ANY].",
       ],
     },
     {
@@ -505,7 +508,7 @@ const enTerms: LegalDoc = {
     {
       heading: "Parties, acceptance and the service",
       body: [
-        "These terms are between [LEGAL ENTITY / BUSINESS NAME], [BUSINESS ADDRESS] (“Vibe Tag”) and the user. Opening an account means accepting these terms, the Privacy Policy, and the community/moderation rules. Mandatory consumer rights are reserved. Vibe Tag is a subjective social-rating platform; it is not a hiring, credit, insurance, housing, education, health, reference-check or other high-impact decision tool.",
+        "These terms are between [FULL NAME or REGISTERED BUSINESS NAME], [ADDRESS FOR NOTICES] (“Vibe Tag”) and the user. Opening an account means accepting these terms, the Privacy Policy, and the community/moderation rules. Mandatory consumer rights are reserved. Vibe Tag is a subjective social-rating platform; it is not a hiring, credit, insurance, housing, education, health, reference-check or other high-impact decision tool.",
       ],
     },
     {
@@ -593,7 +596,7 @@ const enTerms: LegalDoc = {
       heading: "Governing law, disputes and changes",
       body: [
         "A good-faith resolution is sought first via {email}. Turkish law applies. You may apply to the competent bodies under the law, including the consumer arbitration board/consumer court in Türkiye at your place of residence or where the transaction occurred. For non-consumers, the courts/enforcement offices of [VENUE CITY] have jurisdiction. A foreign consumer's non-waivable protections and jurisdiction at their place of residence are reserved. There is no mandatory arbitration or class-action waiver.",
-        "Material changes are announced in advance through an appropriate channel; where new consent/explicit acceptance is required, it is obtained separately. Continued use alone is not sufficient where explicit acceptance is required. An invalid clause does not affect the rest; not exercising a right is not a waiver. Contact: {email}, [BUSINESS ADDRESS].",
+        "Material changes are announced in advance through an appropriate channel; where new consent/explicit acceptance is required, it is obtained separately. Continued use alone is not sufficient where explicit acceptance is required. An invalid clause does not affect the rest; not exercising a right is not a waiver. Contact: {email}, [ADDRESS FOR NOTICES].",
       ],
     },
   ],

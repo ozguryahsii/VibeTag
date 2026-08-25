@@ -12,6 +12,7 @@ export const en = {
     continue: "Continue",
     save: "Save",
     saving: "Saving…",
+    retry: "Try again",
     close: "Close",
     send: "Send",
     sending: "Sending…",

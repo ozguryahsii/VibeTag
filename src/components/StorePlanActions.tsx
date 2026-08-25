@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useD } from "@/components/LocaleProvider";
 import { fill } from "@/lib/i18n";
@@ -37,31 +37,35 @@ export function StorePlanActions({
   // somebody has to be told about — a card that silently drops its own buy
   // button is the kind of failure that gets shipped.
   const [price, setPrice] = useState<string | null>(null);
-  const [lookup, setLookup] = useState<"loading" | "ready" | "empty">("loading");
+  const [lookup, setLookup] = useState<
+    "loading" | "ready" | "empty" | "no-billing"
+  >("loading");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    void (async () => {
-      if (!(await billingAvailable())) {
-        if (!cancelled) setLookup("empty");
-        return;
-      }
-      const products = await fetchProducts([productId]);
-      if (cancelled) return;
-      const found = products.find((p) => p.identifier === productId);
-      if (found) {
-        setPrice(found.priceString);
-        setLookup("ready");
-      } else {
-        setLookup("empty");
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+  const load = useCallback(async () => {
+    setLookup("loading");
+    // No billing on this device at all — parental controls, a managed
+    // device. There is nothing to offer and nothing to explain, so the card
+    // stays as it is rather than reporting a fault about a shop that was
+    // never open.
+    if (!(await billingAvailable())) {
+      setLookup("no-billing");
+      return;
+    }
+    const products = await fetchProducts([productId]);
+    const found = products.find((p) => p.identifier === productId);
+    if (found) {
+      setPrice(found.priceString);
+      setLookup("ready");
+    } else {
+      setLookup("empty");
+    }
   }, [productId]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   async function purchase() {
     setBusy(true);
@@ -73,20 +77,32 @@ export function StorePlanActions({
     if (outcome.kind === "OK") router.refresh();
   }
 
-  if (active || lookup === "loading") return null;
+  if (active || lookup === "loading" || lookup === "no-billing") return null;
 
   /*
-   * The store knows nothing about this product id. Every cause is on the
-   * store's side — the paid-apps agreement not active yet, the product not
-   * out of "Missing Metadata", a freshly created product Apple has not
-   * propagated — and none of them is something the reader can fix. Say the
-   * price is unavailable rather than pretending the plan is not for sale.
+   * Billing works but the store returned nothing for this id. In production
+   * that is a network blip; the rest of the time it is our own configuration
+   * — an agreement not active, a product still in Missing Metadata.
+   *
+   * Silence was the wrong answer: a card with no button reads as "this plan
+   * is not for sale", which is a different and untrue statement. A bare
+   * apology is not much better, so the message comes with the one action
+   * that ever helps.
    */
   if (!price) {
     return (
-      <p className="mt-4 text-[12px] text-muted leading-relaxed">
-        {d.store.priceUnavailable}
-      </p>
+      <div className="mt-4">
+        <p className="text-[12px] text-muted leading-relaxed">
+          {d.store.priceUnavailable}
+        </p>
+        <button
+          type="button"
+          onClick={() => void load()}
+          className="mt-2 h-9 px-4 rounded-full bg-white border border-line font-bold text-[12.5px] text-muted"
+        >
+          {d.common.retry}
+        </button>
+      </div>
     );
   }
 

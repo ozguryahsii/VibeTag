@@ -9,6 +9,7 @@ export const tr: Dictionary = {
     continue: "Devam et",
     save: "Kaydet",
     saving: "Kaydediliyor…",
+    retry: "Tekrar dene",
     close: "Kapat",
     send: "Gönder",
     sending: "Gönderiliyor…",

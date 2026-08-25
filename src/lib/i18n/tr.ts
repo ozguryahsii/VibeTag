@@ -19,6 +19,7 @@ export const tr: Dictionary = {
     no: "Hayır, kalsın",
     anonymous: "Anonim",
     people: "kişi",
+    person: "kişi",
     ratedBy: "Değerlendiren",
     optional: "isteğe bağlı",
     loading: "Yükleniyor…",

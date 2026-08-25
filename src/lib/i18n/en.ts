@@ -22,6 +22,7 @@ export const en = {
     no: "No, keep",
     anonymous: "Anonymous",
     people: "people",
+    person: "person",
     ratedBy: "Rated by",
     optional: "optional",
     loading: "Loading…",

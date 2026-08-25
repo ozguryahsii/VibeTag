@@ -1,7 +1,7 @@
 import { iconFor } from "@/lib/icons";
 import { bandFor, type CardBand } from "@/lib/card-bands";
 import { fill, type Dictionary } from "@/lib/i18n";
-import { topTags } from "@/lib/card-tags";
+import { topTags, peopleWord } from "@/lib/card-tags";
 import { initialsOf } from "@/components/Avatar";
 import { SCENES } from "@/components/card/scenes";
 import type { CardLayoutKind, Scene } from "@/components/card/scene";
@@ -686,7 +686,7 @@ export function drawCard({
   ctx.font = sans(500, u * (layout === "editorial" ? 0.035 : 0.038));
   ctx.fillStyle = p.ink;
   ctx.fillText(
-    `${data.ratingCount} ${d.common.people}`,
+    `${data.ratingCount} ${peopleWord(data.ratingCount, d.common)}`,
     textX,
     footY + u * 0.026,
     cardX + cardW - u * 0.07 - textX,

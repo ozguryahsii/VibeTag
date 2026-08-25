@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { peopleWord } from "@/lib/card-tags";
 import { CARD_BANDS, bandFor } from "@/lib/card-bands";
 import { SCENES } from "@/components/card/scenes";
 
@@ -57,5 +58,39 @@ describe("card bands", () => {
     const rays = CARD_BANDS.map((b) => SCENES[b.key].palette.rays !== null);
     expect(rays.slice(0, 6).some(Boolean)).toBe(false);
     expect(rays.slice(6).every(Boolean)).toBe(true);
+  });
+});
+
+/**
+ * "Rated by 1 people".
+ *
+ * That is what the card said at one rater — which is the state every new
+ * account is in, and the state anybody screenshotting the app for a store
+ * listing is most likely to catch. The card is drawn onto a canvas, so
+ * nothing about it can be asserted after the fact; the wording is only
+ * checkable if it lives outside the drawing.
+ */
+describe("counting raters on the card", () => {
+  const en = { people: "people", person: "person" };
+  const tr = { people: "kişi", person: "kişi" };
+
+  it("uses the singular at exactly one", () => {
+    expect(peopleWord(1, en)).toBe("person");
+  });
+
+  it("uses the plural everywhere else, zero included", () => {
+    expect(peopleWord(0, en)).toBe("people");
+    expect(peopleWord(2, en)).toBe("people");
+    expect(peopleWord(47, en)).toBe("people");
+  });
+
+  /*
+   * Turkish does not pluralise a noun after a number — "1 kişi", "7 kişi" —
+   * so both words are the same and the rule quietly does nothing there.
+   * Asserted so that a future "fix" does not introduce "kişiler".
+   */
+  it("says the same thing either way in Turkish", () => {
+    expect(peopleWord(1, tr)).toBe("kişi");
+    expect(peopleWord(7, tr)).toBe("kişi");
   });
 });

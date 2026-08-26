@@ -87,7 +87,17 @@ export type ApnsResult = {
   ok: boolean;
   status: number;
   reason?: string;
-  /** True when the token was minted for the environment we sent to. */
+  /**
+   * Whether a `BadDeviceToken` from this host may be taken at face value.
+   *
+   * We do not record which environment a token was minted in — the app
+   * cannot reliably tell us — so this is decided by which host we are
+   * talking to. A production server that gets BadDeviceToken is hearing
+   * about a genuinely dead token. A server pointed at sandbox is the
+   * temporary, testing configuration, and the same answer there most likely
+   * means somebody left APNS_ENV set wrong; deleting every real device over
+   * that would be a permanent price for a temporary mistake.
+   */
   environmentMatches: boolean;
 };
 
@@ -104,7 +114,12 @@ export async function sendApns(
   opts: { collapseId?: string } = {},
 ): Promise<ApnsResult> {
   if (!apnsConfigured) {
-    return { ok: false, status: 0, reason: "NotConfigured", environmentMatches: true };
+    return {
+      ok: false,
+      status: 0,
+      reason: "NotConfigured",
+      environmentMatches: false,
+    };
   }
 
   const client = http2.connect(host);
@@ -148,7 +163,7 @@ export async function sendApns(
           ok: status === 200,
           status,
           reason,
-          environmentMatches: true,
+          environmentMatches: !sandbox,
         });
       });
 

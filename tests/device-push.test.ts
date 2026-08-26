@@ -118,6 +118,11 @@ describe("deciding a token is dead", () => {
    * response.
    */
   it("only deletes on BadDeviceToken when the environment matches", () => {
+    // `environmentMatches` is supplied by apns.ts as `!sandbox`: a production
+    // host reporting BadDeviceToken is describing a dead token, while a host
+    // pointed at sandbox is far more likely to be a wrong APNS_ENV. This flag
+    // was hardcoded true for a while, which made the branch below unreachable
+    // and the protection imaginary.
     expect(
       apnsTokenIsDead(400, "BadDeviceToken", { environmentMatches: true }),
     ).toBe(true);

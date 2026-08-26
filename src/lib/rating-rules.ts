@@ -59,3 +59,33 @@ export function canSeeRaterIdentity(
 ): boolean {
   return viewerPlan === "GOLD" && !rating.isProtected && !rating.hideIdentity;
 }
+
+/**
+ * The visibility ladder under identity (decided 2026-08-26).
+ *
+ * Everyone sees the ratings they received in full detail — the scores, the
+ * tags, the comment. What the plan buys is knowing more about the person
+ * behind one: Silver adds the relationship it came from ("work colleague"),
+ * Gold adds the name. Free sees neither, only "Anonymous".
+ *
+ * Pure and string-typed like `canSeeRaterIdentity`, and for the same reason:
+ * these are asked wherever a rating row renders, and an inline `plan !==`
+ * check in one of those places drifting is how a Free member quietly starts
+ * reading relationships they did not pay to see.
+ */
+export function canSeeRatingContext(viewerPlan: string): boolean {
+  return viewerPlan === "SILVER" || viewerPlan === "GOLD";
+}
+
+/**
+ * May this viewer open a message thread to an anonymous rater?
+ *
+ * Silver and up. The thread stays anonymous either way — `anonymousSide` is
+ * sealed by `canSeeRaterIdentity` when the conversation is created — this
+ * rule only decides who gets the door at all. It is enforced server-side in
+ * `openRatingThreadAction`; the button the page shows must agree with it,
+ * which is why both read the same function.
+ */
+export function canMessageRater(viewerPlan: string): boolean {
+  return viewerPlan === "SILVER" || viewerPlan === "GOLD";
+}

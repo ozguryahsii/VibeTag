@@ -94,6 +94,17 @@ name, because "roll back to the previous one" then has no answer either.
 Version numbering: minor bump (`v1.2` → `v1.3`) for a normal feature package,
 patch (`v1.2.1`) for a fix on its own. Current: **v2.17**.
 
+## No shelf — a change is tagged or it does not exist
+
+Added 2026-08-26, in Özgür's words: "Bir şey ya tag'e girip çıkmıştır, ya da
+hiç yoktur." Do not let finished commits pile up behind the last tag. When
+work is done and pushed, the very same message that reports it done says it
+is not yet in any tag — not the message three deploys later, when the
+commits resurface inside an unrelated tag's contents as a surprise. And when
+a tag is cut, everything on the branch since the previous tag is simply what
+the tag contains; never present already-landed commits as optional extras to
+negotiate at deploy time.
+
 ## Docker build-cache cap — do not remove
 
 At several deploys a day, a periodic prune (cron, "check before each deploy")

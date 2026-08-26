@@ -9,7 +9,11 @@ import { groupIconFor } from "@/lib/icons";
 import { IconGlyph, TraitIcon } from "@/components/Icon";
 import { ReportDialog } from "@/components/ReportDialog";
 import { openRatingThreadAction } from "@/lib/actions/social";
-import { canSeeRaterIdentity } from "@/lib/rating-rules";
+import {
+  canMessageRater,
+  canSeeRaterIdentity,
+  canSeeRatingContext,
+} from "@/lib/rating-rules";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n/config";
@@ -35,9 +39,13 @@ export default async function InsightsPage() {
 
   const isSilver = hasPlan(me, "SILVER");
   const isGold = hasPlan(me, "GOLD");
+  const showContext = canSeeRatingContext(me.plan);
+  const mayMessage = canMessageRater(me.plan);
 
-  const details = isSilver
-    ? await prisma.rating.findMany({
+  // Every plan gets the list itself (decided 2026-08-26) — what varies per
+  // row is how much of the person behind a rating is shown: the relationship
+  // from Silver, the name from Gold (§15).
+  const details = await prisma.rating.findMany({
         where: { ratedUserId: me.id, hiddenAt: null },
         select: {
           id: true,
@@ -59,8 +67,7 @@ export default async function InsightsPage() {
         },
         orderBy: { createdAt: "desc" },
         take: 25,
-      })
-    : [];
+      });
 
   const strong = strongestTraits(profile, 3);
   const growth = growthAreas(profile, 2);
@@ -220,7 +227,10 @@ export default async function InsightsPage() {
               </Card>
             </div>
 
-            <div className="mt-6">
+          </Gate>
+
+          {/* ------------------------------------- RATINGS, every plan */}
+          <section className="mt-6 reveal">
               <SectionTitle>
                 {isGold ? d.insights.ratings : d.insights.anonDetails}
               </SectionTitle>
@@ -259,11 +269,16 @@ export default async function InsightsPage() {
                             </span>
                             <div>
                               <p className="text-[13.5px] font-extrabold">
-                                Anonim
+                                {d.common.anonymous}
                               </p>
-                              <p className="text-[11.5px] text-muted">
-                                {relName}
-                              </p>
+                              {/* The relationship is Silver knowledge; on
+                                  Free the row says only that someone rated
+                                  them, never from where. */}
+                              {showContext && (
+                                <p className="text-[11.5px] text-muted">
+                                  {relName}
+                                </p>
+                              )}
                             </div>
                           </>
                         )}
@@ -312,12 +327,21 @@ export default async function InsightsPage() {
                           Turkish label pushes its own pill wider than the
                           grid and spills over the card edge on a phone. */}
                       <div className="mt-3 grid grid-cols-2 gap-2">
-                        <form action={openRatingThreadAction} className="min-w-0">
-                          <input type="hidden" name="ratingId" value={row.id} />
-                          <button className="h-9 w-full min-w-0 truncate rounded-full px-2.5 text-[11px] font-bold text-orange bg-tagbg border border-orange/25 active:scale-[0.97] transition-transform">
-                            {d.messages.newFromRating}
-                          </button>
-                        </form>
+                        {mayMessage ? (
+                          <form action={openRatingThreadAction} className="min-w-0">
+                            <input type="hidden" name="ratingId" value={row.id} />
+                            <button className="h-9 w-full min-w-0 truncate rounded-full px-2.5 text-[11px] font-bold text-orange bg-tagbg border border-orange/25 active:scale-[0.97] transition-transform">
+                              {d.messages.newFromRating}
+                            </button>
+                          </form>
+                        ) : (
+                          <Link
+                            href="/settings"
+                            className="h-9 min-w-0 truncate rounded-full px-2.5 text-[11px] font-bold text-muted bg-cream border border-line inline-flex items-center justify-center"
+                          >
+                            {d.insights.messageLocked}
+                          </Link>
+                        )}
                         <ReportDialog
                           ratingId={row.id}
                           label={d.insights.reportRating}
@@ -335,8 +359,7 @@ export default async function InsightsPage() {
                   );
                 })}
               </div>
-            </div>
-          </Gate>
+          </section>
 
           {/* ------------------------------------------------ GOLD */}
           {isSilver && !isGold && (

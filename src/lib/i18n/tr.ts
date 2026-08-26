@@ -336,6 +336,7 @@ export const tr: Dictionary = {
     growth: "GELİŞİM ALANLARI",
     anonDetails: "Anonim oy detayları",
     ratings: "Değerlendirmeler",
+    messageLocked: "🔒 Anonime mesaj · Silver",
     unlockWith: "{plan} ile aç",
     protectedNote:
       "🔒 Bu değerlendirmenin kimliği sistem tarafından korunuyor — Gold üyelikte de görünmez.",
@@ -753,6 +754,7 @@ export const tr: Dictionary = {
           "Vibe Score ve Vibe Tags",
           "Vibe Card oluşturma",
           "Herkesi değerlendirme, herkesten değerlendirme",
+          "Sana verilen puanların detayı (anonim)",
           "Yakındakilere konumunu açma",
         ],
       },
@@ -763,10 +765,10 @@ export const tr: Dictionary = {
         trial: "İlk hafta ücretsiz",
         perks: [
           "Seni hangi çevrelerden tanıyorlar",
+          "Her puanın hangi ilişkiden geldiği",
           "Güçlü yönler ve gelişim alanları",
-          "Anonim oy detayları",
           "Yakınındaki üyeleri görme",
-          "Seni değerlendirenlere mesaj",
+          "Anonim değerlendirenlere mesaj",
         ],
       },
       gold: {

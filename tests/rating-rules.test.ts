@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { canSeeRaterIdentity, commentAllowed, cooldownDaysLeft, nextUpdateDate } from "@/lib/rating-rules";
+import {
+  canMessageRater,
+  canSeeRaterIdentity,
+  canSeeRatingContext,
+  commentAllowed,
+  cooldownDaysLeft,
+  nextUpdateDate,
+} from "@/lib/rating-rules";
 import { RATING_UPDATE_COOLDOWN_DAYS } from "@/lib/taxonomy";
 
 const DAY = 86_400_000;
@@ -100,5 +107,37 @@ describe("who may write a note", () => {
 
   it("falls back to open on an unknown value rather than locking a profile", () => {
     expect(commentAllowed("WHATEVER", nobody)).toBe(true);
+  });
+});
+
+/**
+ * The ladder under identity (decided 2026-08-26).
+ *
+ * Everyone reads the ratings they received in full detail; the plans buy
+ * knowledge about the person behind one. Silver adds the relationship and
+ * the right to message the anonymous rater; Gold adds the name (§15 above).
+ * Like anonymity itself, this breaks silently — a Free member shown a
+ * relationship line looks perfectly normal on screen — so the rules live in
+ * one place and are pinned here.
+ */
+describe("what each plan knows about a rating's author", () => {
+  it("hides the relationship from Free", () => {
+    expect(canSeeRatingContext("FREE")).toBe(false);
+  });
+
+  it("shows the relationship from Silver up", () => {
+    expect(canSeeRatingContext("SILVER")).toBe(true);
+    expect(canSeeRatingContext("GOLD")).toBe(true);
+  });
+
+  it("reserves messaging the anonymous rater for Silver and Gold", () => {
+    expect(canMessageRater("FREE")).toBe(false);
+    expect(canMessageRater("SILVER")).toBe(true);
+    expect(canMessageRater("GOLD")).toBe(true);
+  });
+
+  it("treats an unknown plan value as Free", () => {
+    expect(canSeeRatingContext("")).toBe(false);
+    expect(canMessageRater("PLATINUM")).toBe(false);
   });
 });

@@ -3,11 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { hasPlan, requireUser } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import { getDict } from "@/lib/i18n/server";
 import { moderateComment } from "@/lib/moderation";
 import { notify } from "@/lib/notifications";
-import { canSeeRaterIdentity } from "@/lib/rating-rules";
+import { canMessageRater, canSeeRaterIdentity } from "@/lib/rating-rules";
 import {
   areFriends,
   canSendInConversation,
@@ -234,7 +234,7 @@ export async function openRatingThreadAction(
   formData: FormData,
 ): Promise<void> {
   const me = await requireUser();
-  if (!hasPlan(me, "SILVER")) redirect("/settings");
+  if (!canMessageRater(me.plan)) redirect("/settings");
 
   const ratingId = String(formData.get("ratingId") ?? "");
   const rating = await prisma.rating.findUnique({

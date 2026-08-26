@@ -339,6 +339,7 @@ export const en = {
     growth: "GROWTH AREAS",
     anonDetails: "Anonymous rating details",
     ratings: "Ratings",
+    messageLocked: "🔒 Message rater · Silver",
     unlockWith: "Unlock with {plan}",
     protectedNote:
       "🔒 This rating's identity is protected by the system — invisible even on Gold.",
@@ -756,6 +757,7 @@ export const en = {
           "Vibe Score and Vibe Tags",
           "Vibe Card creation",
           "Rate anyone, be rated by anyone",
+          "Detailed view of every rating you receive (anonymous)",
           "Sharing your location with Nearby",
         ],
       },
@@ -766,10 +768,10 @@ export const en = {
         trial: "First week free",
         perks: [
           "Which circles know you",
+          "Which relationship each rating came from",
           "Strong sides and growth areas",
-          "Anonymous rating details",
           "Seeing nearby members",
-          "Message people who rated you",
+          "Message your anonymous raters",
         ],
       },
       gold: {

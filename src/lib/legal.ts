@@ -38,7 +38,7 @@ export type LegalDoc = {
   sections: { heading: string; body: string[]; list?: string[] }[];
 };
 
-export const LEGAL_SLUGS = ["privacy", "kvkk", "terms"] as const;
+export const LEGAL_SLUGS = ["privacy", "kvkk", "terms", "child-safety"] as const;
 export type LegalSlug = (typeof LEGAL_SLUGS)[number];
 
 export function isLegalSlug(v: unknown): v is LegalSlug {
@@ -648,9 +648,124 @@ const enTerms: LegalDoc = {
   ],
 };
 
+
+/**
+ * Child safety (CSAE) standards.
+ *
+ * Published because Google Play requires every social app to point at a
+ * public, non-PDF page setting out its standards against child sexual abuse
+ * and exploitation before it may ship. It is not boilerplate: Vibe Tag is an
+ * 18+ service, and the honest version of this page says what we actually do
+ * — refuse minors, take reports in-app, remove and preserve, and report to
+ * the authorities — rather than describing a moderation department we do not
+ * have.
+ */
+const trChildSafety: LegalDoc = {
+  slug: "child-safety",
+  title: "Çocuk Güvenliği Standartları",
+  updated: UPDATED,
+  intro:
+    "Vibe Tag yalnızca 18 yaş ve üzeri için bir hizmettir. Çocukların cinsel istismarı ve sömürüsü (CSAE) ile çocukların cinsel istismarı nitelikli materyal (CSAM) hizmetimizde kesinlikle yasaktır; bu sayfa buna karşı uyguladığımız standartları açıklar.",
+  sections: [
+    {
+      heading: "Yaş sınırı",
+      body: [
+        "Hizmet 18 yaşından küçüklere açık değildir. Kayıt sırasında 18 yaşını doldurduğunun beyan edilmesi zorunludur ve bunun aksini gösteren bir işaret gördüğümüzde hesabı askıya alırız.",
+        `18 yaşından küçük birine ait olduğunu öğrendiğimiz hesap kapatılır ve kanunen saklanması gerekenler dışındaki verileri silinir. Bir ebeveyn ya da vasi, çocuğuna ait bir hesabı {email} adresinden bildirebilir; bu bildirimleri öncelikli işleme alırız.`,
+      ],
+    },
+    {
+      heading: "Yasak içerik ve davranışlar",
+      body: [
+        "Aşağıdakiler hiçbir bağlamda kabul edilmez ve tespit edildiğinde hesabın kalıcı olarak kapatılmasıyla sonuçlanır:",
+      ],
+      list: [
+        "Çocukların cinsel istismarı nitelikli her tür materyal (CSAM) — paylaşılması, aranması, istenmesi ya da bağlantısının verilmesi.",
+        "Bir çocuğu cinselleştiren, cinsel açıdan tasvir eden veya bu yönde ima taşıyan metin, görsel ve etiketler.",
+        "Bir çocukla cinsel amaçla iletişim kurma, güven ilişkisi kurup istismara hazırlama (grooming) ya da buna teşebbüs.",
+        "Çocuk ticareti, çocuğun cinsel sömürüsünün örgütlenmesi veya kolaylaştırılması.",
+        "18 yaşından küçük birinin hizmete erişmesini sağlamak; kendi yaşını ya da bir başkasının yaşını gizlemek.",
+      ],
+    },
+    {
+      heading: "Uygulama içinden bildirim",
+      body: [
+        "Her değerlendirmenin, profilin ve mesaj başlığının yanında bir bildirme yolu vardır; çocuk güvenliğiyle ilgili endişeler bu yolla doğrudan bize ulaşır. Bildirimi yapan kişinin kimliği bildirilen kişiye gösterilmez.",
+        `Uygulamaya erişimin yoksa ya da acil bir durum varsa {email} adresine doğrudan yazabilirsin. Çocuk güvenliği bildirimleri sıraya alınmadan, diğer bildirimlerin önünde incelenir.`,
+      ],
+    },
+    {
+      heading: "Bildirim geldiğinde ne yapıyoruz",
+      body: [
+        "İnceleme insan tarafından yapılır. Bir bildirim doğrulandığında içerik kaldırılır, hesap askıya alınır ya da kalıcı olarak kapatılır ve aynı kişiye ait diğer hesaplar araştırılır.",
+        "CSAM ile ilgili bir tespitte içerik hizmetten kaldırılır, delil niteliğindeki kayıtlar yasal süre boyunca erişime kapalı biçimde saklanır ve durum yetkili makamlara bildirilir. Bu bildirimler, hesabı kapatılan kişiye önceden haber verilmeksizin yapılır.",
+      ],
+    },
+    {
+      heading: "Yasalara uygunluk ve makamlara bildirim",
+      body: [
+        `Çocuk güvenliğine ilişkin yürürlükteki mevzuata uyar, kanunen bildirim yükümlülüğü doğduğunda yetkili ulusal ve bölgesel makamlara — Türkiye'de ilgili adli ve idari mercilere, ilgili olduğu ölçüde NCMEC gibi uluslararası bildirim mekanizmalarına — bildirimde bulunuruz.`,
+        `Bu standartlarla ilgili sorular, makam talepleri ve bildirimler için iletişim: {email} — ${OPERATOR_NAME}, ${OPERATOR_ADDRESS}.`,
+      ],
+    },
+  ],
+};
+
+/** Child safety (CSAE) standards — see the note above the Turkish version. */
+const enChildSafety: LegalDoc = {
+  slug: "child-safety",
+  title: "Child Safety Standards",
+  updated: UPDATED,
+  intro:
+    "Vibe Tag is a service for people aged 18 and over. Child sexual abuse and exploitation (CSAE), and child sexual abuse material (CSAM), are absolutely prohibited here; this page sets out the standards we apply against them.",
+  sections: [
+    {
+      heading: "Age limit",
+      body: [
+        "The service is not open to anyone under 18. Declaring that you are 18 or older is required at sign-up, and we suspend an account as soon as we see a sign to the contrary.",
+        `An account we learn belongs to someone under 18 is closed and its data deleted except what the law requires us to keep. A parent or guardian can report a child's account to {email}; those reports are handled as a priority.`,
+      ],
+    },
+    {
+      heading: "Prohibited content and conduct",
+      body: [
+        "None of the following is acceptable in any context, and each results in permanent closure of the account when found:",
+      ],
+      list: [
+        "Child sexual abuse material (CSAM) of any kind — sharing, seeking, soliciting or linking to it.",
+        "Text, images or tags that sexualise a child, depict a child sexually, or imply as much.",
+        "Contacting a child for sexual purposes, grooming, or any attempt at either.",
+        "Child trafficking, or organising or facilitating the sexual exploitation of a child.",
+        "Helping anyone under 18 reach the service; concealing your own age or someone else's.",
+      ],
+    },
+    {
+      heading: "Reporting from inside the app",
+      body: [
+        "Every rating, profile and message thread carries a way to report it, and child-safety concerns reach us directly through it. The reporter's identity is never shown to the person reported.",
+        `If you cannot reach the app, or the situation is urgent, write straight to {email}. Child-safety reports are reviewed ahead of the queue, before anything else.`,
+      ],
+    },
+    {
+      heading: "What we do with a report",
+      body: [
+        "Review is done by a human. Where a report is confirmed, the content is removed, the account is suspended or permanently closed, and other accounts belonging to the same person are investigated.",
+        "Where CSAM is found, the content is removed from the service, the records that constitute evidence are preserved in restricted storage for the statutory period, and the matter is reported to the competent authorities. Those reports are made without prior notice to the account holder.",
+      ],
+    },
+    {
+      heading: "Legal compliance and reporting to authorities",
+      body: [
+        `We comply with applicable child-safety law and, where a duty to report arises, report to the competent national and regional authorities — in Türkiye to the relevant judicial and administrative bodies, and to international reporting mechanisms such as NCMEC where applicable.`,
+        `For questions about these standards, requests from authorities, and reports: {email} — ${OPERATOR_NAME}, ${OPERATOR_ADDRESS}.`,
+      ],
+    },
+  ],
+};
+
 const DOCS: Record<Locale, Record<LegalSlug, LegalDoc>> = {
-  tr: { privacy: trPrivacy, kvkk: trKvkk, terms: trTerms },
-  en: { privacy: enPrivacy, kvkk: enKvkk, terms: enTerms },
+  tr: { privacy: trPrivacy, kvkk: trKvkk, terms: trTerms, "child-safety": trChildSafety },
+  en: { privacy: enPrivacy, kvkk: enKvkk, terms: enTerms, "child-safety": enChildSafety },
 };
 
 export function legalDoc(slug: LegalSlug, locale: Locale): LegalDoc {

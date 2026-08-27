@@ -828,6 +828,7 @@ export const en = {
     privacy: "Privacy Policy",
     kvkk: "Data Protection Notice (KVKK)",
     terms: "Terms of Use",
+    childSafety: "Child Safety Standards",
   },
 
   report: {

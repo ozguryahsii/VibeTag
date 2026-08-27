@@ -381,10 +381,10 @@ export default async function SettingsPage() {
       <div className="mt-7">
         <SectionTitle>{d.legal.title}</SectionTitle>
         <Card className="grid gap-0.5 !py-2">
-          {(["privacy", "kvkk", "terms"] as const).map((slug) => (
+          {(["privacy", "kvkk", "terms", "childSafety"] as const).map((slug) => (
             <Link
               key={slug}
-              href={`/legal/${slug}`}
+              href={`/legal/${slug === "childSafety" ? "child-safety" : slug}`}
               className="flex items-center justify-between py-2.5"
             >
               <span className="text-[13px] font-semibold">{d.legal[slug]}</span>

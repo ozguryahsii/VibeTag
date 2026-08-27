@@ -158,3 +158,51 @@ describe("registrations a sole trader does not have", () => {
     expect(textOf("kvkk", "en")).toContain("no VERBİS registration");
   });
 });
+
+/**
+ * Child safety (CSAE).
+ *
+ * Google Play will not publish a social app without a public page setting
+ * out its standards against child sexual abuse and exploitation, and the
+ * page has to keep saying the things the policy requires — an edit that
+ * quietly drops the reporting route or the 18+ line would be a policy
+ * violation nobody would notice from the screen.
+ */
+describe("the child safety standards", () => {
+  const docs = LOCALES.map((locale) => ({
+    locale,
+    text: textOf("child-safety", locale),
+  }));
+
+  it("is published in both languages", () => {
+    expect(docs).toHaveLength(2);
+    for (const { text } of docs) expect(text.length).toBeGreaterThan(500);
+  });
+
+  it("names CSAE and CSAM explicitly", () => {
+    for (const { locale, text } of docs) {
+      expect(text, locale).toContain("CSAE");
+      expect(text, locale).toContain("CSAM");
+    }
+  });
+
+  it("states the 18+ limit", () => {
+    for (const { text } of docs) expect(text).toMatch(/18/);
+  });
+
+  it("keeps a way to report, in the app and by email", () => {
+    for (const { locale, text } of docs) {
+      // {email} is substituted at render time; what matters here is that the
+      // route survives an edit.
+      expect(text, locale).toContain("{email}");
+      expect(text.toLowerCase(), locale).toMatch(/bildir|report/);
+    }
+  });
+
+  it("commits to reporting to the authorities", () => {
+    for (const { locale, text } of docs) {
+      expect(text, locale).toContain("NCMEC");
+      expect(text.toLowerCase(), locale).toMatch(/maka|authorit/);
+    }
+  });
+});

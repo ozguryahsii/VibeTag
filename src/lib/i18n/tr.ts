@@ -825,6 +825,7 @@ export const tr: Dictionary = {
     privacy: "Gizlilik Politikası",
     kvkk: "KVKK Aydınlatma Metni",
     terms: "Kullanım Şartları",
+    childSafety: "Çocuk Güvenliği Standartları",
   },
 
   report: {

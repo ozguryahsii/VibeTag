@@ -4,6 +4,7 @@ import { createHash, randomInt, timingSafeEqual } from "node:crypto";
 import { prisma } from "@/lib/db";
 import { resendGapSeconds } from "@/lib/limits";
 import { emailConfigured, otpEmail, sendEmail } from "@/lib/email";
+import { parseReviewAccounts, reviewOtpMatches } from "@/lib/review-access";
 import type { Dictionary } from "@/lib/i18n";
 
 /**
@@ -149,26 +150,22 @@ export async function checkOtp(
 }
 
 /**
- * The store reviewer's way past the email.
+ * The store reviewers' way past the email.
  *
- * Apple and Google review with the demo credentials from the submission
- * form, and they cannot open our mailbox — a mandatory emailed OTP is an
- * automatic rejection. So one account, named by env, may also sign in with
- * one static code that ships in the review notes. Nothing is configured in
- * production by default: both variables unset means this path does not
- * exist. The real OTP mail still goes out and still works.
+ * The rules live in `review-access.ts`, pure and tested; this wrapper only
+ * supplies the env and the user row. Nothing is configured in production by
+ * default: no env, no bypass. The real OTP mail still goes out and still
+ * works for these accounts.
  */
 async function isReviewBypass(userId: string, code: string): Promise<boolean> {
-  const email = process.env.REVIEW_ACCOUNT_EMAIL?.trim().toLowerCase();
-  const fixed = process.env.REVIEW_ACCOUNT_OTP?.trim();
-  if (!email || !fixed || fixed.length < 6) return false;
-  if (code.replace(/\D/g, "") !== fixed) return false;
+  const accounts = parseReviewAccounts(process.env);
+  if (accounts.length === 0) return false;
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { email: true },
   });
-  return user?.email.toLowerCase() === email;
+  return user ? reviewOtpMatches(accounts, user.email, code) : false;
 }
 
 /** Mark an account's email as confirmed. */

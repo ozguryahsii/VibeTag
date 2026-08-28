@@ -79,5 +79,10 @@
 	     prompt, so it says what the location is for and nothing more. -->
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Vibe Tag uses your location only to show you members nearby, and only while you have Nearby switched on. Your location is stored roughly, never precisely, and other people see a distance, never a place.</string>
+	<!-- Saving the Vibe Card. Without this string iOS silently removes
+	     "Save Image" from the share sheet the card opens, which left people
+	     a sheet full of ways to send their card and no way to keep it. -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Vibe Tag saves your Vibe Card image to your photo library only when you choose Save Image.</string>
 </dict>
 </plist>

@@ -45,19 +45,27 @@ export async function areFriends(a: string, b: string): Promise<boolean> {
 }
 
 export async function listFriends(userId: string) {
+  // Location travels with a friend so the friends list can show how far away
+  // they are. It is only ever rendered as a band ("3 km away") and only to a
+  // viewer who has switched Nearby on themselves.
+  const person = {
+    id: true,
+    name: true,
+    username: true,
+    bio: true,
+    avatarUrl: true,
+    avatarColor: true,
+    shareLocation: true,
+    lat: true,
+    lng: true,
+  } as const;
+
   const rows = await prisma.friendship.findMany({
     where: {
       status: "ACCEPTED",
       OR: [{ requesterId: userId }, { addresseeId: userId }],
     },
-    include: {
-      requester: {
-        select: { id: true, name: true, username: true, bio: true, avatarUrl: true, avatarColor: true },
-      },
-      addressee: {
-        select: { id: true, name: true, username: true, bio: true, avatarUrl: true, avatarColor: true },
-      },
-    },
+    include: { requester: { select: person }, addressee: { select: person } },
     orderBy: { acceptedAt: "desc" },
   });
 

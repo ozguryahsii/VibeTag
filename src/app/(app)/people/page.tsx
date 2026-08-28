@@ -138,13 +138,11 @@ export default async function PeoplePage({
     }))
     /*
      * Friends are excluded from the community list because they already have
-     * their own section — but never from search results, and never from the
-     * nearby list. Searching a friend's name and being told "nobody found" is
-     * simply wrong, and so is a nearby list that hides the friend standing in
-     * the same street: sharing a location is the thing that earns a place
-     * here, and becoming friends should not cost it.
+     * their own section above it — but never from search results. Searching a
+     * friend's name and being told "nobody found" is simply wrong, and it was.
+     * Their distance is shown up there instead, beside their name.
      */
-    .filter((u) => searching || u.distance !== null || !friendIds.has(u.id))
+    .filter((u) => searching || !friendIds.has(u.id))
     .sort((a, b) => {
       // Nearby first when we can measure it, then the busiest profiles.
       if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
@@ -174,11 +172,10 @@ export default async function PeoplePage({
           ) : undefined
         }
       >
-        {searching
-          ? fill(d.people.resultsFor, { q: query })
-          : nearbyVisible
-            ? d.people.nearby
-            : d.people.community}
+        {/* Always "Community": the nearest people rise to the top of it when
+            a distance can be measured, but it is the same list either way and
+            renaming it made it read as a second, different one. */}
+        {searching ? fill(d.people.resultsFor, { q: query }) : d.people.community}
       </SectionTitle>
 
       {rows.length === 0 ? (
@@ -304,6 +301,26 @@ export default async function PeoplePage({
     </div>
   );
 
+  /*
+   * A friend's distance belongs here, not in the community list below — that
+   * one is for people you have not met yet. Measured on the same terms as
+   * everywhere else: both sides sharing, and the viewer paying for Nearby.
+   */
+  const friendRows = friends
+    .map((f) => ({
+      ...f,
+      distance:
+        nearbyVisible && f.shareLocation && f.lat !== null && f.lng !== null
+          ? distanceKm(me2!.lat!, me2!.lng!, f.lat, f.lng)
+          : null,
+    }))
+    .sort((a, b) => {
+      if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
+      if (a.distance !== null) return -1;
+      if (b.distance !== null) return 1;
+      return 0;
+    });
+
   const friendList = (
     <div>
       <SectionTitle>{d.people.friends}</SectionTitle>
@@ -315,7 +332,7 @@ export default async function PeoplePage({
         </Card>
       ) : (
         <div className="grid gap-2.5">
-          {friends.map((f) => (
+          {friendRows.map((f) => (
             <Card key={f.id} className={ROW}>
               <Link href={`/u/${f.username}`} className="shrink-0">
                 <Avatar
@@ -330,6 +347,11 @@ export default async function PeoplePage({
                 <p className="text-[11.5px] text-muted truncate">
                   @{f.username}
                 </p>
+                {f.distance !== null && (
+                  <p className="text-[11px] font-bold text-orange mt-0.5">
+                    📍 {distanceLabel(f.distance)}
+                  </p>
+                )}
               </Link>
               <div className={`${ACTIONS} items-center gap-2`}>
                 {/* One family of pills — the same box, ink and type as the

@@ -138,10 +138,13 @@ export default async function PeoplePage({
     }))
     /*
      * Friends are excluded from the community list because they already have
-     * their own section — but never from search results. Searching a friend's
-     * name and being told "nobody found" is simply wrong, and it was.
+     * their own section — but never from search results, and never from the
+     * nearby list. Searching a friend's name and being told "nobody found" is
+     * simply wrong, and so is a nearby list that hides the friend standing in
+     * the same street: sharing a location is the thing that earns a place
+     * here, and becoming friends should not cost it.
      */
-    .filter((u) => searching || !friendIds.has(u.id))
+    .filter((u) => searching || u.distance !== null || !friendIds.has(u.id))
     .sort((a, b) => {
       // Nearby first when we can measure it, then the busiest profiles.
       if (a.distance !== null && b.distance !== null) return a.distance - b.distance;

@@ -592,7 +592,7 @@ export const tr: Dictionary = {
 
   notifications: {
     title: "Bildirimler",
-    subtitle: "Kimin değerlendirdiğini burada da göremezsin — bu bilinçli.",
+    subtitle: "Kimin değerlendirdiğini burada göremezsin.",
     emptyTitle: "Henüz bildirim yok",
     emptyBody:
       "Biri seni değerlendirdiğinde ya da davetin kabul edildiğinde burada göreceksin.",

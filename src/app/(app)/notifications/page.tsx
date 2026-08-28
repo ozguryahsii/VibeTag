@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { hasPlan, requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import {
   listNotifications,
@@ -100,7 +100,12 @@ export default async function NotificationsPage() {
       <h1 className="vt-page-title mt-2 text-[31px] tracking-[-0.02em]">
         {d.notifications.title}
       </h1>
-      <p className="text-[13px] text-muted mt-1">{d.notifications.subtitle}</p>
+      {/* Only true below Gold. Telling a Gold member they cannot see who
+          rated them, on a screen where the names are right there, reads as
+          the app not knowing what it sold them (§15). */}
+      {!hasPlan(user, "GOLD") && (
+        <p className="text-[13px] text-muted mt-1">{d.notifications.subtitle}</p>
+      )}
 
       {items.length === 0 ? (
         <div className="mt-6">

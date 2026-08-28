@@ -595,7 +595,7 @@ export const en = {
 
   notifications: {
     title: "Notifications",
-    subtitle: "You cannot see who rated you here either — that is deliberate.",
+    subtitle: "You cannot see who rated you here.",
     emptyTitle: "No notifications yet",
     emptyBody:
       "You will see it here when someone rates you or accepts your invite.",

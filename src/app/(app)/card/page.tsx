@@ -6,6 +6,7 @@ import { getDict, getLocale } from "@/lib/i18n/server";
 import { tagLabel } from "@/lib/labels";
 import { topTags } from "@/lib/card-tags";
 import { LangToggle } from "@/components/LangToggle";
+import { isNativeShell } from "@/lib/native-shell";
 
 export default async function CardPage() {
   const user = await requireUser();
@@ -13,6 +14,8 @@ export default async function CardPage() {
   const locale = await getLocale();
   const profile = await getVibeProfile(user.id);
   const percentile = await getPercentile(user.id, profile.score);
+  // A WebView has nowhere to download to, so the save path differs there.
+  const inShell = await isNativeShell();
 
   if (profile.ratingCount === 0) {
     return (
@@ -61,6 +64,7 @@ export default async function CardPage() {
       </p>
 
       <VibeCardStudio
+        inShell={inShell}
         data={{
           name: user.name,
           username: user.username,

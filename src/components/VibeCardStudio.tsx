@@ -24,21 +24,49 @@ export type { CardData } from "@/components/card/draw";
  * score does not. The band's name is shown instead, because a card that
  * changes as you climb is only motivating if you can see that it changed.
  */
-export function VibeCardStudio({ data }: { data: CardData }) {
+export function VibeCardStudio({
+  data,
+  inShell = false,
+}: {
+  data: CardData;
+  inShell?: boolean;
+}) {
   const d = useD();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [format, setFormat] = useState<FormatKey>("story");
   const [showScore, setShowScore] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
+  /** The PNG, shown full-size so the platform's own "save image" can reach it. */
+  const [saveImage, setSaveImage] = useState<string | null>(null);
 
   const { band } = sceneFor(data.score);
   const f = FORMATS[format];
 
-  async function download() {
+  /**
+   * Save the card.
+   *
+   * In a browser this is an anchor with a `download` attribute, which is the
+   * whole feature. Inside the app shell that anchor does nothing at all — a
+   * WebView has no downloads folder to put it in — and the screen was
+   * cheerfully announcing "card downloaded" over the top of it.
+   *
+   * So in the shell the card is shown as an image instead, at full size,
+   * where the platform's own press-and-hold menu offers "Add to Photos".
+   * That is the save path a phone actually has, and it needs nothing from
+   * the native side.
+   */
+  function download() {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const png = canvas.toDataURL("image/png");
+
+    if (inShell) {
+      setSaveImage(png);
+      return;
+    }
+
     const a = document.createElement("a");
-    a.href = canvas.toDataURL("image/png");
+    a.href = png;
     a.download = `vibetag-${data.username}-${format}.png`;
     a.click();
     setStatus(d.card.downloaded);
@@ -71,8 +99,9 @@ export function VibeCardStudio({ data }: { data: CardData }) {
       } catch {
         /* share sheet dismissed */
       }
+      return;
     }
-    await download();
+    download();
   }
 
   return (
@@ -156,6 +185,40 @@ export function VibeCardStudio({ data }: { data: CardData }) {
         <p className="mt-3 text-center text-[13px] font-bold text-orange">
           {status}
         </p>
+      )}
+
+      {saveImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 grid place-items-center p-5"
+          onClick={() => setSaveImage(null)}
+        >
+          <div
+            className="w-full max-w-[340px] grid gap-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* An <img>, not the canvas: press-and-hold offers "save image"
+                on a real image element and nothing on a canvas. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={saveImage}
+              alt={d.card.saveTitle}
+              className="w-full h-auto rounded-[22px] shadow-2xl"
+            />
+            <div className="rounded-[22px] bg-warmwhite p-4">
+              <p className="text-[13.5px] font-extrabold">{d.card.saveTitle}</p>
+              <p className="text-[12px] text-muted leading-relaxed mt-1">
+                {d.card.saveBody}
+              </p>
+              <button
+                type="button"
+                onClick={() => setSaveImage(null)}
+                className="mt-3 h-11 w-full rounded-full bg-white border border-line font-bold text-[13px] text-muted"
+              >
+                {d.card.saveClose}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -396,6 +396,10 @@ export const en = {
     share: "Share",
     download: "Download PNG ({w}×{h})",
     downloaded: "Card downloaded 🎉",
+    saveTitle: "Save the image",
+    saveBody:
+      "Press and hold the image, then choose “Add to Photos”. Or send it straight from Share.",
+    saveClose: "Close",
     emptyTitle: "Your card needs a little data",
     emptyBody:
       "Once you have at least one rating you can build your Vibe Card and post it to your story.",

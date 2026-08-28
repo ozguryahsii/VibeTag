@@ -393,6 +393,10 @@ export const tr: Dictionary = {
     share: "Paylaş",
     download: "PNG indir ({w}×{h})",
     downloaded: "Kart indirildi 🎉",
+    saveTitle: "Görseli kaydet",
+    saveBody:
+      "Görsele basılı tut ve “Fotoğraflara ekle”yi seç. Ya da Paylaş ile doğrudan gönder.",
+    saveClose: "Kapat",
     emptyTitle: "Kartın için biraz veri lazım",
     emptyBody:
       "En az bir değerlendirme aldığında Vibe Card'ını oluşturup Story'de paylaşabilirsin.",

@@ -21,6 +21,7 @@ import { IconGlyph } from "@/components/Icon";
 import { ICONS } from "@/lib/icons";
 import { Card, SectionTitle } from "@/components/ui";
 import { nameSearch } from "@/lib/search";
+import { isNativeShell } from "@/lib/native-shell";
 import type { RelationshipKey, TraitKey, VibeTagKey } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
@@ -50,6 +51,8 @@ export default async function PeoplePage({
 }) {
   const me = await requireUser();
   const d = await getDict();
+  // Which "go to settings" advice makes sense depends on where this runs.
+  const inShell = await isNativeShell();
   const { q } = await searchParams;
   const query = (q ?? "").trim();
   const searching = query.length > 0;
@@ -367,7 +370,7 @@ export default async function PeoplePage({
       </form>
     </div>
   ) : (
-    <NearbyToggle />
+    <NearbyToggle inShell={inShell} />
   );
 
   /* Location on, plan Free: they are visible to premium members but cannot

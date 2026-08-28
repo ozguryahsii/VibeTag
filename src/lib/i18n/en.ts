@@ -218,6 +218,8 @@ export const en = {
     nearbyAsking: "Getting your location…",
     nearbyDenied:
       "Location permission was refused. You can allow it from your browser settings.",
+    nearbyDeniedApp:
+      "Location is turned off. You can turn it back on in your phone's Settings → Vibe Tag → Location.",
     nearbyUnsupported: "This device cannot share a location.",
     nearbyNone: "Nobody nearby has shared a location yet.",
     nearbyConsent:

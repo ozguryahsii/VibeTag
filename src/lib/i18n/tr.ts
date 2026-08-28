@@ -215,6 +215,8 @@ export const tr: Dictionary = {
     nearbyAsking: "Konumun alınıyor…",
     nearbyDenied:
       "Konum izni reddedildi. Tarayıcı ayarlarından izin verebilirsin.",
+    nearbyDeniedApp:
+      "Konum izni kapalı. Telefonun Ayarlar → Vibe Tag → Konum bölümünden açabilirsin.",
     nearbyUnsupported: "Bu cihaz konum paylaşamıyor.",
     nearbyNone: "Yakınında konum paylaşan kimse yok.",
     nearbyConsent:

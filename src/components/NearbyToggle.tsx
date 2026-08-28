@@ -9,7 +9,7 @@ import { useD } from "@/components/LocaleProvider";
  * Asks the browser for a position, then hands it to the server action.
  * The permission prompt only ever appears because the person tapped this.
  */
-export function NearbyToggle() {
+export function NearbyToggle({ inShell = false }: { inShell?: boolean }) {
   const d = useD();
   const [state, action, pending] = useActionState<LocationState, FormData>(
     saveLocationAction,
@@ -17,6 +17,10 @@ export function NearbyToggle() {
   );
   const [status, setStatus] = useState<string | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+  // One choice, used by both the refusal we hear from the browser and the
+  // one that comes back from the server action.
+  const denied = inShell ? d.people.nearbyDeniedApp : d.people.nearbyDenied;
 
   function ask() {
     if (!("geolocation" in navigator)) {
@@ -29,7 +33,10 @@ export function NearbyToggle() {
         setStatus(null);
         setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
       },
-      () => setStatus(d.people.nearbyDenied),
+      // "Allow it in your browser settings" is advice with no address inside
+      // the app — there is no browser to open. Same fix the notification
+      // toggle already carries.
+      () => setStatus(denied),
       { enableHighAccuracy: false, timeout: 12000, maximumAge: 600000 },
     );
   }
@@ -75,8 +82,11 @@ export function NearbyToggle() {
       )}
 
       {(status || state.error) && (
-        <p className="mt-2.5 text-[12px] font-semibold text-muted">
-          {status ?? d.people.nearbyDenied}
+        <p
+          data-testid="nearby-status"
+          className="mt-2.5 text-[12px] font-semibold text-muted"
+        >
+          {status ?? denied}
         </p>
       )}
     </div>

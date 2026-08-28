@@ -25,6 +25,24 @@ import type { RelationshipKey, TraitKey, VibeTagKey } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * One person, one row: avatar · name · what you can do with them.
+ *
+ * The buttons cannot shrink — a pill with its label cut in half is not a
+ * button — so on a narrow phone they were pushing the row wider than the
+ * screen and the whole page slid sideways. Nothing looked broken on a
+ * 390-point phone with short seed names, which is why it shipped.
+ *
+ * So the row wraps instead. `basis-28` gives the name a floor rather than
+ * letting flex squeeze it to nothing: while everything fits, the layout is
+ * exactly what it was; when it does not, the buttons drop to a second line
+ * and sit at the right (`ml-auto`), whole and reachable. Turkish labels are
+ * longer than the English ones, so this is a Turkish-first constraint.
+ */
+const ROW = "flex flex-wrap items-center gap-x-3.5 gap-y-2.5 !py-3.5";
+const NAME_COL = "min-w-0 flex-1 basis-28";
+const ACTIONS = "flex shrink-0 ml-auto";
+
 export default async function PeoplePage({
   searchParams,
 }: {
@@ -165,7 +183,7 @@ export default async function PeoplePage({
       ) : (
         <div className="grid gap-2.5">
           {rows.map((u) => (
-            <Card key={u.id} className="flex items-center gap-3.5 !py-3.5">
+            <Card key={u.id} className={ROW}>
               <Link href={`/u/${u.username}`} className="shrink-0">
                 <Avatar
                   name={u.name}
@@ -175,7 +193,7 @@ export default async function PeoplePage({
                 />
               </Link>
 
-              <Link href={`/u/${u.username}`} className="min-w-0 flex-1">
+              <Link href={`/u/${u.username}`} className={NAME_COL}>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[14.5px] font-extrabold truncate">
                     {u.name}
@@ -209,21 +227,21 @@ export default async function PeoplePage({
                * friendship that already exists.
                */}
               {friendIds.has(u.id) ? (
-                <form action={openFriendThreadAction} className="shrink-0">
+                <form action={openFriendThreadAction} className={ACTIONS}>
                   <input type="hidden" name="username" value={u.username} />
                   <button className="text-[12px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-3.5 py-2">
                     {d.people.message}
                   </button>
                 </form>
               ) : requestedIds.has(u.id) ? (
-                <form action={cancelFriendRequestAction} className="shrink-0">
+                <form action={cancelFriendRequestAction} className={ACTIONS}>
                   <input type="hidden" name="username" value={u.username} />
                   <button className="text-[11px] font-bold text-muted bg-white border border-line rounded-full px-3 py-2">
                     {d.people.requestSent}
                   </button>
                 </form>
               ) : (
-                <form action={requestFriendAction} className="shrink-0">
+                <form action={requestFriendAction} className={ACTIONS}>
                   <input type="hidden" name="username" value={u.username} />
                   <button
                     className="text-[12px] font-bold text-orange bg-tagbg border border-orange/20 rounded-full px-3 py-2"
@@ -245,20 +263,20 @@ export default async function PeoplePage({
       <SectionTitle>{d.people.requests}</SectionTitle>
       <div className="grid gap-2.5">
         {requests.map((r) => (
-          <Card key={r.id} className="flex items-center gap-3.5 !py-3.5">
+          <Card key={r.id} className={ROW}>
             <Avatar
               name={r.requester.name}
               url={r.requester.avatarUrl}
               color={r.requester.avatarColor}
               size={44}
             />
-            <div className="min-w-0 flex-1">
+            <div className={NAME_COL}>
               <p className="text-[14px] font-extrabold truncate">
                 {r.requester.name}
               </p>
               <p className="text-[11.5px] text-muted">{d.people.incoming}</p>
             </div>
-            <div className="flex gap-2 shrink-0">
+            <div className={`${ACTIONS} gap-2`}>
               <form action={respondFriendAction}>
                 <input type="hidden" name="friendshipId" value={r.id} />
                 <input type="hidden" name="decision" value="accept" />
@@ -292,7 +310,7 @@ export default async function PeoplePage({
       ) : (
         <div className="grid gap-2.5">
           {friends.map((f) => (
-            <Card key={f.id} className="flex items-center gap-3.5 !py-3.5">
+            <Card key={f.id} className={ROW}>
               <Link href={`/u/${f.username}`} className="shrink-0">
                 <Avatar
                   name={f.name}
@@ -301,13 +319,13 @@ export default async function PeoplePage({
                   size={44}
                 />
               </Link>
-              <Link href={`/u/${f.username}`} className="min-w-0 flex-1">
+              <Link href={`/u/${f.username}`} className={NAME_COL}>
                 <p className="text-[14px] font-extrabold truncate">{f.name}</p>
                 <p className="text-[11.5px] text-muted truncate">
                   @{f.username}
                 </p>
               </Link>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className={`${ACTIONS} items-center gap-2`}>
                 {/* One family of pills — the same box, ink and type as the
                     "+" in the list below, so the two sections read as one. */}
                 <form action={openFriendThreadAction}>

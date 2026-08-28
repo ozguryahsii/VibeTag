@@ -759,8 +759,10 @@ export const tr: Dictionary = {
         trial: null,
         perks: [
           "Vibe Profili oluşturma",
-          "Vibe Card oluşturma",
-          "Herkesi değerlendirebilme",
+          "Vibe Skor Kart oluşturma",
+          "Sınırsız değerlendirme gönder / al",
+          "Sana verilen puanların detaylarını anonim olarak görebilme",
+          "Diğerlerine Konum paylaşabilme",
         ],
       },
       silver: {
@@ -769,11 +771,10 @@ export const tr: Dictionary = {
         price: "₺69/ay",
         trial: "İlk hafta ücretsiz",
         perks: [
-          "Seni hangi çevrelerden tanıyorlar",
-          "Her puanın hangi ilişkiden geldiği",
-          "Güçlü yönler ve gelişim alanları",
-          "Yakınındaki üyeleri görme",
-          "Anonim değerlendirenlere mesaj",
+          "Vibe Skor'ların hangi çevreden geldiğini görebilme",
+          "Güçlü yönlerin ve gelişim alanlarını analiz etme",
+          "Yakınındaki diğer üyeleri görebilme",
+          "Seni değerlendirenlere mesaj gönderebilme",
         ],
       },
       gold: {
@@ -783,9 +784,8 @@ export const tr: Dictionary = {
         trial: "İlk hafta ücretsiz",
         perks: [
           "Silver'daki her şey",
-          "Sana yapılan her değerlendirmenin sahibini gör",
-          "Kim, seni nereden tanıyarak değerlendirmiş",
-              ],
+          "Sana yapılan değerlendirmeler artık anonim değil !",
+        ],
       },
     },
   },

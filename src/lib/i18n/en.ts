@@ -762,8 +762,10 @@ export const en = {
         trial: null,
         perks: [
           "Create your Vibe profile",
-          "Create your Vibe Card",
-          "Rate anyone",
+          "Create your Vibe Score card",
+          "Send and receive unlimited ratings",
+          "See the details of your ratings, anonymously",
+          "Share your location with others",
         ],
       },
       silver: {
@@ -772,11 +774,10 @@ export const en = {
         price: "₺69/mo",
         trial: "First week free",
         perks: [
-          "Which circles know you",
-          "Which relationship each rating came from",
-          "Strong sides and growth areas",
-          "Seeing nearby members",
-          "Message your anonymous raters",
+          "See which circles your Vibe Scores come from",
+          "Analyse your strong sides and growth areas",
+          "See other members nearby",
+          "Message the people who rated you",
         ],
       },
       gold: {
@@ -786,9 +787,8 @@ export const en = {
         trial: "First week free",
         perks: [
           "Everything in Silver",
-          "See who wrote every rating you received",
-          "Who rated you, and how they know you",
-              ],
+          "Ratings you receive are no longer anonymous!",
+        ],
       },
     },
   },

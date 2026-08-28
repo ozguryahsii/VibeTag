@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "862742669064",
+    "project_id": "vibetag-cd8d3",
+    "storage_bucket": "vibetag-cd8d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862742669064:android:3923696b766c7a616c6ebd",
+        "android_client_info": {
+          "package_name": "net.vibetag.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEVIH6MsGdLXfZP1vHij0LWU9y2H2k6x0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

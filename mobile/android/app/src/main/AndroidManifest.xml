@@ -32,4 +32,21 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+      Nearby. The page asks through the browser Geolocation API, and
+      Capacitor's WebChromeClient answers by requesting both of these at
+      runtime; undeclared, Android refuses without asking and the app's
+      permission screen shows no Location row at all, so nobody can grant
+      what the app is asking for.
+
+      Coarse is what the feature actually needs — the fix asks with
+      enableHighAccuracy false, and the server rounds what it stores — but
+      the bridge requests the pair, so the pair is declared. On Android 12+
+      this also lets someone hand over an approximate location instead of a
+      precise one, which is the right default for a list sorted by distance
+      bands.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 </manifest>

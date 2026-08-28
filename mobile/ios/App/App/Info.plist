@@ -73,5 +73,11 @@
 	     until somebody notices it is waiting. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Nearby. The page asks through the browser Geolocation API; without
+	     this string iOS refuses the request before the person is ever shown
+	     a prompt, and the feature simply never works. Shown verbatim in that
+	     prompt, so it says what the location is for and nothing more. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Vibe Tag uses your location only to show you members nearby, and only while you have Nearby switched on. Your location is stored roughly, never precisely, and other people see a distance, never a place.</string>
 </dict>
 </plist>

@@ -118,7 +118,11 @@ export function fcmPayload(
       // lets Android hold it to save battery, which is right for background
       // sync and wrong here. Same choice as apns-priority 10.
       priority: "HIGH",
-      notification: { sound: "default", click_action: "TAP" },
+      // No click_action. Android reads it as the intent action to fire when
+      // the notification is tapped, and nothing in the app declares one — so
+      // setting it made every tap land nowhere at all, which is worse than
+      // the default it replaced (open the app).
+      notification: { sound: "default" },
     },
   };
 }

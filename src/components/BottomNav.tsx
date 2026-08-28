@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ICONS } from "@/lib/icons";
 import { IconGlyph } from "@/components/Icon";
@@ -34,6 +35,32 @@ const TABS: Tab[] = [
 export function BottomNav({ unreadDm = 0 }: { unreadDm?: number }) {
   const path = usePathname();
   const d = useD();
+
+  /*
+   * The count arrives from the (app) layout, which does not re-run on a
+   * client-side navigation — so after reading a thread the badge kept
+   * claiming an unread message until something forced a full page load. In
+   * the app shell that could be days.
+   *
+   * So the server value is only the first paint, and every route change asks
+   * again. A failed request leaves the last known number rather than blanking
+   * the badge: a stale one is a smaller lie than a missing one.
+   */
+  const [unread, setUnread] = useState(unreadDm);
+  useEffect(() => setUnread(unreadDm), [unreadDm]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/messages/unread", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body) => {
+        if (!cancelled && typeof body?.count === "number") setUnread(body.count);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [path]);
 
   // A chat thread owns the whole screen, composer pinned to the bottom —
   // the tab bar would sit on top of the input.
@@ -71,7 +98,7 @@ export function BottomNav({ unreadDm = 0 }: { unreadDm?: number }) {
                 );
               }
 
-              const showDot = t.href === "/messages" && unreadDm > 0;
+              const showDot = t.href === "/messages" && unread > 0;
 
               return (
                 <Link
@@ -101,7 +128,7 @@ export function BottomNav({ unreadDm = 0 }: { unreadDm?: number }) {
                       className="absolute top-0.5 right-1.5 min-w-4 h-4 px-1 grid place-items-center rounded-full grad-score text-white text-[9px] font-black"
                       style={{ boxShadow: "0 0 0 2px #FCF8EF" }}
                     >
-                      {unreadDm > 9 ? "9+" : unreadDm}
+                      {unread > 9 ? "9+" : unread}
                     </span>
                   )}
 

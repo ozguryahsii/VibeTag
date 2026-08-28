@@ -251,3 +251,17 @@ describe("deciding an FCM token is dead", () => {
     expect(fcmTokenIsDead(200, undefined)).toBe(false);
   });
 });
+
+/*
+ * A tapped notification has to open the app. `click_action` names an intent
+ * action for Android to fire instead of the default launch, and nothing in
+ * the shell declares one — so setting it sent every tap nowhere, silently.
+ */
+describe("a tapped Android notification", () => {
+  it("carries no click_action, so the tap opens the app", () => {
+    const payload = fcmPayload({ title: "t", body: "b" }, "/messages") as {
+      android: { notification: Record<string, unknown> };
+    };
+    expect(payload.android.notification).not.toHaveProperty("click_action");
+  });
+});

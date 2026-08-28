@@ -55,12 +55,31 @@ export function VibeCardStudio({
    * That is the save path a phone actually has, and it needs nothing from
    * the native side.
    */
-  function download() {
+  async function download() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const png = canvas.toDataURL("image/png");
 
     if (inShell) {
+      // One tap, then the system sheet — "Save Image" is right there. The
+      // press-and-hold overlay stays only as the fallback for a WebView
+      // without file sharing; as a first answer it read as a lecture.
+      const blob = await new Promise<Blob | null>((res) =>
+        canvas.toBlob(res, "image/png"),
+      );
+      if (blob) {
+        const file = new File([blob], `vibetag-${data.username}.png`, {
+          type: "image/png",
+        });
+        if (navigator.canShare?.({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file] });
+          } catch {
+            /* sheet dismissed — their choice, not a failure to report */
+          }
+          return;
+        }
+      }
       setSaveImage(png);
       return;
     }

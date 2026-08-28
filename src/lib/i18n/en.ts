@@ -761,12 +761,9 @@ export const en = {
         price: "₺0",
         trial: null,
         perks: [
-          "My Vibe profile",
-          "Vibe Score and Vibe Tags",
-          "Vibe Card creation",
-          "Rate anyone, be rated by anyone",
-          "Detailed view of every rating you receive (anonymous)",
-          "Sharing your location with Nearby",
+          "Create your Vibe profile",
+          "Create your Vibe Card",
+          "Rate anyone",
         ],
       },
       silver: {

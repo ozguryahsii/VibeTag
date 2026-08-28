@@ -758,12 +758,9 @@ export const tr: Dictionary = {
         price: "₺0",
         trial: null,
         perks: [
-          "My Vibe profili",
-          "Vibe Score ve Vibe Tags",
+          "Vibe Profili oluşturma",
           "Vibe Card oluşturma",
-          "Herkesi değerlendirme, herkesten değerlendirme",
-          "Sana verilen puanların detayı (anonim)",
-          "Yakındakilere konumunu açma",
+          "Herkesi değerlendirebilme",
         ],
       },
       silver: {

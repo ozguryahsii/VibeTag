@@ -255,13 +255,15 @@ export default async function PublicProfile({
             </Link>
           )}
 
-          <div className="mt-3 flex items-center justify-center gap-4">
-            <ReportDialog username={user.username} label={d.profile.report} compact />
+          {/* Buttons, not underlined text: these are actions with weight,
+              and a bare link under the rate button read as an afterthought. */}
+          <div className="mt-3 grid grid-cols-2 gap-2.5">
+            <ReportDialog username={user.username} label={d.profile.report} />
             <form action={toggleBlockAction}>
               <input type="hidden" name="username" value={user.username} />
               <button
                 type="submit"
-                className="text-[11.5px] font-bold text-muted underline underline-offset-2"
+                className="h-11 w-full rounded-full bg-white border border-line text-[13.5px] font-bold text-muted active:scale-[0.98] transition-transform"
               >
                 {d.profile.block}
               </button>

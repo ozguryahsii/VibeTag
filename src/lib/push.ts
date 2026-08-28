@@ -6,8 +6,11 @@ import { dictionaryFor } from "@/lib/i18n";
 import { DEFAULT_LOCALE, isLocale } from "@/lib/i18n/config";
 import { renderNotification } from "@/lib/notifications";
 import { apnsConfigured, sendApns } from "@/lib/apns";
+import { fcmConfigured, sendFcm } from "@/lib/fcm";
 import {
   apnsPayload,
+  fcmPayload,
+  fcmTokenIsDead,
   apnsTokenIsDead,
   type DevicePlatform,
 } from "@/lib/device-push";
@@ -146,41 +149,52 @@ async function pushToBrowsers(
 }
 
 /**
- * APNs — the iOS app shell.
+ * The native app shells: APNs for iOS, FCM for Android.
  *
- * Android tokens are stored but not sent to: FCM needs a Firebase project and
- * a `google-services.json` in the shell, neither of which exists yet. They
- * are kept rather than dropped so that turning FCM on later is a sending
- * change, not a "ask every Android user to re-enable notifications" change.
+ * Each half is independent and each is inert without its own credentials, so
+ * a server holding only Apple's key still notifies every iPhone rather than
+ * failing on the first Android row it meets. Tokens are only ever deleted on
+ * the services' own word that they are dead (see `device-push.ts`); an
+ * outage, a throttle or a missing key leaves the table alone, because a
+ * temporary fault must not become a permanent one nobody thinks to look for.
  */
 async function pushToDevices(
   userId: string,
   copy: { title: string; body: string },
   href: string | null,
 ): Promise<void> {
-  if (!apnsConfigured) return;
+  if (!apnsConfigured && !fcmConfigured) return;
 
-  const devices = await prisma.deviceToken.findMany({
-    where: { userId, platform: "APNS" },
-  });
+  const devices = await prisma.deviceToken.findMany({ where: { userId } });
   if (devices.length === 0) return;
 
-  const payload = apnsPayload(copy, href);
+  const apnsBody = apnsPayload(copy, href);
+  const fcmBody = fcmPayload(copy, href);
 
   await Promise.all(
     devices.map(async (device) => {
       try {
-        const result = await sendApns(device.token, payload);
-        if (
-          apnsTokenIsDead(result.status, result.reason, {
-            environmentMatches: result.environmentMatches,
-          })
-        ) {
+        if (device.platform === "APNS") {
+          if (!apnsConfigured) return;
+          const result = await sendApns(device.token, apnsBody);
+          if (
+            apnsTokenIsDead(result.status, result.reason, {
+              environmentMatches: result.environmentMatches,
+            })
+          ) {
+            await removeDeviceToken(device.token);
+          }
+          return;
+        }
+
+        if (!fcmConfigured) return;
+        const result = await sendFcm(device.token, fcmBody);
+        if (fcmTokenIsDead(result.status, result.errorCode)) {
           await removeDeviceToken(device.token);
         }
       } catch {
-        // An unreachable Apple is not the caller's problem, and it is
-        // certainly not a reason to delete somebody's phone.
+        // An unreachable Apple or Google is not the caller's problem, and it
+        // is certainly not a reason to delete somebody's phone.
       }
     }),
   );

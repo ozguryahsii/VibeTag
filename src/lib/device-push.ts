@@ -96,6 +96,58 @@ export function apnsTokenIsDead(
 }
 
 /**
+ * The message body FCM's HTTP v1 API expects, minus the token.
+ *
+ * `notification` is what Android draws while the app is in the background;
+ * `data` is what the shell reads when somebody taps it. Both carry the
+ * destination because only one of them survives depending on which state the
+ * app was in, and a tap that lands on the wrong screen is the bug this
+ * duplication exists to prevent. Data values must be strings — FCM rejects
+ * the whole message over a number.
+ */
+export function fcmPayload(
+  copy: { title: string; body: string },
+  href: string | null,
+): Record<string, unknown> {
+  const url = href ?? "/home";
+  return {
+    notification: { title: copy.title, body: copy.body },
+    data: { url },
+    android: {
+      // "Somebody rated you" is worth waking the device for; the alternative
+      // lets Android hold it to save battery, which is right for background
+      // sync and wrong here. Same choice as apns-priority 10.
+      priority: "HIGH",
+      notification: { sound: "default", click_action: "TAP" },
+    },
+  };
+}
+
+/**
+ * Should this FCM token be deleted?
+ *
+ * Only `UNREGISTERED` — the app was uninstalled, or the token was replaced.
+ * Everything else is kept on purpose, and the two worth naming are the ones
+ * that look fatal and are not:
+ *
+ *   SENDER_ID_MISMATCH  the token belongs to another Firebase project. Almost
+ *                       always our own misconfiguration, and acting on it
+ *                       would delete every real device at once.
+ *   INVALID_ARGUMENT    usually a malformed message, which is our bug, not a
+ *                       dead device.
+ *
+ * The asymmetry with `apnsTokenIsDead` is deliberate: Apple's BadDeviceToken
+ * is ambiguous enough to need an environment check, while FCM says
+ * UNREGISTERED when and only when it means it.
+ */
+export function fcmTokenIsDead(
+  status: number,
+  errorCode: string | undefined,
+): boolean {
+  return status === 404 || errorCode === "UNREGISTERED";
+}
+
+/**
  * The APNs signing key, however it survived the trip into an env var.
  *
  * A .p8 is a multi-line PEM file, and every way of getting one into a
@@ -116,6 +168,16 @@ export function apnsTokenIsDead(
  * deployment stays inert instead of throwing on first notification.
  */
 export function decodeApnsKey(raw: string | undefined | null): string | null {
+  return decodePrivateKey(raw);
+}
+
+/**
+ * The same three shapes, for any PEM private key we have to read from an env
+ * var — Apple's .p8 and the Firebase service account's key alike. Firebase
+ * hands its key out inside a JSON file where the newlines are already
+ * literal `\n`, so it arrives needing exactly the repair described above.
+ */
+export function decodePrivateKey(raw: string | undefined | null): string | null {
   const value = (raw ?? "").trim();
   if (!value) return null;
 

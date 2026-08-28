@@ -4,6 +4,8 @@ import {
   decodeApnsKey,
   apnsPayload,
   apnsTokenIsDead,
+  fcmPayload,
+  fcmTokenIsDead,
   isDevicePlatform,
   normalizeDeviceToken,
 } from "@/lib/device-push";
@@ -172,5 +174,80 @@ describe("reading the APNs signing key", () => {
     expect(decodeApnsKey("   ")).toBeNull();
     expect(decodeApnsKey("not-a-key")).toBeNull();
     expect(decodeApnsKey(Buffer.from("hello").toString("base64"))).toBeNull();
+  });
+});
+
+/**
+ * Android, through FCM.
+ *
+ * The same two silent failures as the Apple side, arrived at differently:
+ * a message Google rejects is never delivered and nothing on screen says so,
+ * and a token deleted over the wrong error is a person who quietly stops
+ * being notified for good.
+ */
+describe("what we send to Google", () => {
+  it("carries the title, body and destination", () => {
+    const payload = fcmPayload(
+      { title: "Yeni değerlendirme", body: "Bir kişi seni değerlendirdi." },
+      "/insights",
+    ) as {
+      notification: { title: string; body: string };
+      data: { url: string };
+    };
+    expect(payload.notification).toEqual({
+      title: "Yeni değerlendirme",
+      body: "Bir kişi seni değerlendirdi.",
+    });
+    expect(payload.data.url).toBe("/insights");
+  });
+
+  it("falls back to home when the notification has no link", () => {
+    const payload = fcmPayload({ title: "t", body: "b" }, null) as {
+      data: { url: string };
+    };
+    expect(payload.data.url).toBe("/home");
+  });
+
+  /*
+   * FCM rejects the whole message if a data value is not a string, and the
+   * rejection reads like a bad token rather than a bad payload.
+   */
+  it("keeps every data value a string", () => {
+    const payload = fcmPayload({ title: "t", body: "b" }, "/me") as {
+      data: Record<string, unknown>;
+    };
+    for (const value of Object.values(payload.data)) {
+      expect(typeof value).toBe("string");
+    }
+  });
+
+  it("asks Android to deliver now rather than when convenient", () => {
+    const payload = fcmPayload({ title: "t", body: "b" }, null) as {
+      android: { priority: string };
+    };
+    expect(payload.android.priority).toBe("HIGH");
+  });
+});
+
+describe("deciding an FCM token is dead", () => {
+  it("deletes on UNREGISTERED — the app is gone", () => {
+    expect(fcmTokenIsDead(404, "UNREGISTERED")).toBe(true);
+    expect(fcmTokenIsDead(404, undefined)).toBe(true);
+  });
+
+  /*
+   * SENDER_ID_MISMATCH is the FCM equivalent of Apple's BadDeviceToken trap:
+   * it fires when the token belongs to another Firebase project, which in
+   * practice means our own project id is wrong — and acting on it would
+   * delete every real device at once.
+   */
+  it("keeps the token through failures that are ours to fix", () => {
+    expect(fcmTokenIsDead(403, "SENDER_ID_MISMATCH")).toBe(false);
+    expect(fcmTokenIsDead(400, "INVALID_ARGUMENT")).toBe(false);
+    expect(fcmTokenIsDead(401, "UNAUTHENTICATED")).toBe(false);
+    expect(fcmTokenIsDead(429, "QUOTA_EXCEEDED")).toBe(false);
+    expect(fcmTokenIsDead(503, "UNAVAILABLE")).toBe(false);
+    expect(fcmTokenIsDead(500, "INTERNAL")).toBe(false);
+    expect(fcmTokenIsDead(200, undefined)).toBe(false);
   });
 });

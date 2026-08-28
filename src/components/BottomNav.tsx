@@ -68,9 +68,22 @@ export function BottomNav({ unreadDm = 0 }: { unreadDm?: number }) {
 
   return (
     <>
-      <div className="h-24" />
-      <nav className="fixed bottom-0 inset-x-0 z-40 pointer-events-none">
-        <div className="max-w-[500px] mx-auto px-3 pb-4 pointer-events-auto">
+      <div className="h-28" />
+      {/* The gradient backdrop is what keeps text from showing under the
+          pill: the pill floats, so without it the page scrolled on visibly
+          between the pill and the screen edge. Safe-area padding keeps the
+          whole thing above the iPhone home indicator. */}
+      <nav
+        className="fixed bottom-0 inset-x-0 z-40 pointer-events-none pt-6"
+        style={{
+          background:
+            "linear-gradient(to top, #FBF8F2 62%, rgba(251,248,242,0))",
+        }}
+      >
+        <div
+          className="max-w-[500px] mx-auto px-3 pointer-events-auto"
+          style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+        >
           <div
             className="flex items-center justify-between rounded-full px-1.5 py-2"
             style={{

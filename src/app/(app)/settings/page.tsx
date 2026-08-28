@@ -105,11 +105,7 @@ export default async function SettingsPage() {
           limit={photoLimit(user.plan)}
         />
         <div className="mt-2.5">
-          <ProfileEditor
-            name={user.name}
-            bio={user.bio ?? ""}
-            avatarColor={user.avatarColor}
-          />
+          <ProfileEditor name={user.name} bio={user.bio ?? ""} />
         </div>
       </div>
 

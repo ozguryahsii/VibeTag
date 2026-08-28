@@ -114,6 +114,15 @@ select {
   background-image: var(--grad-gold);
 }
 
+/* A fixed bar only stays put if the page cannot scroll sideways under it.
+   One row overflowing by a few pixels used to drag the whole viewport — and
+   the "fixed" nav with it. clip, not hidden: hidden creates a scroll
+   container, clip just refuses the overflow. */
+html,
+body {
+  overflow-x: clip;
+}
+
 @utility grad-text {
   background-image: var(--grad-score);
   background-clip: text;

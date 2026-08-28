@@ -148,23 +148,16 @@ export async function updateProfileAction(
   const d = await getDict();
   const name = String(formData.get("name") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
-  const avatarColor = String(formData.get("avatarColor") ?? "#FF8A3D");
 
   if (name.length < 2) return { error: d.auth.errors.nameShort };
   if (bio.length > 160) return { error: d.auth.errors.bioLong };
 
-  // The profile picture is not edited here. It is chosen in the photo box,
-  // which owns `avatarUrl` — writing it from this form too would mean two
-  // places quietly overwriting each other.
+  // Neither the picture nor the accent colour is edited here. Photos live in
+  // the photo box, which owns `avatarUrl`; the colour is assigned at sign-up
+  // and stays — the picker was removed on 2026-08-28.
   await prisma.user.update({
     where: { id: user.id },
-    data: {
-      name,
-      bio: bio || null,
-      avatarColor: /^#[0-9a-fA-F]{6}$/.test(avatarColor)
-        ? avatarColor
-        : "#FF8A3D",
-    },
+    data: { name, bio: bio || null },
   });
 
   revalidatePath("/", "layout");

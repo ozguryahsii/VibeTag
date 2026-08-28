@@ -92,12 +92,15 @@ export function NativePushPrompt() {
         <p className="text-[12px] text-muted leading-relaxed mt-0.5">
           {d.push.askBody}
         </p>
+        {/* No fixed heights here. With a large system font "Bildirimleri aç"
+            wraps, and a wrapped label inside h-10 spills out of the pill —
+            the buttons split the row instead, and grow around their text. */}
         <div className="mt-3 flex gap-2.5">
           <button
             type="button"
             onClick={enable}
             disabled={working}
-            className="h-10 px-4 rounded-full grad-score text-white font-bold text-[13px] disabled:opacity-50"
+            className="flex-1 min-w-0 min-h-10 px-3 py-2 grid place-items-center rounded-full grad-score text-white font-bold text-[13px] leading-tight disabled:opacity-50"
           >
             {working ? d.common.saving : d.push.askYes}
           </button>
@@ -105,7 +108,7 @@ export function NativePushPrompt() {
             type="button"
             onClick={dismiss}
             disabled={working}
-            className="h-10 px-4 rounded-full bg-white border border-line font-bold text-[13px] text-muted disabled:opacity-50"
+            className="flex-1 min-w-0 min-h-10 px-3 py-2 grid place-items-center rounded-full bg-white border border-line font-bold text-[13px] text-muted leading-tight disabled:opacity-50"
           >
             {d.push.askLater}
           </button>

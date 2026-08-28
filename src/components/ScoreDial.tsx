@@ -94,17 +94,25 @@ export function ScoreDial({
         >
           MY VIBE
         </div>
+        {/* line-height 1, not 0.8: Android's WebView paints gradient text
+            (background-clip: text) only inside the line box when an ancestor
+            clips — the profile card is overflow-hidden — so the tight line
+            box swallowed the digits' top and bottom. The extra height is
+            taken back with margins, and translateZ lifts the element onto
+            its own layer, clear of the ancestor's clip. */}
         <div
           className={calm ? "tabular-nums" : "grad-text tabular-nums"}
           style={{
-            marginTop: size * 0.035,
+            marginTop: size * 0.035 - size * 0.04,
+            marginBottom: -size * 0.04,
             color: calm ? "#4C3D33" : undefined,
             fontFamily: "var(--font-score)",
             fontSize: size * 0.4,
             fontWeight: 400,
-            lineHeight: 0.8,
+            lineHeight: 1,
             letterSpacing: "-0.055em",
             paddingRight: "0.045em",
+            transform: "translateZ(0)",
           }}
         >
           {shown}

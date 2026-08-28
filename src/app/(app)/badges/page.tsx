@@ -16,6 +16,7 @@ import { badgeLabel, badgeRequirement, percent, tierLabel } from "@/lib/labels";
 import { TIER_STYLE } from "@/lib/tier-style";
 import { iconFor } from "@/lib/icons";
 import { IconGlyph } from "@/components/Icon";
+import { BadgeTile } from "@/components/BadgeTile";
 import { LangToggle } from "@/components/LangToggle";
 import { Card, Meter, SectionTitle } from "@/components/ui";
 import { verificationState } from "@/lib/verification";
@@ -31,84 +32,6 @@ function fmtDate(date: Date, locale: Locale): string {
     month: "short",
     year: "numeric",
   }).format(date);
-}
-
-/**
- * One badge, as a square.
- *
- * Four facts and nothing else: which badge, which tier, what it cost, and —
- * if it is yours — when. The blurb that used to sit in the middle turned a
- * shelf into an essay; a wall of tiles you can scan beats ten paragraphs you
- * will not read twice.
- */
-function BadgeTile({
-  badge,
-  d,
-  locale,
-}: {
-  badge: Held;
-  d: Dictionary;
-  locale: Locale;
-}) {
-  const style = TIER_STYLE[badge.tier];
-  const earned = badge.earned;
-
-  return (
-    <Card
-      padded={false}
-      className="flex flex-col items-center p-2.5 text-center"
-      style={
-        earned
-          ? { borderColor: style.ring, background: "#FFFDF9" }
-          : { opacity: 0.62 }
-      }
-    >
-      {/* Same glyph at every tier — only the metal climbs. */}
-      <span
-        className={`grid h-10 w-10 place-items-center rounded-full ${
-          earned ? style.grad : "bg-cream border border-line"
-        }`}
-      >
-        <IconGlyph
-          def={iconFor(badge.icon)}
-          size={19}
-          color={earned ? "#fff" : "#B5A99F"}
-          strokeWidth={earned ? 2 : 1.8}
-        />
-      </span>
-
-      <p
-        className={`mt-1.5 text-[11.5px] font-extrabold leading-[1.15] ${
-          earned ? "" : "text-muted"
-        }`}
-      >
-        {badgeLabel(badge.key, d)}
-      </p>
-      <p
-        className="text-[9.5px] font-bold leading-tight mt-0.5"
-        style={{ color: style.ink }}
-      >
-        {tierLabel(badge.tier, d)}
-      </p>
-
-      <p className="mt-1 text-[9.5px] text-muted leading-tight">
-        {badgeRequirement(badge, d, locale)}
-      </p>
-
-      {earned ? (
-        <p className="mt-1 text-[9.5px] font-bold text-muted tabular-nums">
-          {badge.earnedAt ? fmtDate(badge.earnedAt, locale) : "—"}
-        </p>
-      ) : (
-        <div className="mt-1.5 w-full">
-          <Meter value={badge.progress * 100} />
-          <p className="mt-1 text-[9.5px] font-bold text-muted tabular-nums">
-            {percent(badge.progress * 100, locale)}
-          </p>
-        </div>
-      )}
-    </Card>
-  );
 }
 
 export default async function BadgesPage() {
@@ -129,6 +52,20 @@ export default async function BadgesPage() {
   const all: Held[] = computeBadges(profile).map((b) => {
     const at = earnedAt.get(`${b.key}:${b.tier}`) ?? null;
     return { ...b, earned: b.earned || at !== null, earnedAt: at };
+  });
+
+  // The tile is a client component — it owns the detail sheet a press opens —
+  // so everything it shows crosses as plain, already-localised strings.
+  const tileProps = (b: Held) => ({
+    icon: b.icon,
+    tier: b.tier,
+    earned: b.earned,
+    progress: b.progress,
+    label: badgeLabel(b.key, d),
+    tierText: tierLabel(b.tier, d),
+    requirement: badgeRequirement(b, d, locale),
+    earnedDate: b.earnedAt ? fmtDate(b.earnedAt, locale) : null,
+    progressText: percent(b.progress * 100, locale),
   });
 
   const earnedTotal = all.filter((b) => b.earned).length;
@@ -174,12 +111,7 @@ export default async function BadgesPage() {
           <SectionTitle>{d.badgesPage.earned}</SectionTitle>
           <div className="grid grid-cols-3 gap-2.5">
             {best.map((b) => (
-              <BadgeTile
-                key={`${b.key}:${b.tier}`}
-                badge={b}
-                d={d}
-                locale={locale}
-              />
+              <BadgeTile key={`${b.key}:${b.tier}`} {...tileProps(b)} />
             ))}
           </div>
         </section>
@@ -293,12 +225,7 @@ export default async function BadgesPage() {
 
             <div className="grid grid-cols-3 gap-2.5">
               {badges.map((b) => (
-                <BadgeTile
-                  key={`${b.key}:${b.tier}`}
-                  badge={b}
-                  d={d}
-                  locale={locale}
-                />
+                <BadgeTile key={`${b.key}:${b.tier}`} {...tileProps(b)} />
               ))}
             </div>
           </section>

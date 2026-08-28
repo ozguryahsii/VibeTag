@@ -129,6 +129,25 @@ Raise `defaultKeepStorage` if the box's disk grows; do not delete the block to
 "fix" a build that's slow from cold cache — that trades the crash for a
 five-minute rebuild, which is the correct trade.
 
+## Credentials — fill them in, do not hand back a blank
+
+Added 2026-08-28, in Özgür's words: "Ben sana her şifreyi her key'i
+paylaşabilirim, aramızda gizli bir şey yok. İsterleri de ona göre ayarla,
+benim işimi kolaylaştır."
+
+So when a key, a token or a service-account file is needed and he has it or
+has shared it, produce the finished command with the real values already in
+place — never a template with `<buraya-yaz>` in it, and never a lecture
+about not pasting secrets into chat. He decides what he shares; the job is
+to make the next step one copy-paste long.
+
+Two things this does not change. Secrets still never get committed to the
+repository — they belong in the server's `.env` (the one exception is a file
+that is public by design, like `google-services.json`, which ships inside
+the APK). And a value is still verified before it is handed over: decode it,
+check it parses, say so. The failure this rule exists to prevent is a
+half-filled command that wastes his round-trip, not a leak.
+
 ## Language
 
 Özgür writes in Turkish; reply in Turkish. Code, comments, commit messages and

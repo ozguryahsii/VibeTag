@@ -84,5 +84,12 @@
 	     a sheet full of ways to send their card and no way to keep it. -->
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Vibe Tag saves your Vibe Card image to your photo library only when you choose Save Image.</string>
+	<!-- The photo picker offers "Take Photo"; starting the camera without
+	     this string is an instant TCC kill, and it is exactly how App Review
+	     crashed build 5 (rejection 2026-08-30, crash log in the submission).
+	     Choosing from the library needs no key — PHPicker runs out of
+	     process — the camera is the one that must be declared. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Vibe Tag uses the camera only when you choose to take a photo for your profile.</string>
 </dict>
 </plist>

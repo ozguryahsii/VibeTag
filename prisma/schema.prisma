@@ -85,11 +85,18 @@ model User {
   /// cannot sign in or rate; the row and its history stay intact.
   suspendedAt DateTime?
 
-  /// Who may write a note when rating this person: EVERYONE | CIRCLE (the
-  /// people they invited and their friends, as one group). Ratings
-  /// themselves are open to everyone — this gates only the free-text note,
-  /// which is where harassment actually happens.
-  commentPolicy String @default("EVERYONE")
+  /// Who may rate this person: EVERYONE | CIRCLE (the people they invited
+  /// and their friends, as one group) | NOBODY (paused — nothing new comes
+  /// in, what they already have keeps counting). Until 2026-09-02 this
+  /// gated only the free-text note; App Review read "anyone can score you"
+  /// as a feature that objectifies real people, and they had a point. The
+  /// note follows the rating: whoever may rate may also write.
+  ratingPolicy String @default("EVERYONE")
+
+  /// Whether the notes people wrote about them appear on their public
+  /// profile. Off hides the wall from everyone else; they still read every
+  /// note themselves on Insights.
+  showComments Boolean @default(true)
 
   /// Last language this person chose. The UI reads a cookie; a push
   /// notification has no request to read one from, so the choice is mirrored

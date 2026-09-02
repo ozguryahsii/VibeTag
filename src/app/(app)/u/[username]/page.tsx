@@ -5,7 +5,9 @@ import { toggleBlockAction } from "@/lib/actions/safety";
 import { ReportDialog } from "@/components/ReportDialog";
 import { prisma } from "@/lib/db";
 import { getMyRatingOf, getPercentile, getUserByUsername, getVibeProfile } from "@/lib/profile";
-import { cooldownDaysLeft } from "@/lib/rating-rules";
+import { cooldownDaysLeft, ratingAllowed } from "@/lib/rating-rules";
+import { hasInviteGrant } from "@/lib/invite";
+import { areFriends } from "@/lib/social";
 import { bestPerFamily, earnedBadges, hardestBadges } from "@/lib/badges";
 import { verificationState } from "@/lib/verification";
 import { generateVibeSummary } from "@/lib/insights";
@@ -81,6 +83,14 @@ export default async function PublicProfile({
   );
   const existing = isMe ? null : await getMyRatingOf(me.id, user.id);
   const daysLeft = existing ? cooldownDaysLeft(existing.lastUpdatedAt) : 0;
+  // Their door, not mine: a closed profile shows why instead of a button
+  // that leads to a closed door one tap later.
+  const mayRate =
+    !isMe &&
+    ratingAllowed(user.ratingPolicy, {
+      invited: await hasInviteGrant(me.id, user.id),
+      friends: await areFriends(me.id, user.id),
+    });
 
   const blockedByMe = isMe
     ? null
@@ -91,14 +101,18 @@ export default async function PublicProfile({
         select: { id: true },
       });
 
-  // Anonymous wall — comments are never attributed to a person here,
-  // no matter who is looking (§9).
-  const comments = await prisma.rating.findMany({
-    where: { ratedUserId: user.id, comment: { not: null }, hiddenAt: null },
-    select: { id: true, comment: true, relationship: true, createdAt: true },
-    orderBy: { createdAt: "desc" },
-    take: 6,
-  });
+  // The wall of notes — never attributed to a person here, no matter who is
+  // looking (§9), and only there at all if its owner keeps it on. Off means
+  // off for everyone but them: they read their notes on Insights, and
+  // seeing the wall on their own profile would suggest others see it too.
+  const comments = user.showComments
+    ? await prisma.rating.findMany({
+        where: { ratedUserId: user.id, comment: { not: null }, hiddenAt: null },
+        select: { id: true, comment: true, relationship: true, createdAt: true },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+      })
+    : [];
 
   return (
     <main className="px-5 pt-12">
@@ -235,7 +249,15 @@ export default async function PublicProfile({
 
       {!isMe && !blockedByMe && (
         <div className="mt-5">
-          {existing && daysLeft > 0 ? (
+          {!mayRate ? (
+            <div className="card p-4 text-center" data-testid="rating-closed">
+              <p className="text-[13.5px] font-bold">
+                {user.ratingPolicy === "NOBODY"
+                  ? fill(d.profile.notAccepting, { name: firstName })
+                  : fill(d.profile.circleOnly, { name: firstName })}
+              </p>
+            </div>
+          ) : existing && daysLeft > 0 ? (
             <div className="card p-4 text-center">
               <p className="text-[13.5px] font-bold">
                 {d.profile.alreadyRated}

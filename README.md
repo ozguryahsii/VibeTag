@@ -189,10 +189,17 @@ içeren notları gönderim anında reddeder. Bir kelime listesi taban seviyedir,
 
 ### 8. Gizlilik ayarı
 
-Puanlama herkese açıktır. `commentPolicy` yazılı notu kapılar ve iki değeri
-vardır: `EVERYONE` ya da `CIRCLE` (kullanıcının davet ettikleri ve arkadaşları,
-tek grup olarak). Taciz notta yaşar, puanda değil — o yüzden kapı notun
-üstündedir ve ayar notu yazanın değil, hakkında yazılanın elindedir.
+`ratingPolicy` kimin değerlendirebileceğini belirler ve üç değeri vardır:
+`EVERYONE`, `CIRCLE` (kullanıcının davet ettikleri ve arkadaşları, tek grup
+olarak) ya da `NOBODY` (duraklatılmış: yeni değerlendirme gelmez, mevcut oylar
+sayılmaya devam eder). Yazılı not puanı takip eder — puan verebilen not da
+yazabilir. Ayar, değerlendirenin değil, hakkında yazılanın elindedir.
+
+`showComments` ise hakkında yazılan notların herkese açık profilde görünüp
+görünmeyeceğini belirler; kapalıyken kişi notları yalnızca kendi Insights
+ekranında okur. İkisi de 2026-09-02'de App Review'un 1.2 (gerçek kişileri
+nesneleştirme) itirazına cevaben bu hâlini aldı: eskiden puan herkese açıktı
+ve ayar yalnızca notu kapatırdı.
 
 ### 9. Skor — `src/lib/vibe.ts`
 

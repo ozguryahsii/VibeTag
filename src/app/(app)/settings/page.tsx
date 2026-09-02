@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { logoutAction } from "@/lib/actions/auth";
-import { setCommentPolicyAction, toggleBlockAction } from "@/lib/actions/safety";
+import { setRatingPolicyAction, setShowCommentsAction, toggleBlockAction } from "@/lib/actions/safety";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { PhotoVault } from "@/components/PhotoVault";
 import { mainPhotoId, photoLimit } from "@/lib/photos";
@@ -235,14 +235,16 @@ export default async function SettingsPage() {
         <Card className="grid gap-3">
           <div>
             <p className="text-[13.5px] font-extrabold">
-              {d.settings.whoCanComment}
+              {d.settings.whoCanRate}
             </p>
             <p className="text-[12px] text-muted leading-relaxed mt-0.5">
-              {d.settings.whoCanCommentBody}
+              {d.settings.whoCanRateBody}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
+          {/* One column: three doors with a line of explanation each read
+              better stacked than squeezed side by side on a phone. */}
+          <div className="grid gap-2.5" data-testid="rating-policy">
             {[
               {
                 key: "EVERYONE",
@@ -254,14 +256,20 @@ export default async function SettingsPage() {
                 label: d.settings.circleOnly,
                 hint: d.settings.circleOnlyHint,
               },
+              {
+                key: "NOBODY",
+                label: d.settings.nobody,
+                hint: d.settings.nobodyHint,
+              },
             ].map((opt) => {
-              const active = user.commentPolicy === opt.key;
+              const active = user.ratingPolicy === opt.key;
               return (
-                <form key={opt.key} action={setCommentPolicyAction}>
-                  <input type="hidden" name="commentPolicy" value={opt.key} />
+                <form key={opt.key} action={setRatingPolicyAction}>
+                  <input type="hidden" name="ratingPolicy" value={opt.key} />
                   <button
                     type="submit"
-                    className={`w-full h-full rounded-[20px] p-3 text-left ${
+                    aria-pressed={active}
+                    className={`w-full rounded-[20px] p-3 text-left ${
                       active ? "grad-ring" : "bg-cream border border-line"
                     }`}
                   >
@@ -276,6 +284,40 @@ export default async function SettingsPage() {
               );
             })}
           </div>
+        </Card>
+
+        <Card className="mt-2.5 flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[13.5px] font-extrabold">
+              {d.settings.showComments}
+            </p>
+            <p className="text-[12px] text-muted leading-relaxed mt-0.5">
+              {d.settings.showCommentsBody}
+            </p>
+          </div>
+          <form action={setShowCommentsAction} className="shrink-0">
+            <input
+              type="hidden"
+              name="showComments"
+              value={user.showComments ? "0" : "1"}
+            />
+            <button
+              type="submit"
+              role="switch"
+              aria-checked={user.showComments}
+              aria-label={d.settings.showComments}
+              data-testid="show-comments"
+              className={`relative h-7 w-12 rounded-full transition-colors ${
+                user.showComments ? "grad-score" : "bg-line"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                  user.showComments ? "translate-x-[22px]" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </form>
         </Card>
 
         <Card className="grid gap-3 mt-2.5">

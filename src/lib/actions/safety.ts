@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { destroySession, requireUser } from "@/lib/auth";
 import { isReportReason } from "@/lib/moderation";
+import { RATING_POLICIES } from "@/lib/rating-rules";
 import { getDict } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 
@@ -130,16 +131,29 @@ export async function reportAction(
 
 // ------------------------------------------------------------ privacy
 
-export async function setCommentPolicyAction(formData: FormData): Promise<void> {
+export async function setRatingPolicyAction(formData: FormData): Promise<void> {
   const me = await requireUser();
-  const policy = String(formData.get("commentPolicy") ?? "EVERYONE");
-  if (!["EVERYONE", "CIRCLE"].includes(policy)) return;
+  const policy = String(formData.get("ratingPolicy") ?? "EVERYONE");
+  if (!(RATING_POLICIES as readonly string[]).includes(policy)) return;
 
   await prisma.user.update({
     where: { id: me.id },
-    data: { commentPolicy: policy },
+    data: { ratingPolicy: policy },
   });
   revalidatePath("/settings");
+}
+
+/** Show or hide the notes written about me on my public profile. */
+export async function setShowCommentsAction(formData: FormData): Promise<void> {
+  const me = await requireUser();
+  const show = String(formData.get("showComments") ?? "") === "1";
+
+  await prisma.user.update({
+    where: { id: me.id },
+    data: { showComments: show },
+  });
+  revalidatePath("/settings");
+  revalidatePath(`/u/${me.username}`);
 }
 
 // ------------------------------------------------------- account deletion

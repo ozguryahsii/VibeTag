@@ -16,22 +16,33 @@ export function nextUpdateDate(lastUpdatedAt: Date | null): Date | null {
 }
 
 /**
- * Who may write a free-text note when rating this person.
+ * Who may rate this person — score, tags and note alike.
  *
- * Ratings themselves are open to everyone; the note is where harassment
- * actually happens, so it is the note the rated person controls. Two
- * choices only: open, or "my circle" — the people they invited and their
- * friends, as one group. (INVITED and FRIENDS are the pre-merge spellings
- * of that circle; rows are migrated, but a stray value must still deny the
- * way its owner meant.) Unknown values fall back to EVERYONE rather than
- * throwing — a bad row must not make a profile unratable.
+ * Three choices: open; "my circle" — the people they invited and their
+ * friends, as one group; or nobody, which pauses the profile. Paused means
+ * nothing new comes in and nothing already there changes: an existing
+ * rater may not revise either. What they already received keeps counting.
+ *
+ * Until 2026-09-02 this gated only the written note, on the theory that
+ * harassment lives in prose. App Review (guideline 1.2) read "anyone may
+ * score a real person" as objectifying them, and a score somebody never
+ * asked for is not that different from a note they never asked for. So the
+ * whole rating is now the rated person's to open or close.
+ *
+ * INVITED and FRIENDS are the pre-merge spellings of the circle; rows are
+ * migrated, but a stray value must still deny the way its owner meant.
+ * Unknown values fall back to EVERYONE rather than throwing — a bad row
+ * must not make a profile unratable.
  */
-export type CommentPolicy = "EVERYONE" | "CIRCLE";
+export type RatingPolicy = "EVERYONE" | "CIRCLE" | "NOBODY";
 
-export function commentAllowed(
+export const RATING_POLICIES: readonly RatingPolicy[] = ["EVERYONE", "CIRCLE", "NOBODY"];
+
+export function ratingAllowed(
   policy: string,
   ctx: { invited: boolean; friends: boolean },
 ): boolean {
+  if (policy === "NOBODY") return false;
   if (policy === "CIRCLE") return ctx.invited || ctx.friends;
   if (policy === "INVITED") return ctx.invited;
   if (policy === "FRIENDS") return ctx.friends;

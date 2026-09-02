@@ -16,7 +16,9 @@ export default async function RatePickerPage() {
 
   const [users, mine] = await Promise.all([
     prisma.user.findMany({
-      where: { id: { not: me.id } },
+      // A paused profile is not a suggestion — tapping it would only
+      // open a closed door.
+      where: { id: { not: me.id }, ratingPolicy: { not: "NOBODY" } },
       select: {
         id: true,
         name: true,

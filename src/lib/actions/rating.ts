@@ -9,7 +9,7 @@ import { moderateComment } from "@/lib/moderation";
 import { notify } from "@/lib/notifications";
 import { awardAndNotify } from "@/lib/awards";
 import { areFriends } from "@/lib/social";
-import { commentAllowed, cooldownDaysLeft } from "@/lib/rating-rules";
+import { ratingAllowed, cooldownDaysLeft } from "@/lib/rating-rules";
 import { getDict, getLocale } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 import { traitLabel } from "@/lib/labels";
@@ -60,7 +60,7 @@ export async function submitRatingAction(
 
   const rated = await prisma.user.findUnique({
     where: { username },
-    select: { id: true, username: true, name: true, commentPolicy: true },
+    select: { id: true, username: true, name: true, ratingPolicy: true },
   });
   if (!rated) return { error: d.rating.errors.noUser };
   if (rated.id === rater.id) {
@@ -86,17 +86,17 @@ export async function submitRatingAction(
     };
   }
 
-  // Anyone may rate anyone. What the policy gates is the free-text note —
-  // that is where harassment happens, and it is the rated person's call.
+  // The rated person decides who may rate them at all — score, tags and
+  // note alike. Checked here and not only on the page: a form is a request,
+  // not a permission.
   if (
-    comment &&
-    !commentAllowed(rated.commentPolicy, {
+    !ratingAllowed(rated.ratingPolicy, {
       invited: await hasInviteGrant(rater.id, rated.id),
       friends: await areFriends(rater.id, rated.id),
     })
   ) {
     return {
-      error: fill(d.rating.errors.commentNotAllowed, {
+      error: fill(d.rating.errors.notAccepting, {
         name: rated.name.split(" ")[0],
       }),
     };

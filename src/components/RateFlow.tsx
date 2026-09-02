@@ -57,12 +57,9 @@ export type ExistingSummary = {
 export function RateFlow({
   target,
   existing,
-  canComment,
 }: {
   target: RateTarget;
   existing: ExistingSummary | null;
-  /** Decided server-side from the rated person's comment policy. */
-  canComment: boolean;
 }) {
   const d = useD();
   const locale = useLocale();
@@ -211,7 +208,7 @@ export function RateFlow({
         {tags.map((t) => (
           <input key={t} type="hidden" name="tags" value={t} />
         ))}
-        <input type="hidden" name="comment" value={canComment ? comment : ""} />
+        <input type="hidden" name="comment" value={comment} />
 
         {/* ---------------------------------------------- step 0 */}
         {step === 0 && (
@@ -421,29 +418,16 @@ export function RateFlow({
               {d.rateFlow.noteBody}
             </p>
 
-            {canComment ? (
-              <>
-                <textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value.slice(0, 280))}
-                  rows={4}
-                  placeholder={d.rateFlow.notePlaceholder}
-                  className="mt-4 w-full rounded-[22px] border border-line bg-warmwhite p-4 text-[14px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition resize-none shadow-[0_10px_30px_rgba(93,58,42,0.035)]"
-                />
-                <div className="text-right text-[11px] text-muted mt-1">
-                  {comment.length}/280
-                </div>
-              </>
-            ) : (
-              /* The rated person's choice, said plainly. Scores still count —
-                 only the free-text note is closed to this rater. */
-              <div className="mt-4 rounded-[22px] border border-line bg-cream px-4 py-4">
-                <p className="text-[13px] font-bold">{d.rateFlow.noteLocked}</p>
-                <p className="text-[12px] text-muted leading-relaxed mt-1">
-                  {fill(d.rateFlow.noteLockedBody, { name: firstName })}
-                </p>
-              </div>
-            )}
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value.slice(0, 280))}
+              rows={4}
+              placeholder={d.rateFlow.notePlaceholder}
+              className="mt-4 w-full rounded-[22px] border border-line bg-warmwhite p-4 text-[14px] outline-none focus:border-coral/60 focus:ring-4 focus:ring-coral/10 transition resize-none shadow-[0_10px_30px_rgba(93,58,42,0.035)]"
+            />
+            <div className="text-right text-[11px] text-muted mt-1">
+              {comment.length}/280
+            </div>
 
             <div className="mt-4 rounded-2xl bg-warmwhite border border-line px-4 py-3.5">
               <p

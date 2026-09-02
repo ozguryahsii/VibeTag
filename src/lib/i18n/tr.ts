@@ -17,7 +17,7 @@ export const tr: Dictionary = {
     delete: "Sil",
     yes: "Evet, çıkar",
     no: "Hayır, kalsın",
-    anonymous: "Anonim",
+    anonymous: "Kimliği gizli",
     people: "kişi",
     person: "kişi",
     ratedBy: "Değerlendiren",
@@ -62,7 +62,7 @@ export const tr: Dictionary = {
     haveAccount: "Zaten hesabım var",
     points: [
       {
-        title: "Tüm oylar anonim",
+        title: "Kimliğin gizli kalır",
         body: "Kimin ne yazdığını kimse göremez.",
       },
       {
@@ -171,7 +171,7 @@ export const tr: Dictionary = {
       "Farklı çevrelerden {n} kişi daha, profilini belirgin şekilde gerçekçi kılar.",
     insightsTitle: "Seni hangi çevrelerden tanıyorlar?",
     insightsBody:
-      "Çevre dağılımı, güçlü yönler ve anonim değerlendirme detayları.",
+      "Çevre dağılımı, güçlü yönler ve değerlendirme detayları.",
     insightsCta: "Analizi aç",
   },
 
@@ -271,11 +271,14 @@ export const tr: Dictionary = {
     noteBody: "İsteğe bağlı. Birkaç dürüst cümle, puandan daha çok şey anlatır.",
     notePlaceholder:
       "Örn. Söz verdiği işi zamanında teslim etti, iletişimi çok netti.",
-    noteLocked: "Bu profilde not yazma kapalı",
-    noteLockedBody:
-      "{name} yazılı notları yalnızca belirli kişilerden kabul ediyor. Puanların ve Vibe Tag'lerin yine tam olarak sayılır.",
+    pausedTitle: "{name} şu anda değerlendirme almıyor",
+    pausedBody:
+      "Bu kişi profilini değerlendirmeye kapatmış. Bunu istediği zaman ayarlarından yeniden açabilir.",
+    circleOnlyTitle: "{name} yalnızca çevresinden değerlendirme alıyor",
+    circleOnlyBody:
+      "Bu kişiyi yalnızca davet ettiği kişiler ve arkadaşları değerlendirebilir. Arkadaş olduğunuzda ya da davetiyle katıldığında değerlendirebilirsin.",
     privacyNote:
-      "🔒 Değerlendirmeler varsayılan olarak anonim gösterilir. {name} Gold üyeyse kendisini değerlendirenleri görebilir. Değerlendirmeni <b>ayda bir kez</b> güncelleyebilirsin.",
+      "🔒 Kimliğin varsayılan olarak gizli tutulur. {name} Gold üyeyse kendisini değerlendirenleri görebilir. Değerlendirmeni <b>ayda bir kez</b> güncelleyebilirsin.",
     alreadyRated: "Bu kişiyi zaten değerlendirdin.",
     alreadyRatedBody:
       "Ayda bir kez güncelleyebilirsin — <b>{n} gün</b> sonra tekrar düzenleyebilirsin.",
@@ -291,7 +294,7 @@ export const tr: Dictionary = {
     successNew: "Teşekkürler!",
     successUpdate: "Değerlendirmen güncellendi",
     successBody:
-      "{name} artık çevresinin onda gördüğü güzel özelliklerden birini daha görebilecek. Değerlendirmen <b>anonim</b> olarak eklendi.",
+      "{name} artık çevresinin onda gördüğü güzel özelliklerden birini daha görebilecek. Değerlendirmen <b>kimliğin gizli tutularak</b> eklendi.",
     seeProfile: "{name}'in profilini gör",
     rateAnother: "Başka birini değerlendir",
     scoreWords: ["", "Zayıf", "İdare eder", "İyi", "Çok iyi", "Mükemmel"],
@@ -306,7 +309,9 @@ export const tr: Dictionary = {
     strengths: "Güçlü yönler",
     circles: "Nereden tanınıyor?",
     aiSummary: "AI özeti",
-    anonNotes: "Anonim notlar",
+    anonNotes: "Çevresinden notlar",
+    notAccepting: "{name} şu anda değerlendirme almıyor.",
+    circleOnly: "{name} yalnızca çevresinden değerlendirme alıyor.",
     fromCircle: "{group} çevresinden",
     rateCta: "{name}'i değerlendir",
     updateCta: "Değerlendirmemi güncelle",
@@ -336,9 +341,9 @@ export const tr: Dictionary = {
     detailed: "Detaylı analiz",
     strongest: "EN GÜÇLÜ YÖNLER",
     growth: "GELİŞİM ALANLARI",
-    anonDetails: "Anonim oy detayları",
+    anonDetails: "Oy detayları",
     ratings: "Değerlendirmeler",
-    messageLocked: "🔒 Anonime mesaj · Silver",
+    messageLocked: "🔒 Değerlendirene mesaj · Silver",
     unlockWith: "{plan} ile aç",
     protectedNote:
       "🔒 Bu değerlendirmenin kimliği sistem tarafından korunuyor — Gold üyelikte de görünmez.",
@@ -346,7 +351,7 @@ export const tr: Dictionary = {
     goldKicker: "GOLD · VIBE IDENTITY",
     goldTitle: "Kimlerin değerlendirdiğini gör",
     goldBody:
-      "Kim, nereden tanıyor ve hangi alanlarda değerlendirdi. Korunan ve gizlenen oylar her zaman anonim kalır.",
+      "Kim, nereden tanıyor ve hangi alanlarda değerlendirdi. Korunan ve gizlenen oyların kimliği her zaman gizli kalır.",
     goldCta: "Gold'a geç",
     emptyTitle: "Analiz için veri yok",
     emptyBody:
@@ -568,16 +573,16 @@ export const tr: Dictionary = {
     how: [
       "Linki paylaş — açan kişi doğrudan senin değerlendirme sayfana düşer.",
       "Seni nereden tanıdığını seçer; sadece o ilişkiye uygun kriterler açılır.",
-      "Cevabı anonim eklenir, sen kimin ne yazdığını görmezsin.",
+      "Cevabı kimliği gizli tutularak eklenir, sen kimin ne yazdığını görmezsin.",
     ],
     shareText:
-      "{name} olarak Vibe Tag'deyim — beni nasıl gördüğünü merak ediyorum. 30 saniye sürüyor, cevabın anonim kalıyor:",
+      "{name} olarak Vibe Tag'deyim — beni nasıl gördüğünü merak ediyorum. 30 saniye sürüyor, kimliğin gizli kalıyor:",
   },
 
   inviteLanding: {
     waiting: "{name} senden bir",
     waitingVibe: "Vibe",
-    body: "Onu nereden tanıdığını seç ve sadece o ilişkide gözlemlediklerini değerlendir. Cevabın <b>anonim</b> kalır.",
+    body: "Onu nereden tanıdığını seç ve sadece o ilişkide gözlemlediklerini değerlendir. Kimliğin <b>gizli</b> kalır.",
     peopleSay: "İnsanlar {name} için diyor ki",
     points: [
       "Tanışıklığını seçmeden değerlendiremezsin",
@@ -667,9 +672,9 @@ export const tr: Dictionary = {
       "Bu kişi sana yazdığında cevap verebilirsin. Böylece değerlendirme, açık bir kanala dönüşmüyor.",
     blockedThread: "Biriniz diğerini engellediği için bu sohbet kapalı.",
     aboutRating: "Aldığın bir değerlendirme üzerine",
-    anonymousPartner: "Anonim değerlendiren",
+    anonymousPartner: "Kimliği gizli değerlendiren",
     anonymousNote:
-      "Bu kişi seni anonim değerlendirdi — sohbeti görürsün, kimliğini değil.",
+      "Bu kişi seni kimliği gizli olarak değerlendirdi — sohbeti görürsün, kimliğini değil.",
     you: "Sen",
     unreadOne: "1 okunmamış mesaj",
     unreadMany: "{n} okunmamış mesaj",
@@ -708,13 +713,18 @@ export const tr: Dictionary = {
       "Ücretsiz deneme hakkını {plan} üyelikte kullandın. Deneme hesap başına bir kezdir, o yüzden bu plan doğrudan ücretlidir.",
     trialSpentShort: "Deneme hakkın kullanıldı",
     privacy: "Gizlilik ve güvenlik",
-    whoCanComment: "Sana kimler yorum yapabilir?",
-    whoCanCommentBody:
-      "Puanlama herkese açıktır. Bu ayar, değerlendirmeye kimlerin yazılı not ekleyebileceğini belirler.",
+    whoCanRate: "Seni kimler değerlendirebilir?",
+    whoCanRateBody:
+      "Puan, Vibe Tag ve yazılı not — hepsi bu ayara bağlıdır. Kapattığında aldığın değerlendirmeler silinmez, sayılmaya devam eder.",
     everyone: "Herkes",
-    everyoneHint: "Notlar açık",
-    circleOnly: "Davet ettiklerim ve arkadaşlarım",
-    circleOnlyHint: "Sadece çevrem",
+    everyoneHint: "Vibe Tag'deki tüm üyeler",
+    circleOnly: "Sadece çevrem",
+    circleOnlyHint: "Davet ettiklerim ve arkadaşlarım",
+    nobody: "Hiç kimse",
+    nobodyHint: "Yeni değerlendirme almayı duraklat",
+    showComments: "Notlarımı profilimde göster",
+    showCommentsBody:
+      "Kapalıyken hakkında yazılan notları yalnızca sen görürsün; profilinde kimseye görünmez.",
     blocked: "Engellediklerin",
     blockedEmpty: "Kimseyi engellemedin.",
     account: "Hesap",
@@ -731,7 +741,7 @@ export const tr: Dictionary = {
     deleteMismatch: "Onaylamak için kullanıcı adını yaz: {username}",
     privacyPoints: [
       {
-        title: "Anonim Değerlendirmeler",
+        title: "Gizli Kimlik",
         body: "Kimin ne yazdığı profillerde görünmez. Yalnızca Gold üyeler kendilerini değerlendirenleri görebilir.",
       },
       {
@@ -761,7 +771,7 @@ export const tr: Dictionary = {
           "Vibe Profili oluşturma",
           "Vibe Skor Kart oluşturma",
           "Sınırsız değerlendirme gönder / al",
-          "Sana verilen puanların detaylarını anonim olarak görebilme",
+          "Sana verilen puanların detaylarını görebilme (kimlikler gizli)",
           "Diğerlerine Konum paylaşabilme",
         ],
       },
@@ -784,7 +794,7 @@ export const tr: Dictionary = {
         trial: "İlk hafta ücretsiz",
         perks: [
           "Silver'daki her şey",
-          "Sana yapılan değerlendirmeler artık anonim değil !",
+          "Seni değerlendirenlerin kimliği artık gizli değil !",
         ],
       },
     },
@@ -840,7 +850,7 @@ export const tr: Dictionary = {
       "Bu değerlendirmeyi kimin yazdığını biz de sana söylemeyiz — bildirimin de kimliğini ona açmaz.",
     bodyUser: "Bildirimin gizlidir, karşı tarafa iletilmez.",
     bodyThread:
-      "Bildirimin gizlidir. Karşı taraf sana anonimse öyle kalır — bildirmek kimseyi açığa çıkarmaz.",
+      "Bildirimin gizlidir. Karşı tarafın kimliği sana gizliyse öyle kalır — bildirmek kimseyi açığa çıkarmaz.",
     notePlaceholder: "Kısaca ne olduğunu anlatabilirsin (isteğe bağlı)",
     submit: "Bildir",
     received: "Bildirimin alındı",
@@ -880,8 +890,7 @@ export const tr: Dictionary = {
       youBlocked:
         "Bu kişiyi engellemişsin. Değerlendirmek için engeli kaldırman gerek.",
       theyBlocked: "Bu kişiyi şu anda değerlendiremezsin.",
-      commentNotAllowed:
-        "{name} senden yazılı not kabul etmiyor. Notu boş bırak — puanların yine sayılır.",
+      notAccepting: "{name} şu anda senden değerlendirme kabul etmiyor.",
       notAllowedTrait: "“{label}” bu tanışıklık türünde değerlendirilemez.",
       notAllowedTag: "“{label}” etiketi bu tanışıklık türünde verilemez.",
     },

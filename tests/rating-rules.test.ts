@@ -3,7 +3,8 @@ import {
   canMessageRater,
   canSeeRaterIdentity,
   canSeeRatingContext,
-  commentAllowed,
+  ratingAllowed,
+  RATING_POLICIES,
   cooldownDaysLeft,
   nextUpdateDate,
 } from "@/lib/rating-rules";
@@ -83,30 +84,52 @@ describe("rater identity visibility", () => {
   });
 });
 
-describe("who may write a note", () => {
+/**
+ * Who may rate me at all (decided 2026-09-02, after App Review 1.2).
+ *
+ * The rated person's door: open, my circle, or closed. This used to close
+ * only the written note while anyone could still score; now it closes the
+ * whole rating. Like the other two rules it breaks silently — a paused
+ * profile that still receives ratings looks perfectly normal on screen —
+ * so the values and the fallback are pinned here.
+ */
+describe("who may rate me", () => {
   const nobody = { invited: false, friends: false };
+  const circle = { invited: true, friends: false };
 
   it("is open to everyone by default", () => {
-    expect(commentAllowed("EVERYONE", nobody)).toBe(true);
+    expect(ratingAllowed("EVERYONE", nobody)).toBe(true);
   });
 
   it("lets either half of the circle through in CIRCLE mode", () => {
-    expect(commentAllowed("CIRCLE", nobody)).toBe(false);
-    expect(commentAllowed("CIRCLE", { invited: true, friends: false })).toBe(true);
-    expect(commentAllowed("CIRCLE", { invited: false, friends: true })).toBe(true);
+    expect(ratingAllowed("CIRCLE", nobody)).toBe(false);
+    expect(ratingAllowed("CIRCLE", circle)).toBe(true);
+    expect(ratingAllowed("CIRCLE", { invited: false, friends: true })).toBe(true);
+  });
+
+  it("closes the door to everyone in NOBODY mode — the circle included", () => {
+    expect(ratingAllowed("NOBODY", nobody)).toBe(false);
+    expect(ratingAllowed("NOBODY", circle)).toBe(false);
+    expect(ratingAllowed("NOBODY", { invited: true, friends: true })).toBe(false);
   });
 
   // Pre-merge spellings. Rows are migrated, but a stray value must still
   // deny the way its owner meant, not fall open.
   it("honours the legacy INVITED and FRIENDS values", () => {
-    expect(commentAllowed("INVITED", { invited: true, friends: false })).toBe(true);
-    expect(commentAllowed("INVITED", { invited: false, friends: true })).toBe(false);
-    expect(commentAllowed("FRIENDS", { invited: false, friends: true })).toBe(true);
-    expect(commentAllowed("FRIENDS", nobody)).toBe(false);
+    expect(ratingAllowed("INVITED", circle)).toBe(true);
+    expect(ratingAllowed("INVITED", { invited: false, friends: true })).toBe(false);
+    expect(ratingAllowed("FRIENDS", { invited: false, friends: true })).toBe(true);
+    expect(ratingAllowed("FRIENDS", nobody)).toBe(false);
   });
 
   it("falls back to open on an unknown value rather than locking a profile", () => {
-    expect(commentAllowed("WHATEVER", nobody)).toBe(true);
+    expect(ratingAllowed("WHATEVER", nobody)).toBe(true);
+  });
+
+  // The settings screen offers exactly these; the action accepts exactly
+  // these. A fourth value in one place and not the other is a silent no-op.
+  it("offers exactly the three doors", () => {
+    expect([...RATING_POLICIES]).toEqual(["EVERYONE", "CIRCLE", "NOBODY"]);
   });
 });
 

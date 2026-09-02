@@ -20,7 +20,7 @@ export const en = {
     delete: "Delete",
     yes: "Yes, remove",
     no: "No, keep",
-    anonymous: "Anonymous",
+    anonymous: "Identity hidden",
     people: "people",
     person: "person",
     ratedBy: "Rated by",
@@ -65,7 +65,7 @@ export const en = {
     haveAccount: "I already have an account",
     points: [
       {
-        title: "Every rating is anonymous",
+        title: "Your identity stays hidden",
         body: "Nobody can see who wrote what.",
       },
       {
@@ -174,7 +174,7 @@ export const en = {
       "{n} more people from different circles makes your profile noticeably truer.",
     insightsTitle: "Which circles know you?",
     insightsBody:
-      "Circle breakdown, strongest sides and anonymous rating details.",
+      "Circle breakdown, strongest sides and rating details.",
     insightsCta: "Open the analysis",
   },
 
@@ -274,11 +274,14 @@ export const en = {
     noteBody: "Optional. A few honest words carry further than a score.",
     notePlaceholder:
       "e.g. Delivered what they promised on time, communicated very clearly.",
-    noteLocked: "Notes are closed on this profile",
-    noteLockedBody:
-      "{name} accepts written notes only from certain people. Your scores and Vibe Tags still count in full.",
+    pausedTitle: "{name} is not taking ratings right now",
+    pausedBody:
+      "This person has closed their profile to new ratings. They can reopen it from their settings whenever they like.",
+    circleOnlyTitle: "{name} only takes ratings from their circle",
+    circleOnlyBody:
+      "Only the people they invited and their friends can rate them. You can rate them once you are friends or joined through their invite.",
     privacyNote:
-      "🔒 Ratings are shown anonymously by default. If {name} is a Gold member, they can see who rated them. You may revise your rating <b>once a month</b>.",
+      "🔒 Your identity is hidden by default. If {name} is a Gold member, they can see who rated them. You may revise your rating <b>once a month</b>.",
     alreadyRated: "You have already rated this person.",
     alreadyRatedBody:
       "You may revise it once a month — you can edit again in <b>{n} days</b>.",
@@ -294,7 +297,7 @@ export const en = {
     successNew: "Thank you!",
     successUpdate: "Your rating was updated",
     successBody:
-      "{name} will now see one more of the good things their circle sees in them. Your rating was added <b>anonymously</b>.",
+      "{name} will now see one more of the good things their circle sees in them. Your rating was added with <b>your identity hidden</b>.",
     seeProfile: "See {name}’s profile",
     rateAnother: "Rate someone else",
     scoreWords: ["", "Weak", "So-so", "Good", "Very good", "Excellent"],
@@ -309,7 +312,9 @@ export const en = {
     strengths: "Strong sides",
     circles: "Which circles know them?",
     aiSummary: "AI summary",
-    anonNotes: "Anonymous notes",
+    anonNotes: "Notes from their circle",
+    notAccepting: "{name} is not taking ratings right now.",
+    circleOnly: "{name} only takes ratings from their circle.",
     fromCircle: "from their {group} circle",
     rateCta: "Rate {name}",
     updateCta: "Update my rating",
@@ -339,7 +344,7 @@ export const en = {
     detailed: "Detailed analysis",
     strongest: "STRONGEST VIBES",
     growth: "GROWTH AREAS",
-    anonDetails: "Anonymous rating details",
+    anonDetails: "Rating details",
     ratings: "Ratings",
     messageLocked: "🔒 Message rater · Silver",
     unlockWith: "Unlock with {plan}",
@@ -349,7 +354,7 @@ export const en = {
     goldKicker: "GOLD · VIBE IDENTITY",
     goldTitle: "See who rated you",
     goldBody:
-      "Who they are, how they know you and what they rated. Protected and hidden ratings always stay anonymous.",
+      "Who they are, how they know you and what they rated. Protected and hidden ratings always keep their identity hidden.",
     goldCta: "Go Gold",
     emptyTitle: "No data to analyse",
     emptyBody:
@@ -571,16 +576,16 @@ export const en = {
     how: [
       "Share the link — whoever opens it lands straight on your rating page.",
       "They pick how they know you; only criteria fitting that relationship open up.",
-      "Their answer is added anonymously; you never see who wrote what.",
+      "Their answer is added with their identity hidden; you never see who wrote what.",
     ],
     shareText:
-      "I'm on Vibe Tag as {name} — curious how you see me. Takes 30 seconds and your answer stays anonymous:",
+      "I'm on Vibe Tag as {name} — curious how you see me. Takes 30 seconds and your identity stays hidden:",
   },
 
   inviteLanding: {
     waiting: "{name} is waiting for a",
     waitingVibe: "Vibe",
-    body: "Pick how you know them and rate only what you observed in that relationship. Your answer stays <b>anonymous</b>.",
+    body: "Pick how you know them and rate only what you observed in that relationship. Your identity stays <b>hidden</b>.",
     peopleSay: "People say {name} is",
     points: [
       "You cannot rate without picking how you know them",
@@ -670,9 +675,9 @@ export const en = {
       "You can reply once this person writes to you. That keeps ratings from turning into an open channel.",
     blockedThread: "This conversation is closed because one of you blocked the other.",
     aboutRating: "About a rating you received",
-    anonymousPartner: "Anonymous rater",
+    anonymousPartner: "Rater · identity hidden",
     anonymousNote:
-      "This person rated you anonymously — you see the thread, not their identity.",
+      "This person rated you with their identity hidden — you see the thread, not who they are.",
     you: "You",
     unreadOne: "1 unread message",
     unreadMany: "{n} unread messages",
@@ -711,13 +716,18 @@ export const en = {
       "You used your free trial on {plan}. A trial is one per account, so this plan starts paid.",
     trialSpentShort: "Trial already used",
     privacy: "Privacy and safety",
-    whoCanComment: "Who can write you a note?",
-    whoCanCommentBody:
-      "Anyone can rate you — scores are open. This decides who may add a written note to their rating.",
+    whoCanRate: "Who can rate you?",
+    whoCanRateBody:
+      "Scores, Vibe Tags and written notes all follow this setting. Closing it never deletes what you already received — it keeps counting.",
     everyone: "Everyone",
-    everyoneHint: "Open notes",
-    circleOnly: "People I invited and my friends",
-    circleOnlyHint: "My circle only",
+    everyoneHint: "Every member of Vibe Tag",
+    circleOnly: "My circle only",
+    circleOnlyHint: "People I invited and my friends",
+    nobody: "Nobody",
+    nobodyHint: "Pause new ratings",
+    showComments: "Show my notes on my profile",
+    showCommentsBody:
+      "When off, only you see the notes written about you; nothing shows on your profile.",
     blocked: "People you blocked",
     blockedEmpty: "You have not blocked anyone.",
     account: "Account",
@@ -734,7 +744,7 @@ export const en = {
     deleteMismatch: "Type your username to confirm: {username}",
     privacyPoints: [
       {
-        title: "Anonymous Ratings",
+        title: "Hidden Identity",
         body: "Who wrote what never appears on profiles. Only Gold members can see who rated them.",
       },
       {
@@ -764,7 +774,7 @@ export const en = {
           "Create your Vibe profile",
           "Create your Vibe Score card",
           "Send and receive unlimited ratings",
-          "See the details of your ratings, anonymously",
+          "See the details of your ratings (identities hidden)",
           "Share your location with others",
         ],
       },
@@ -787,7 +797,7 @@ export const en = {
         trial: "First week free",
         perks: [
           "Everything in Silver",
-          "Ratings you receive are no longer anonymous!",
+          "Who rated you is no longer hidden!",
         ],
       },
     },
@@ -843,7 +853,7 @@ export const en = {
       "We will not tell you who wrote this rating — and your report does not reveal your identity to them either.",
     bodyUser: "Your report is confidential and is not passed to the other side.",
     bodyThread:
-      "Your report is confidential. If the other side is anonymous to you, it stays that way — reporting never reveals them.",
+      "Your report is confidential. If the other side's identity is hidden from you, it stays that way — reporting never reveals them.",
     notePlaceholder: "Briefly describe what happened (optional)",
     submit: "Report",
     received: "Your report was received",
@@ -883,8 +893,7 @@ export const en = {
       youBlocked:
         "You blocked this person. Remove the block to rate them.",
       theyBlocked: "You cannot rate this person right now.",
-      commentNotAllowed:
-        "{name} does not accept written notes from you. Clear the note — your scores still count.",
+      notAccepting: "{name} is not accepting a rating from you right now.",
       notAllowedTrait: "“{label}” cannot be rated in this relationship.",
       notAllowedTag: "“{label}” cannot be given in this relationship.",
     },

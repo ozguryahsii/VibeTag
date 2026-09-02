@@ -17,7 +17,8 @@ export type PublicUser = {
   emailVerifiedAt: Date | null;
   phoneVerifiedAt: Date | null;
   idVerifiedAt: Date | null;
-  commentPolicy: string;
+  ratingPolicy: string;
+  showComments: boolean;
   createdAt: Date;
 };
 
@@ -38,7 +39,8 @@ export async function getUserByUsername(
       emailVerifiedAt: true,
       phoneVerifiedAt: true,
       idVerifiedAt: true,
-      commentPolicy: true,
+      ratingPolicy: true,
+      showComments: true,
       createdAt: true,
     },
   });

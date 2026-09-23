@@ -38,6 +38,19 @@ export type RatingPolicy = "EVERYONE" | "CIRCLE" | "NOBODY";
 
 export const RATING_POLICIES: readonly RatingPolicy[] = ["EVERYONE", "CIRCLE", "NOBODY"];
 
+/**
+ * Which door needs saying so out loud.
+ *
+ * Closing a profile harms nobody and needs no ceremony. Opening it to
+ * everyone is the choice that lets strangers write about a real person, so
+ * it is the one that carries a consent text and is recorded when given
+ * (App Review 1.2, 2026-09-23). Kept here, beside the policy it guards, so
+ * the settings screen and the server action cannot disagree about it.
+ */
+export function needsOpenConsent(policy: string): boolean {
+  return policy === "EVERYONE";
+}
+
 export function ratingAllowed(
   policy: string,
   ctx: { invited: boolean; friends: boolean },

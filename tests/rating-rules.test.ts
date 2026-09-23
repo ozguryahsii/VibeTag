@@ -3,6 +3,7 @@ import {
   canMessageRater,
   canSeeRaterIdentity,
   canSeeRatingContext,
+  needsOpenConsent,
   ratingAllowed,
   RATING_POLICIES,
   cooldownDaysLeft,
@@ -130,6 +131,21 @@ describe("who may rate me", () => {
   // these. A fourth value in one place and not the other is a silent no-op.
   it("offers exactly the three doors", () => {
     expect([...RATING_POLICIES]).toEqual(["EVERYONE", "CIRCLE", "NOBODY"]);
+  });
+
+  /*
+   * Consent, and which door asks for it (decided 2026-09-23).
+   *
+   * A new account starts on CIRCLE; opening it to everyone is the one
+   * choice that lets strangers write about a real person, so it carries a
+   * consent text and is recorded. The dialog explains it, the server action
+   * enforces it, and both read this — a settings screen that asks while the
+   * action does not is a consent flow that consents to nothing.
+   */
+  it("asks for consent only on the open door", () => {
+    expect(needsOpenConsent("EVERYONE")).toBe(true);
+    expect(needsOpenConsent("CIRCLE")).toBe(false);
+    expect(needsOpenConsent("NOBODY")).toBe(false);
   });
 });
 

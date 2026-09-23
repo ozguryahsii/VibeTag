@@ -91,12 +91,24 @@ model User {
   /// gated only the free-text note; App Review read "anyone can score you"
   /// as a feature that objectifies real people, and they had a point. The
   /// note follows the rating: whoever may rate may also write.
-  ratingPolicy String @default("EVERYONE")
+  ///
+  /// The default closed on 2026-09-23, after App Review upheld the same
+  /// objection a second time: a setting somebody must find and change is
+  /// not consent, so a new account starts with its circle only — the people
+  /// it invited and its friends — and opening the door to everyone is a
+  /// decision its owner makes on purpose.
+  ratingPolicy String @default("CIRCLE")
+
+  /// When they consented, in as many words, to being rated by anyone at
+  /// all. Set the moment they choose EVERYONE and never cleared, so the
+  /// record survives them closing the door again.
+  openRatingConsentAt DateTime?
 
   /// Whether the notes people wrote about them appear on their public
   /// profile. Off hides the wall from everyone else; they still read every
-  /// note themselves on Insights.
-  showComments Boolean @default(true)
+  /// note themselves on Insights. Off by default for the same reason as
+  /// the policy above: nothing about a person is published until they say so.
+  showComments Boolean @default(false)
 
   /// Last language this person chose. The UI reads a cookie; a push
   /// notification has no request to read one from, so the choice is mirrored

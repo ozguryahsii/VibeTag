@@ -723,6 +723,12 @@ export const tr: Dictionary = {
     circleOnlyHint: "Davet ettiklerim ve arkadaşlarım",
     nobody: "Hiç kimse",
     nobodyHint: "Yeni değerlendirme almayı duraklat",
+    openConsentTitle: "Profilini herkese açıyorsun",
+    openConsentBody:
+      "Bunu açtığında Vibe Tag'deki tüm üyeler seni değerlendirebilir ve hakkında yazılı not bırakabilir. Değerlendirenlerin kimliği sana gizli kalır. İstediğin an buradan geri kapatabilirsin; kapatman o ana kadar aldığın değerlendirmeleri silmez.",
+    openConsentCheck:
+      "Okudum ve herkesin beni değerlendirmesine açık rıza veriyorum.",
+    openConsentConfirm: "Herkese aç",
     showComments: "Notlarımı profilimde göster",
     showCommentsBody:
       "Kapalıyken hakkında yazılan notları yalnızca sen görürsün; profilinde kimseye görünmez.",

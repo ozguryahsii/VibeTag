@@ -729,6 +729,12 @@ export const en = {
     circleOnlyHint: "People I invited and my friends",
     nobody: "Nobody",
     nobodyHint: "Pause new ratings",
+    openConsentTitle: "You are opening your profile to everyone",
+    openConsentBody:
+      "Every member of Vibe Tag will be able to rate you and leave a written note about you. Raters' identities stay hidden from you. You can close it again here at any time, and closing it never deletes the ratings you already received.",
+    openConsentCheck:
+      "I have read this and I explicitly consent to being rated by anyone.",
+    openConsentConfirm: "Open to everyone",
     showComments: "Show my notes on my profile",
     showCommentsBody:
       "When off, only you see the notes written about you; nothing shows on your profile.",

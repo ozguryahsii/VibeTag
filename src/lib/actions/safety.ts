@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { destroySession, requireUser } from "@/lib/auth";
 import { isReportReason } from "@/lib/moderation";
-import { RATING_POLICIES } from "@/lib/rating-rules";
+import { needsOpenConsent, RATING_POLICIES } from "@/lib/rating-rules";
 import { getDict } from "@/lib/i18n/server";
 import { fill } from "@/lib/i18n";
 
@@ -133,12 +133,23 @@ export async function reportAction(
 
 export async function setRatingPolicyAction(formData: FormData): Promise<void> {
   const me = await requireUser();
-  const policy = String(formData.get("ratingPolicy") ?? "EVERYONE");
+  const policy = String(formData.get("ratingPolicy") ?? "");
   if (!(RATING_POLICIES as readonly string[]).includes(policy)) return;
+
+  // The open door is the only one that needs consent, and the checkbox is
+  // what consent looks like. Checked here rather than only in the dialog:
+  // a form is a request, not a permission, and this particular request
+  // decides whether strangers may write about a person.
+  const consented = String(formData.get("consent") ?? "") === "1";
+  if (needsOpenConsent(policy) && !consented) return;
 
   await prisma.user.update({
     where: { id: me.id },
-    data: { ratingPolicy: policy },
+    data: {
+      ratingPolicy: policy,
+      // Never cleared afterwards: closing the door again does not unsay it.
+      ...(needsOpenConsent(policy) ? { openRatingConsentAt: new Date() } : {}),
+    },
   });
   revalidatePath("/settings");
 }

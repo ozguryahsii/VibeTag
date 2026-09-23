@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { logoutAction } from "@/lib/actions/auth";
 import { setRatingPolicyAction, setShowCommentsAction, toggleBlockAction } from "@/lib/actions/safety";
 import { ProfileEditor } from "@/components/ProfileEditor";
+import { RatingPolicyPicker } from "@/components/RatingPolicyPicker";
 import { PhotoVault } from "@/components/PhotoVault";
 import { mainPhotoId, photoLimit } from "@/lib/photos";
 import { canStartTrial, trialStateFor } from "@/lib/trial";
@@ -242,48 +243,10 @@ export default async function SettingsPage() {
             </p>
           </div>
 
-          {/* One column: three doors with a line of explanation each read
-              better stacked than squeezed side by side on a phone. */}
-          <div className="grid gap-2.5" data-testid="rating-policy">
-            {[
-              {
-                key: "EVERYONE",
-                label: d.settings.everyone,
-                hint: d.settings.everyoneHint,
-              },
-              {
-                key: "CIRCLE",
-                label: d.settings.circleOnly,
-                hint: d.settings.circleOnlyHint,
-              },
-              {
-                key: "NOBODY",
-                label: d.settings.nobody,
-                hint: d.settings.nobodyHint,
-              },
-            ].map((opt) => {
-              const active = user.ratingPolicy === opt.key;
-              return (
-                <form key={opt.key} action={setRatingPolicyAction}>
-                  <input type="hidden" name="ratingPolicy" value={opt.key} />
-                  <button
-                    type="submit"
-                    aria-pressed={active}
-                    className={`w-full rounded-[20px] p-3 text-left ${
-                      active ? "grad-ring" : "bg-cream border border-line"
-                    }`}
-                  >
-                    <span className="block text-[13px] font-bold">
-                      {opt.label}
-                    </span>
-                    <span className="block text-[11px] text-muted mt-0.5">
-                      {opt.hint}
-                    </span>
-                  </button>
-                </form>
-              );
-            })}
-          </div>
+          <RatingPolicyPicker
+            value={user.ratingPolicy}
+            action={setRatingPolicyAction}
+          />
         </Card>
 
         <Card className="mt-2.5 flex items-center gap-3">

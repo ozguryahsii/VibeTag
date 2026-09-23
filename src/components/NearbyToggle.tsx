@@ -77,7 +77,10 @@ export function NearbyToggle({ inShell = false }: { inShell?: boolean }) {
           onClick={ask}
           className="mt-3.5 h-11 w-full rounded-full grad-score text-white font-bold text-[13.5px]"
         >
-          {d.people.nearbyEnable}
+          {/* Neutral on purpose — this is the tap that raises the system
+              permission prompt, and a button that says "turn on" answers the
+              prompt's question before it is asked (App Review 5.1.1(iv)). */}
+          {d.people.nearbyContinue}
         </button>
       )}
 

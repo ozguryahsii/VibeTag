@@ -207,6 +207,7 @@ export const tr: Dictionary = {
     nearbyBody:
       "Konumunu tam olarak değil, kabaca saklarız ve yalnızca bu listeyi sıralamak için kullanırız. İstediğin an kapatabilirsin.",
     nearbyEnable: "Yakındakileri aç",
+    nearbyContinue: "Devam et",
     nearbyDisable: "Yakındakileri kapat",
     nearbyLockedTitle: "Yakınındakiler özelliği Premium bir özelliktir",
     nearbyLockedBody:

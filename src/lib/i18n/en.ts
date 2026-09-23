@@ -210,6 +210,10 @@ export const en = {
     nearbyBody:
       "We store your location roughly, never precisely, and only use it to sort this list. You can turn it off any time.",
     nearbyEnable: "Turn on nearby",
+    // The button that triggers the system permission prompt. App Review
+    // (5.1.1(iv), 2026-09-23) reads "Turn on" before a prompt as steering the
+    // answer; a neutral word leaves the decision where it belongs.
+    nearbyContinue: "Continue",
     nearbyDisable: "Turn off nearby",
     nearbyLockedTitle: "Nearby is a Premium feature",
     nearbyLockedBody:
